@@ -5,54 +5,76 @@
 <title>Ward Talkboard</title>
 
 <style>
+:root{
+--bg:#0b1020;
+--panel:#121a33;
+--tile:#1b2a57;
+--text:#f2f6ff;
+--accent:#76a7ff;
+--radius:22px;
+}
+
 body{
 margin:0;
-font-family:-apple-system;
-background:#0b1020;
-color:white;
+background:var(--bg);
+color:var(--text);
+font-family:-apple-system, system-ui;
 }
+
+/* ---------------- TABS ---------------- */
 
 header{
 display:flex;
-justify-content:space-around;
-padding:15px;
-background:#121a33;
+gap:14px;
+padding:18px;
+background:var(--panel);
+flex-wrap:wrap;
 }
 
-header button{
+.tab{
 flex:1;
-margin:5px;
-padding:20px;
+min-width:120px;
 font-size:22px;
-font-weight:bold;
+padding:18px 20px;
 border-radius:20px;
-border:none;
-background:#1b2a57;
+border:1px solid rgba(255,255,255,.18);
+background:transparent;
 color:white;
+font-weight:700;
 }
 
-.active{
-background:#2b7cff;
+.tab.active{
+border-color:var(--accent);
+box-shadow:0 0 0 3px rgba(118,167,255,.25) inset;
 }
+
+/* ---------------- GRID ---------------- */
 
 .grid{
 display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-padding:20px;
+grid-template-columns:repeat(2,1fr);
+gap:24px;
+padding:24px;
 }
 
+@media (min-width:900px){
+.grid{ grid-template-columns:repeat(3,1fr); }
+}
+
+/* ---------------- TILES ---------------- */
+
 .tile{
-height:180px;
-border-radius:30px;
+min-height:230px;
+border-radius:var(--radius);
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-font-size:24px;
-font-weight:bold;
+font-size:26px;
+font-weight:800;
 text-align:center;
 border:none;
+color:white;
 }
 
 .move{ background:#2fe6b3; color:black; }
@@ -61,9 +83,13 @@ border:none;
 .needs{ background:#ff6b6b; }
 
 .icon{
-font-size:60px;
-margin-bottom:10px;
+font-size:72px;
+margin-bottom:18px;
 }
+
+/* ---------------- SPEECH ---------------- */
+
+functionPlaceholder{}
 
 </style>
 </head>
@@ -71,10 +97,10 @@ margin-bottom:10px;
 <body>
 
 <header>
-<button onclick="show('move')" id="moveTab" class="active">Move</button>
-<button onclick="show('team')" id="teamTab">Team</button>
-<button onclick="show('equipment')" id="equipmentTab">Equipment</button>
-<button onclick="show('needs')" id="needsTab">Needs</button>
+<button class="tab active" onclick="show('move')" id="moveTab">Move</button>
+<button class="tab" onclick="show('team')" id="teamTab">Team</button>
+<button class="tab" onclick="show('equipment')" id="equipmentTab">Equipment</button>
+<button class="tab" onclick="show('needs')" id="needsTab">Needs</button>
 </header>
 
 <div id="content" class="grid"></div>
