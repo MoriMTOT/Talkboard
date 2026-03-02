@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ward Talkboard (iPad)</title>
+<style>
+:root{
+--bg:#0b1020; --panel:#121a33; --tile:#1b2a57; --tile2:#21346c;
+--text:#f2f6ff; --muted:#b7c3e6; --accent:#76a7ff; --danger:#ff6b6b;
+--radius:18px;
+}
+*{ box-sizing:border-box; }
+body{
+margin:0; background:var(--bg); color:var(--text);
+font-family:-apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+-webkit-font-smoothing:antialiased;
+padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
+}
+header{
+display:flex; align-items:flex-start; justify-content:space-between;
+gap:10px; padding:10px 6px 12px 6px;
+}
+.left{ display:flex; flex-direction:column; gap:2px; }
+.title{ font-size:18px; font-weight:800; letter-spacing:.2px; }
+.sub{ font-size:13px; color:var(--muted); }
+.controls{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+button, .chip{
+border:none; border-radius:999px; padding:10px 12px;
+background:var(--panel); color:var(--text); font-size:14px; font-weight:700;
+touch-action:manipulation;
+}
+button:active{ transform:scale(0.985); }
+.chip{ background:transparent; border:1px solid rgba(255,255,255,.15); }
+.chip.on{ border-color:var(--accent); box-shadow:0 0 0 2px rgba(118,167,255,.18) inset; }
+main{ max-width:1050px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+.saybar{
+background:var(--panel); border-radius:var(--radius); padding:12px;
+display:flex; gap:10px; align-items:center; justify-content:space-between;
+border:1px solid rgba(255,255,255,.08);
+}
+.saytext{ display:flex; flex-direction:column; gap:4px; }
+#message{ font-size:22px; font-weight:900; line-height:1.12; }
+#messageSmall{ font-size:13px; color:var(--muted); font-weight:650; }
+.saybtns{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.big{
+border-radius:16px; padding:12px 14px; background:var(--tile2);
+font-size:16px; font-weight:900;
+border:1px solid rgba(255,255,255,.10);
+min-width:110px;
+}
+.danger{ background:rgba(255,107,107,.20); border-color:rgba(255,107,107,.35); }
+.row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; }
+.tabbar{ display:flex; gap:8px; flex-wrap:wrap; }
+.tab{ background:transparent; border:1px solid rgba(255,255,255,.14); }
+.tab.on{
+border-color:var(--accent);
+box-shadow:0 0 0 2px rgba(118,167,255,.16) inset;
+}
+.grid{
+display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+}
+@media (min-width:700px){ .grid{ grid-template-columns:repeat(3, 1fr); } }
+@media (min-width:980px){ .grid{ grid-template-columns:repeat(4, 1fr); } }
+
+.tile{
+background:var(--tile);
+border-radius:var(--radius);
+border:1px solid rgba(255,255,255,.10);
+overflow:hidden;
+min-height:150px;
+display:flex; flex-direction:column;
+user-select:none; -webkit-user-select:none;
+touch-action:manipulation;
+}
+.img{
+flex:1;
+background-size:cover;
+background-position:center;
+display:flex; align-items:flex-end;
+padding:10px;
+position:relative;
+}
+.img::before{
+content:"";
+position:absolute; inset:0;
+background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.05));
+pointer-events:none;
+}
+.label{
+position:relative;
+font-size:18px; font-weight:950; letter-spacing:.2px;
+padding:10px 12px;
+background:rgba(0,0,0,.18);
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+max-width:100%;
+}
+.hint{
+padding:10px 12px 12px 12px;
+font-size:12px; color:rgba(242,246,255,.78);
+font-weight:650;
+}
+.footer{ color:var(--muted); font-size:12px; padding:6px 6px 16px 6px; }
+
+/* Edit overlay */
+.modalBack{
+position:fixed; inset:0; background:rgba(0,0,0,.55);
+display:none; align-items:center; justify-content:center;
+padding:16px; z-index:50;
+}
+.modal{
+width:min(560px, 100%);
+background:var(--panel);
+border:1px solid rgba(255,255,255,.12);
+border-radius:18px;
+padding:14px;
+}
+.modal h3{ margin:0 0 8px 0; font-size:16px; }
+.field{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+.field label{ font-size:12px; color:var(--muted); font-weight:700; }
+.field input[type="text"]{
+border-radius:12px; border:1px solid rgba(255,255,255,.14);
+background:#0e1530; color:var(--text);
+padding:12px; font-size:16px; font-weight:700;
+outline:none;
+}
+.modalBtns{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:12px; }
+.ghost{ background:transparent; border:1px solid rgba(255,255,255,.16); }
+</style>
+</head>
+<body>
+<header>
+<div class="left">
+<div class="title">Ward Talkboard</div>
+<div class="sub" id="subline">Tap a tile. It will speak.</div>
+</div>
+<div class="controls">
+<button class="chip" id="confirmChip" title="Tap twice to confirm speaking">Confirm</button>
+<button class="chip" id="soundChip" title="Speech on/off">Sound: On</button>
+<button class="chip" id="editChip" title="Edit tiles (add real photos)">Edit: Off</button>
+<button class="chip" id="resetBtn" title="Reset to default tiles">Reset</button>
+<button class="chip" id="clearBtn" title="Clear message">Clear</button>
+</div>
+</header>
+
+<main>
+<section class="saybar" aria-label="Message bar">
+<div class="saytext">
+<div id="message">Tap a picture</div>
+<div id="messageSmall">Use Confirm if accidental taps happen.</div>
+</div>
+<div class="saybtns">
+<button class="big" id="speakBtn">Speak</button>
+<button class="big danger" id="helpBtn">HELP</button>
+</div>
+</section>
+
+<section class="row">
+<div class="tabbar" id="tabs"></div>
+</section>
+
+<section class="grid" id="grid"></section>
+
+<div class="footer">
+iPad tip: Share → <b>Add to Home Screen</b> (works like an app icon).<br/>
+Edit mode lets you replace any tile with a real photo from the iPad.
+</div>
+</main>
+
+<!-- Edit Modal -->
+<div class="modalBack" id="modalBack" role="dialog" aria-modal="true">
+<div class="modal">
+<h3>Edit tile</h3>
+
+<div class="field">
+<label>Label (big text on tile)</label>
+<input type="text" id="editLabel" />
+</div>
+
+<div class="field">
+<label>Spoken phrase (what it says out loud)</label>
+<input type="text" id="editSay" />
+</div>
+
+<div class="field">
+<label>Photo (optional) — choose a real image</label>
+<input type="file" id="editFile" accept="image/*" />
+</div>
+
+<div class="modalBtns">
+<button class="ghost" id="cancelEdit">Cancel</button>
+<button class="ghost danger" id="removePhoto">Remove photo</button>
+<button id="saveEdit">Save</button>
+</div>
+</div>
+</div>
+
+<script>
+/* ---------- Simple built-in “photo-style” images (SVG data URIs) ---------- */
+function svgDataUri(svg){
+return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+const IMG = {
+yes: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a6d"/><stop offset="1" stop-color="#2f6cff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/><circle cx="610" cy="145" r="78" fill="#76a7ff" opacity=".25"/>
+<path d="M210 270l110 110 270-270" fill="none" stroke="#f2f6ff" stroke-width="70" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`),
+no: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#5a1020"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/><circle cx="180" cy="150" r="78" fill="#ffffff" opacity=".18"/>
+<path d="M260 170l280 280M540 170L260 450" stroke="#f2f6ff" stroke-width="70" stroke-linecap="round"/>
+</svg>`),
+help: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#30103f"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<path d="M400 90c-95 0-170 52-170 130 0 55 35 89 88 110 25 10 32 20 32 45v10h100v-18c0-62-22-82-58-96-28-11-52-24-52-51 0-30 25-50 63-50 36 0 60 18 70 48l90-30C545 128 485 90 400 90z" fill="#f2f6ff"/>
+<circle cx="400" cy="420" r="38" fill="#f2f6ff"/>
+</svg>`),
+bed: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b2a3a"/><stop offset="1" stop-color="#2b7cff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<rect x="120" y="250" width="560" height="120" rx="22" fill="#f2f6ff" opacity=".9"/>
+<rect x="120" y="200" width="220" height="90" rx="22" fill="#f2f6ff" opacity=".9"/>
+<rect x="120" y="370" width="560" height="28" rx="14" fill="#76a7ff" opacity=".55"/>
+<rect x="145" y="398" width="36" height="60" rx="10" fill="#f2f6ff" opacity=".85"/>
+<rect x="619" y="398" width="36" height="60" rx="10" fill="#f2f6ff" opacity=".85"/>
+</svg>`),
+sit: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#10203a"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="300" cy="160" r="55" fill="#f2f6ff"/>
+<path d="M280 230c0-50 40-80 90-80h10" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
+<path d="M370 190v140h150" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="470" y="290" width="190" height="40" rx="18" fill="#f2f6ff"/>
+<rect x="470" y="330" width="50" height="110" rx="18" fill="#f2f6ff"/>
+</svg>`),
+stand: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a2a"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="380" cy="145" r="55" fill="#f2f6ff"/>
+<path d="M380 205v170" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
+<path d="M380 265l-90 90M380 265l90 90" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
+<path d="M380 230l-90 40M380 230l90 40" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
+<rect x="180" y="420" width="440" height="26" rx="13" fill="#f2f6ff" opacity=".55"/>
+</svg>`),
+oob: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b1b3a"/><stop offset="1" stop-color="#ffcf5a"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<rect x="120" y="280" width="380" height="90" rx="20" fill="#f2f6ff" opacity=".85"/>
+<rect x="120" y="240" width="180" height="70" rx="20" fill="#f2f6ff" opacity=".85"/>
+<path d="M520 180l130 0 0 60" stroke="#f2f6ff" stroke-width="34" stroke-linecap="round"/>
+<path d="M610 160l60 50-60 50" fill="none" stroke="#f2f6ff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="610" cy="400" r="56" fill="#f2f6ff"/>
+<rect x="580" y="280" width="60" height="110" rx="25" fill="#f2f6ff"/>
+</svg>`),
+rest: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#6b7cff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<path d="M250 320c0-80 65-145 145-145 45 0 85 20 112 52-18-6-37-9-58-9-80 0-145 65-145 145 0 35 13 67 34 92-53-18-88-69-88-135z" fill="#f2f6ff" opacity=".92"/>
+<path d="M520 120l30 30-30 30h60l30 30-30 30" fill="none" stroke="#f2f6ff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+</svg>`),
+nurse: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a6d"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="400" cy="165" r="70" fill="#f2f6ff"/>
+<path d="M250 420c15-110 95-170 150-170s135 60 150 170" fill="#f2f6ff" opacity=".9"/>
+<rect x="335" y="85" width="130" height="55" rx="18" fill="#0b1020" opacity=".25"/>
+<path d="M400 98v30M385 113h30" stroke="#f2f6ff" stroke-width="10" stroke-linecap="round"/>
+</svg>`),
+doctor: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b2a57"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="330" cy="165" r="70" fill="#f2f6ff"/>
+<path d="M220 420c12-120 80-180 160-180 90 0 150 60 160 180" fill="#f2f6ff" opacity=".9"/>
+<path d="M500 170c40 0 70 30 70 70 0 30-20 56-40 68v40" fill="none" stroke="#f2f6ff" stroke-width="20" stroke-linecap="round"/>
+<circle cx="530" cy="395" r="14" fill="#f2f6ff"/>
+</svg>`),
+ot: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a3a"/><stop offset="1" stop-color="#ffcf5a"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="300" cy="160" r="65" fill="#f2f6ff"/>
+<path d="M210 430c10-120 85-190 160-190 85 0 150 70 160 190" fill="#f2f6ff" opacity=".9"/>
+<path d="M520 190l120 120" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
+<path d="M600 185c0 40-32 72-72 72s-72-32-72-72 32-72 72-72 72 32 72 72z" fill="none" stroke="#f2f6ff" stroke-width="20" opacity=".85"/>
+</svg>`),
+pt: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#10203a"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="320" cy="155" r="65" fill="#f2f6ff"/>
+<path d="M220 420c10-120 85-190 160-190 85 0 150 70 160 190" fill="#f2f6ff" opacity=".9"/>
+<path d="M520 180l150 0" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
+<path d="M560 145v70" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
+</svg>`),
+sp: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#30103f"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="310" cy="165" r="65" fill="#f2f6ff"/>
+<path d="M215 420c10-120 85-190 160-190 85 0 150 70 160 190" fill="#f2f6ff" opacity=".9"/>
+<path d="M520 150c70 0 130 40 130 90s-60 90-130 90c-15 0-30-2-44-6l-46 32 12-54c-32-18-52-45-52-72 0-50 60-90 130-90z" fill="#f2f6ff" opacity=".9"/>
+</svg>`),
+wheelchair: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#2b7cff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="330" cy="165" r="55" fill="#f2f6ff"/>
+<path d="M330 220v115h160" stroke="#f2f6ff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="520" cy="360" r="92" fill="none" stroke="#f2f6ff" stroke-width="26"/>
+<circle cx="520" cy="360" r="18" fill="#f2f6ff"/>
+<path d="M520 360l60-50" stroke="#f2f6ff" stroke-width="18" stroke-linecap="round"/>
+<path d="M470 300h95" stroke="#f2f6ff" stroke-width="18" stroke-linecap="round"/>
+</svg>`),
+toilet: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b2a57"/><stop offset="1" stop-color="#ffcf5a"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<rect x="260" y="140" width="280" height="120" rx="28" fill="#f2f6ff" opacity=".95"/>
+<path d="M290 260h220c0 120-40 170-110 170s-110-50-110-170z" fill="#f2f6ff" opacity=".95"/>
+<rect x="520" y="170" width="40" height="70" rx="12" fill="#f2f6ff" opacity=".8"/>
+</svg>`),
+pain: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#5a1020"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<path d="M400 430s-170-110-170-230c0-55 45-100 100-100 30 0 58 14 75 36 17-22 45-36 75-36 55 0 100 45 100 100 0 120-170 230-170 230z" fill="#f2f6ff" opacity=".92"/>
+<path d="M520 110l30 40-46 10 30 35-45-6 10 45-40-25-20 40-10-45-45 6 30-35-46-10 30-40 35 25 10-45 25 38 25-38 10 45z" fill="#f2f6ff" opacity=".78"/>
+</svg>`),
+drink: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a6d"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<path d="M300 120h200l-30 300c-2 20-18 35-38 35h-64c-20 0-36-15-38-35l-30-300z" fill="#f2f6ff" opacity=".92"/>
+<path d="M520 170h40c40 0 70 30 70 70s-30 70-70 70h-20" fill="none" stroke="#f2f6ff" stroke-width="20" stroke-linecap="round"/>
+</svg>`),
+reposition: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#10203a"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<rect x="160" y="270" width="480" height="110" rx="22" fill="#f2f6ff" opacity=".92"/>
+<rect x="160" y="220" width="190" height="80" rx="22" fill="#f2f6ff" opacity=".92"/>
+<path d="M520 170c60 0 110 50 110 110" fill="none" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
+<path d="M610 280l40-30-10 50" fill="none" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`),
+stop: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#5a1020"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<path d="M400 110l150 90v200l-150 90-150-90V200l150-90z" fill="#f2f6ff" opacity=".92"/>
+<text x="400" y="320" text-anchor="middle" font-size="90" font-weight="900" fill="#5a1020">STOP</text>
+</svg>`),
+wait: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<circle cx="400" cy="260" r="160" fill="none" stroke="#f2f6ff" stroke-width="26" opacity=".95"/>
+<path d="M400 170v105l85 55" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`),
+again: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b2a57"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<path d="M520 165l90 0 0 90" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
+<path d="M610 165l-80 80" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
+<path d="M540 210c-40-40-105-55-160-35-90 33-135 132-102 222 33 90 132 135 222 102 38-14 70-40 90-73" fill="none" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
+</svg>`)
+};
+
+/* ---------- Default pages + items (what you asked + essentials) ---------- */
+const DEFAULT_PAGES = [
+{
+name: "Move",
+items: [
+{ img: IMG.bed, label: "In bed", say: "I want to stay in bed" },
+{ img: IMG.sit, label: "Sit", say: "I want to sit up" },
+{ img: IMG.stand, label: "Stand", say: "I want to stand" },
+{ img: IMG.oob, label: "Out of bed", say: "I want to get out of bed" },
+{ img: IMG.rest, label: "Rest", say: "I need a rest" },
+{ img: IMG.reposition, label: "Reposition", say: "Please help me change position" },
+{ img: IMG.wait, label: "Wait", say: "Please wait" },
+{ img: IMG.stop, label: "Stop", say: "Stop please" }
+]
+},
+{
+name: "Team",
+items: [
+{ img: IMG.nurse, label: "Nurse", say: "I want the nurse please" },
+{ img: IMG.doctor, label: "Doctor", say: "I want the doctor please" },
+{ img: IMG.ot, label: "OT", say: "I want occupational therapy please" },
+{ img: IMG.pt, label: "PT", say: "I want physiotherapy please" },
+{ img: IMG.sp, label: "SP", say: "I want speech pathology please" },
+{ img: IMG.help, label: "Call help", say: "I need help now" },
+{ img: IMG.again, label: "Again", say: "Please say that again" },
+{ img: IMG.wait, label: "Later", say: "Later please" }
+]
+},
+{
+name: "Equipment",
+items: [
+{ img: IMG.wheelchair, label: "Wheelchair", say: "I want my wheelchair" },
+{ img: IMG.bed, label: "Bed", say: "I want the bed adjusted" },
+{ img: IMG.reposition, label: "Pillows", say: "I need pillows adjusted" },
+{ img: IMG.help, label: "Call bell", say: "Please use the call bell" },
+{ img: IMG.stop, label: "Too fast", say: "Please slow down" },
+{ img: IMG.wait, label: "Hold", say: "Hold on please" },
+{ img: IMG.yes, label: "Yes", say: "Yes" },
+{ img: IMG.no, label: "No", say: "No" }
+]
+},
+{
+name: "Needs",
+items: [
+{ img: IMG.toilet, label: "Toilet", say: "I need the toilet" },
+{ img: IMG.drink, label: "Drink", say: "I want a drink" },
+{ img: IMG.pain, label: "Pain", say: "I have pain" },
+{ img: IMG.help, label: "Help", say: "I need help now" },
+{ img: IMG.yes, label: "Yes", say: "Yes" },
+{ img: IMG.no, label: "No", say: "No" },
+{ img: IMG.again, label: "Again", say: "Again please" },
+{ img: IMG.wait, label: "Wait", say: "Please wait" }
+]
+}
+];
+
+/* ---------- State ---------- */
+let pages = loadSavedPages() || structuredClone(DEFAULT_PAGES);
+let currentPage = 0;
+let confirmMode = false;
+let soundOn = true;
+let editMode = false;
+let pending = null;
+
+const messageEl = document.getElementById("message");
+const messageSmallEl = document.getElementById("messageSmall");
+const sublineEl = document.getElementById("subline");
+const gridEl = document.getElementById("grid");
+const tabsEl = document.getElementById("tabs");
+
+const confirmChip = document.getElementById("confirmChip");
+const soundChip = document.getElementById("soundChip");
+const editChip = document.getElementById("editChip");
+const resetBtn = document.getElementById("resetBtn");
+const clearBtn = document.getElementById("clearBtn");
+const speakBtn = document.getElementById("speakBtn");
+const helpBtn = document.getElementById("helpBtn");
+
+/* ---------- Speech ---------- */
+function speak(text){
+if(!soundOn) return;
+try{
+window.speechSynthesis.cancel();
+const u = new SpeechSynthesisUtterance(text);
+u.rate = 0.95; // slightly slower
+u.pitch = 1.0;
+window.speechSynthesis.speak(u);
+}catch(e){
+console.log(e);
+}
+}
+
+/* ---------- UI ---------- */
+function setMessage(text, small=""){
+messageEl.textContent = text || "…";
+messageSmallEl.textContent = small;
+}
+
+function renderTabs(){
+tabsEl.innerHTML = "";
+pages.forEach((p, idx) => {
+const b = document.createElement("button");
+b.className = "tab chip" + (idx===currentPage ? " on" : "");
+b.textContent = p.name;
+b.onclick = () => { currentPage = idx; pending=null; render(); };
+tabsEl.appendChild(b);
+});
+}
+
+function renderGrid(){
+gridEl.innerHTML = "";
+const items = pages[currentPage].items;
+
+items.forEach((item, idx) => {
+const tile = document.createElement("div");
+tile.className = "tile";
+tile.setAttribute("role","button");
+tile.setAttribute("tabindex","0");
+
+const img = document.createElement("div");
+img.className = "img";
+img.style.backgroundImage = `url('${item.img}')`;
+
+const label = document.createElement("div");
+label.className = "label";
+label.textContent = item.label;
+
+img.appendChild(label);
+
+const hint = document.createElement("div");
+hint.className = "hint";
+hint.textContent = editMode
+? "Tap to edit photo/phrase"
+: (confirmMode ? "Tap twice to speak" : "Tap to speak");
+
+tile.appendChild(img);
+tile.appendChild(hint);
+
+tile.onclick = () => {
+if(editMode){
+openEditModal(currentPage, idx);
+return;
+}
+
+if(confirmMode){
+if(pending && pending.p === currentPage && pending.i === idx){
+pending = null;
+setMessage(item.say, "");
+speak(item.say);
+}else{
+pending = { p: currentPage, i: idx };
+setMessage(item.label, "Tap again to confirm");
+speak(item.label);
+}
+}else{
+pending = null;
+setMessage(item.say, "");
+speak(item.say);
+}
+};
+
+gridEl.appendChild(tile);
+});
+}
+
+function render(){
+renderTabs();
+renderGrid();
+
+sublineEl.textContent = editMode
+? "Edit mode: tap a tile to add a real photo / change phrase."
+: (confirmMode ? "Tap once to select. Tap again to speak." : "Tap a tile. It will speak.");
+
+confirmChip.classList.toggle("on", confirmMode);
+soundChip.classList.toggle("on", soundOn);
+editChip.classList.toggle("on", editMode);
+
+soundChip.textContent = soundOn ? "Sound: On" : "Sound: Off";
+editChip.textContent = editMode ? "Edit: On" : "Edit: Off";
+}
+
+/* ---------- Storage ---------- */
+function savePages(){
+try{ localStorage.setItem("wardTalkboard.pages.v1", JSON.stringify(pages)); }catch(e){}
+}
+function loadSavedPages(){
+try{
+const raw = localStorage.getItem("wardTalkboard.pages.v1");
+return raw ? JSON.parse(raw) : null;
+}catch(e){ return null; }
+}
+
+/* ---------- Controls ---------- */
+confirmChip.onclick = () => { confirmMode = !confirmMode; pending=null; render(); };
+soundChip.onclick = () => { soundOn = !soundOn; render(); if(soundOn) speak("Sound on"); };
+editChip.onclick = () => { editMode = !editMode; pending=null; render(); };
+clearBtn.onclick = () => { pending=null; setMessage("…",""); window.speechSynthesis.cancel(); };
+speakBtn.onclick = () => { speak(messageEl.textContent === "…" ? " " : messageEl.textContent); };
+helpBtn.onclick = () => { pending=null; setMessage("I need help now",""); speak("I need help now"); };
+
+resetBtn.onclick = () => {
+pages = structuredClone(DEFAULT_PAGES);
+savePages();
+pending=null;
+setMessage("Reset done", "Default tiles restored.");
+speak("Reset done");
+render();
+};
+
+/* ---------- Edit Modal ---------- */
+const modalBack = document.getElementById("modalBack");
+const editLabel = document.getElementById("editLabel");
+const editSay = document.getElementById("editSay");
+const editFile = document.getElementById("editFile");
+const cancelEdit = document.getElementById("cancelEdit");
+const saveEditBtn = document.getElementById("saveEdit");
+const removePhotoBtn = document.getElementById("removePhoto");
+
+let editing = null;
+
+function openEditModal(pageIndex, itemIndex){
+editing = { p: pageIndex, i: itemIndex };
+const item = pages[pageIndex].items[itemIndex];
+editLabel.value = item.label || "";
+editSay.value = item.say || "";
+editFile.value = "";
+modalBack.style.display = "flex";
+}
+
+function closeEditModal(){
+modalBack.style.display = "none";
+editing = null;
+}
+
+cancelEdit.onclick = () => closeEditModal();
+
+removePhotoBtn.onclick = () => {
+if(!editing) return;
+const item = pages[editing.p].items[editing.i];
+// If you removed a custom photo, revert to a reasonable default look:
+// keep current image if it's one of our IMG, otherwise set a neutral background.
+item.img = item.img.startsWith("data:image/svg+xml") ? item.img : IMG.help;
+savePages();
+setMessage("Photo removed", "");
+render();
+closeEditModal();
+};
+
+saveEditBtn.onclick = async () => {
+if(!editing) return;
+const item = pages[editing.p].items[editing.i];
+
+item.label = (editLabel.value || "").trim() || item.label;
+item.say = (editSay.value || "").trim() || item.say;
+
+// If a file selected, convert to base64 data URL and store.
+const file = editFile.files && editFile.files[0];
+if(file){
+const dataUrl = await fileToDataUrl(file, 1200); // resize-ish for storage
+item.img = dataUrl;
+}
+
+pages[editing.p].items[editing.i] = item;
+savePages();
+setMessage("Saved", item.say);
+speak("Saved");
+render();
+closeEditModal();
+};
+
+modalBack.addEventListener("click", (e) => {
+if(e.target === modalBack) closeEditModal();
+});
+
+function fileToDataUrl(file, maxWidth){
+return new Promise((resolve, reject) => {
+const reader = new FileReader();
+reader.onerror = reject;
+reader.onload = () => {
+const img = new Image();
+img.onload = () => {
+// Simple resize to reduce storage (keeps aspect ratio).
+const scale = Math.min(1, maxWidth / img.width);
+const w = Math.round(img.width * scale);
+const h = Math.round(img.height * scale);
+
+const canvas = document.createElement("canvas");
+canvas.width = w; canvas.height = h;
+const ctx = canvas.getContext("2d");
+ctx.drawImage(img, 0, 0, w, h);
+
+// JPEG is smaller than PNG for photos.
+resolve(canvas.toDataURL("image/jpeg", 0.85));
+};
+img.onerror = reject;
+img.src = reader.result;
+};
+reader.readAsDataURL(file);
+});
+}
+
+/* ---------- Start ---------- */
+setMessage("Tap a picture", "You can switch to Confirm or add real photos in Edit mode.");
+render();
+</script>
+</body>
+</html>
