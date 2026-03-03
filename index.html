@@ -691,9 +691,18 @@ b.style.border = "none";
 }
 
 // run now + again after page builds (chips are dynamic)
+// Run once now
 colourPageChips();
-setTimeout(colourPageChips, 300);
-setTimeout(colourPageChips, 1000);
+
+// Re-apply colours whenever anything is clicked (after the app re-renders)
+document.addEventListener("click", () => {
+setTimeout(colourPageChips, 0);
+setTimeout(colourPageChips, 50);
+});
+
+// Also keep it alive in case of other re-renders
+setInterval(colourPageChips, 500);
+
 </script>
 </body>
 </html>
