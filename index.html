@@ -662,6 +662,38 @@ reader.readAsDataURL(file);
 /* ---------- Start ---------- */
 setMessage("Tap a picture", "You can switch to Confirm or add real photos in Edit mode.");
 render();
+  // --- Colour the 4 page chips (Move/Team/Equipment/Needs) by their text ---
+function colourPageChips(){
+document.querySelectorAll('button.chip').forEach(b=>{
+const t = (b.textContent || "").trim().toLowerCase();
+
+if(t === "move"){
+b.style.background = "#2b7cff"; // blue
+b.style.color = "white";
+b.style.border = "none";
+}
+if(t === "team"){
+b.style.background = "#2fe6b3"; // green
+b.style.color = "white";
+b.style.border = "none";
+}
+if(t === "equipment"){
+b.style.background = "#ffd43b"; // yellow
+b.style.color = "black"; // readable
+b.style.border = "none";
+}
+if(t === "needs"){
+b.style.background = "#ff4d4f"; // red
+b.style.color = "white";
+b.style.border = "none";
+}
+});
+}
+
+// run now + again after page builds (chips are dynamic)
+colourPageChips();
+setTimeout(colourPageChips, 300);
+setTimeout(colourPageChips, 1000);
 </script>
 </body>
 </html>
