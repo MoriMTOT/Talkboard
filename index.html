@@ -707,6 +707,64 @@ setTimeout(colourPageChips, 50);
 
 // Also keep it alive in case of other re-renders
 setInterval(colourPageChips, 500);
+/* ---- Clear medical pictogram icons ---- */
+
+function replaceIcons(){
+
+const icons = {
+"sit":"https://static.arasaac.org/pictograms/1626/1626_500.png",
+"stand":"https://static.arasaac.org/pictograms/2141/2141_500.png",
+"out of bed":"https://static.arasaac.org/pictograms/26291/26291_500.png",
+"in bed":"https://static.arasaac.org/pictograms/3769/3769_500.png",
+"rest":"https://static.arasaac.org/pictograms/2896/2896_500.png",
+"stop":"https://static.arasaac.org/pictograms/1086/1086_500.png",
+
+"nurse":"https://static.arasaac.org/pictograms/2401/2401_500.png",
+"doctor":"https://static.arasaac.org/pictograms/2399/2399_500.png",
+"ot":"https://static.arasaac.org/pictograms/3314/3314_500.png",
+"pt":"https://static.arasaac.org/pictograms/2462/2462_500.png",
+"sp":"https://static.arasaac.org/pictograms/2994/2994_500.png",
+
+"wheelchair":"https://static.arasaac.org/pictograms/1208/1208_500.png",
+"call":"https://static.arasaac.org/pictograms/2666/2666_500.png",
+"toilet":"https://static.arasaac.org/pictograms/2522/2522_500.png",
+
+"drink":"https://static.arasaac.org/pictograms/2348/2348_500.png",
+"water":"https://static.arasaac.org/pictograms/2348/2348_500.png",
+"food":"https://static.arasaac.org/pictograms/2416/2416_500.png",
+"pain":"https://static.arasaac.org/pictograms/319/319_500.png",
+"help":"https://static.arasaac.org/pictograms/2682/2682_500.png"
+};
+
+document.querySelectorAll(".tile").forEach(tile=>{
+const label = tile.innerText.toLowerCase();
+
+Object.keys(icons).forEach(key=>{
+if(label.includes(key)){
+const img = document.createElement("img");
+img.src = icons[key];
+img.style.width = "90%";
+img.style.height = "90%";
+img.style.objectFit = "contain";
+
+tile.innerHTML = "";
+tile.appendChild(img);
+
+const text = document.createElement("div");
+text.innerText = key;
+text.style.fontSize = "14px";
+text.style.marginTop = "4px";
+
+tile.appendChild(text);
+}
+});
+
+});
+
+}
+
+setTimeout(replaceIcons,500);
+setTimeout(replaceIcons,1500);
 
 </script>
 </body>
