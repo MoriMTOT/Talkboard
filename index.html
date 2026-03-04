@@ -578,24 +578,100 @@ grid.appendChild(el);
 }
 
 /* =================== EDIT MODE =================== */
-function editTile(tile){
-const newLabel = prompt("Button name:", tile.label);
-if(newLabel !== null && newLabel.trim() !== ""){
-tile.label = newLabel.trim();
+function renderPainBar(){
+painBar.innerHTML = "";
+painBar.classList.add("on");
+
+// wrapper
+painBar.style.display = "flex";
+painBar.style.gap = "6px";
+painBar.style.alignItems = "stretch";
+
+// Add a label strip above (optional but clearer)
+// If you don't want it, delete these 7 lines.
+const topHint = document.createElement("div");
+topHint.style.width = "100%";
+topHint.style.display = "flex";
+topHint.style.justifyContent = "space-between";
+topHint.style.marginBottom = "8px";
+topHint.style.color = "rgba(243,246,255,.85)";
+topHint.style.fontWeight = "900";
+topHint.innerHTML = `<span>No pain</span><span>Worst pain</span>`;
+// Insert as first item by temporarily switching to column layout
+painBar.style.flexDirection = "column";
+painBar.appendChild(topHint);
+
+const row = document.createElement("div");
+row.style.display = "flex";
+row.style.gap = "6px";
+row.style.width = "100%";
+row.style.alignItems = "stretch";
+row.style.flexDirection = "row";
+painBar.appendChild(row);
+
+function faceSVG(level){
+const S = `fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"`;
+if(level===0){
+return `<svg viewBox="0 0 256 256" width="26" height="26">
+<circle ${S} cx="128" cy="128" r="90"/>
+<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
+<path ${S} d="M92 162h72"/>
+</svg>`;
+}
+if(level===5){
+return `<svg viewBox="0 0 256 256" width="26" height="26">
+<circle ${S} cx="128" cy="128" r="90"/>
+<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
+<path ${S} d="M92 170c16-12 56-12 72 0"/>
+</svg>`;
+}
+// 10
+return `<svg viewBox="0 0 256 256" width="26" height="26">
+<circle ${S} cx="128" cy="128" r="90"/>
+<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
+<path ${S} d="M92 178c18-20 54-20 72 0"/>
+</svg>`;
 }
 
-const newSay = prompt("What it should say:", tile.say);
-if(newSay !== null && newSay.trim() !== ""){
-tile.say = newSay.trim();
+for(let n=0; n<=10; n++){
+const b = document.createElement("button");
+b.className = "painBtn";
+b.type = "button";
+
+// colour gradient (green → yellow → orange → red)
+b.style.background = painColor(n);
+
+// make them look like a bar segment
+b.style.borderRadius = (n===0) ? "14px 0 0 14px" : (n===10 ? "0 14px 14px 0" : "0");
+b.style.flex = "1 1 0";
+b.style.display = "flex";
+b.style.alignItems = "center";
+b.style.justifyContent = "center";
+b.style.gap = "6px";
+
+// Add faces only at 0, 5, 10
+if(n===0 || n===5 || n===10){
+const wrap = document.createElement("span");
+wrap.innerHTML = faceSVG(n);
+b.appendChild(wrap);
 }
 
-pendingEditTile = tile;
-setTimeout(()=> filePick.click(), 80);
+const t = document.createElement("span");
+t.textContent = String(n);
+t.style.fontWeight = "950";
+t.style.fontSize = "20px";
+b.appendChild(t);
 
-saveAll();
-render();
-showToast("Saved text (photo optional)");
+b.addEventListener("click", ()=>{
+speak(`My pain is ${n}`);
+[...row.children].forEach(x=>x.classList.remove("active"));
+b.classList.add("active");
+});
+
+row.appendChild(b);
 }
+}
+
 
 filePick.addEventListener("change", async (e)=>{
 const file = e.target.files && e.target.files[0];
