@@ -26,14 +26,14 @@
 --ctrlPadX:14px;
 
 /* Tiles */
---tileMinH:160px; /* smaller = less vertical scrolling */
---labelFont:26px; /* bigger label */
---iconSize:58px; /* ✅ half size */
+--tileMinH:160px;
+--labelFont:26px;
+--iconSize:58px; /* half size */
 --gap:14px;
 --radius:18px;
 
 /* Pain bar */
---painFont:22px;
+--painFont:20px;
 --painMinH:56px;
 }
 
@@ -116,13 +116,12 @@ main{
 padding:14px 14px calc(14px + env(safe-area-inset-bottom));
 }
 
-/* ✅ 3 columns (less scrolling) */
+/* 3 columns (less scrolling) */
 .grid{
 display:grid;
 grid-template-columns:repeat(3, 1fr);
 gap:var(--gap);
 }
-/* On very small screens, keep 2 */
 @media (max-width: 520px){
 .grid{ grid-template-columns:repeat(2, 1fr); }
 }
@@ -140,11 +139,11 @@ touch-action:manipulation;
 }
 
 .tile.yesTile{
-background:linear-gradient(180deg, rgba(47,230,179,.26), rgba(16,34,71,1));
+background:linear-gradient(180deg, rgba(47,230,179,.22), rgba(16,34,71,1));
 border-color:rgba(47,230,179,.42);
 }
 .tile.noTile{
-background:linear-gradient(180deg, rgba(255,77,79,.26), rgba(16,34,71,1));
+background:linear-gradient(180deg, rgba(255,77,79,.22), rgba(16,34,71,1));
 border-color:rgba(255,77,79,.42);
 }
 
@@ -216,21 +215,26 @@ z-index:50;
 
 #filePick{display:none}
 
-/* Pain scale: one line */
-.painBar{
-display:none;
-gap:10px;
-align-items:stretch;
+/* Pain scale (one line) */
+.painWrap{ display:none; margin-bottom:14px; }
+.painWrap.on{ display:block; }
+.painTop{
+display:flex;
 justify-content:space-between;
-flex-wrap:nowrap;
-overflow:hidden;
-margin-bottom:14px;
+margin-bottom:8px;
+color:rgba(243,246,255,.85);
+font-weight:900;
+font-size:14px;
 }
-.painBar.on{ display:flex; }
+.painRow{
+display:flex;
+gap:6px;
+width:100%;
+}
 .painBtn{
 flex:1 1 0;
 min-height:var(--painMinH);
-border-radius:14px;
+border-radius:0;
 border:1px solid rgba(255,255,255,.14);
 background:rgba(255,255,255,.06);
 color:var(--text);
@@ -239,10 +243,90 @@ font-size:var(--painFont);
 touch-action:manipulation;
 user-select:none;
 -webkit-user-select:none;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:6px;
+padding:0;
 }
+.painBtn.left{ border-radius:14px 0 0 14px; }
+.painBtn.right{ border-radius:0 14px 14px 0; }
 .painBtn.active{
 box-shadow:0 0 0 4px rgba(255,255,255,.14) inset;
 border-color:rgba(255,255,255,.28);
+}
+
+/* EDIT PANEL (reliable on iPad) */
+.modal{
+position:fixed; inset:0;
+background:rgba(0,0,0,.55);
+display:none;
+align-items:flex-end;
+justify-content:center;
+z-index:100;
+padding:12px 12px calc(12px + env(safe-area-inset-bottom));
+}
+.modal.on{ display:flex; }
+.sheet{
+width:min(720px, 100%);
+background:rgba(18,26,51,.98);
+border:1px solid rgba(255,255,255,.16);
+border-radius:20px;
+padding:14px;
+}
+.sheet h3{
+margin:0 0 10px 0;
+font-size:16px;
+color:rgba(243,246,255,.85);
+letter-spacing:.2px;
+}
+.field{
+display:flex;
+flex-direction:column;
+gap:6px;
+margin-bottom:10px;
+}
+.field label{
+font-size:13px;
+color:rgba(243,246,255,.75);
+font-weight:800;
+}
+.field input{
+height:44px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,.14);
+background:rgba(255,255,255,.06);
+color:var(--text);
+padding:0 12px;
+font-size:16px;
+font-weight:700;
+outline:none;
+}
+.sheetActions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:flex-end;
+margin-top:10px;
+}
+.btn{
+border-radius:999px;
+border:1px solid rgba(255,255,255,.16);
+background:rgba(255,255,255,.08);
+color:var(--text);
+height:44px;
+padding:0 14px;
+font-weight:900;
+font-size:14px;
+touch-action:manipulation;
+}
+.btn.primary{
+border-color:rgba(118,167,255,.55);
+background:rgba(118,167,255,.14);
+}
+.btn.danger{
+border-color:rgba(255,77,79,.45);
+background:rgba(255,77,79,.14);
 }
 </style>
 </head>
@@ -251,7 +335,6 @@ border-color:rgba(255,255,255,.28);
 <header>
 <div class="row controls">
 <div class="title">Ward Talkboard</div>
-
 <button class="chip" id="confirmChip" type="button">Confirm</button>
 <button class="chip on" id="soundChip" type="button">Sound</button>
 <button class="chip" id="editChip" type="button">Edit</button>
@@ -267,19 +350,47 @@ border-color:rgba(255,255,255,.28);
 <button class="chip" id="pagePain" type="button">Pain</button>
 </div>
 
-<div class="hint">Tap a tile to speak. <b>Confirm</b> = double-tap. <b>Edit</b> = change label/phrase/photo. Yes/No at the end. Pain scale is one line.</div>
+<div class="hint">Edit ON → tap a tile → edit panel. Yes/No at the end. Pain scale is one line.</div>
 </header>
 
 <main>
-<div class="painBar" id="painBar"></div>
+<div class="painWrap" id="painWrap">
+<div class="painTop"><span>No pain</span><span>Worst pain</span></div>
+<div class="painRow" id="painRow"></div>
+</div>
+
 <div class="grid" id="grid"></div>
 </main>
 
 <div class="toast" id="toast">Saved</div>
 <input id="filePick" type="file" accept="image/*" />
 
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+<div class="sheet">
+<h3>Edit button</h3>
+
+<div class="field">
+<label for="editLabel">Button name</label>
+<input id="editLabel" autocomplete="off" />
+</div>
+
+<div class="field">
+<label for="editSay">What it should say</label>
+<input id="editSay" autocomplete="off" />
+</div>
+
+<div class="sheetActions">
+<button class="btn" id="photoBtn" type="button">Choose photo</button>
+<button class="btn danger" id="removePhotoBtn" type="button">Remove photo</button>
+<button class="btn" id="cancelBtn" type="button">Cancel</button>
+<button class="btn primary" id="saveBtn" type="button">Save</button>
+</div>
+</div>
+</div>
+
 <script>
-/* =================== CLEAR SIMPLE ICONS (small) =================== */
+/* ===== Icons ===== */
 function iconSVG(name){
 const S = `fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"`;
 const icons = {
@@ -308,7 +419,7 @@ sp:`<svg viewBox="0 0 256 256"><path ${S} d="M44 78c0-18 14-32 32-32h104c18 0 32
 return icons[name] || icons.help;
 }
 
-/* =================== DEFAULT DATA =================== */
+/* ===== Defaults ===== */
 const DEFAULT = {
 move: [
 {id:"sit", label:"Sit", say:"I want to sit up", icon:"sit", photo:null},
@@ -348,23 +459,26 @@ const YES_NO_END = [
 {id:"no_fixed", label:"No", say:"No", icon:"no", photo:null, _fixed:true, _yn:"no"},
 ];
 
-const STORAGE_KEY = "wardTalkboard_v6";
+const STORAGE_KEY = "wardTalkboard_v7";
 
-/* =================== STATE =================== */
+/* ===== State ===== */
 let state = loadState();
 let currentPage = "move";
 let confirmMode = false;
 let soundOn = true;
 let editMode = false;
 
-let pendingEditTile = null;
 let confirmPendingId = null;
 let confirmTimer = null;
+
+let editingTile = null; // reference to tile currently being edited (not Yes/No)
 
 const grid = document.getElementById("grid");
 const toast = document.getElementById("toast");
 const filePick = document.getElementById("filePick");
-const painBar = document.getElementById("painBar");
+
+const painWrap = document.getElementById("painWrap");
+const painRow = document.getElementById("painRow");
 
 const confirmChip = document.getElementById("confirmChip");
 const soundChip = document.getElementById("soundChip");
@@ -378,7 +492,16 @@ const pageEquipment = document.getElementById("pageEquipment");
 const pageNeeds = document.getElementById("pageNeeds");
 const pagePain = document.getElementById("pagePain");
 
-/* =================== HELPERS =================== */
+/* Edit Modal elements */
+const editModal = document.getElementById("editModal");
+const editLabel = document.getElementById("editLabel");
+const editSay = document.getElementById("editSay");
+const photoBtn = document.getElementById("photoBtn");
+const removePhotoBtn = document.getElementById("removePhotoBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
+
+/* ===== Helpers ===== */
 function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
 
 function showToast(msg){
@@ -453,51 +576,151 @@ render();
 saveAll();
 }
 
-/* Yes/No at the END (not start). Pain page shows pain bar only. */
+/* Yes/No at the END. Pain uses pain bar only. */
 function tilesForPage(page){
 const base = state[page] || [];
-if(page === "pain") return []; // pain uses painBar only
+if(page === "pain") return [];
 return [...base, ...YES_NO_END];
 }
 
-/* =================== PAIN BAR (one line 0–10) =================== */
+/* ===== Pain bar ===== */
 function painColor(n){
-// gentle → strong (no emoji)
-if(n <= 2) return "rgba(47,230,179,.18)"; // green
-if(n <= 5) return "rgba(255,212,59,.18)"; // yellow
-if(n <= 7) return "rgba(255,140,0,.18)"; // orange-ish
-return "rgba(255,77,79,.18)"; // red
+if(n <= 2) return "rgba(47,230,179,.18)";
+if(n <= 5) return "rgba(255,212,59,.18)";
+if(n <= 7) return "rgba(255,140,0,.18)";
+return "rgba(255,77,79,.18)";
 }
-
+function faceSVG(level){
+const S = `fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"`;
+if(level===0){
+return `<svg viewBox="0 0 256 256" width="26" height="26">
+<circle ${S} cx="128" cy="128" r="90"/>
+<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
+<path ${S} d="M92 162h72"/>
+</svg>`;
+}
+if(level===5){
+return `<svg viewBox="0 0 256 256" width="26" height="26">
+<circle ${S} cx="128" cy="128" r="90"/>
+<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
+<path ${S} d="M92 170c16-12 56-12 72 0"/>
+</svg>`;
+}
+return `<svg viewBox="0 0 256 256" width="26" height="26">
+<circle ${S} cx="128" cy="128" r="90"/>
+<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
+<path ${S} d="M92 178c18-20 54-20 72 0"/>
+</svg>`;
+}
 function renderPainBar(){
-painBar.innerHTML = "";
-painBar.classList.add("on");
-
+painRow.innerHTML = "";
 for(let n=0; n<=10; n++){
 const b = document.createElement("button");
 b.className = "painBtn";
 b.type = "button";
-b.textContent = String(n);
 b.style.background = painColor(n);
+if(n===0) b.classList.add("left");
+if(n===10) b.classList.add("right");
+
+if(n===0 || n===5 || n===10){
+const span = document.createElement("span");
+span.innerHTML = faceSVG(n);
+b.appendChild(span);
+}
+
+const t = document.createElement("span");
+t.textContent = String(n);
+b.appendChild(t);
+
 b.addEventListener("click", ()=>{
-// speak pain level
 speak(`My pain is ${n}`);
-// highlight
-[...painBar.children].forEach(x=>x.classList.remove("active"));
+[...painRow.children].forEach(x=>x.classList.remove("active"));
 b.classList.add("active");
 });
-painBar.appendChild(b);
+
+painRow.appendChild(b);
 }
 }
 
-/* =================== RENDER =================== */
+/* ===== Edit modal ===== */
+function openEditor(tile){
+editingTile = tile;
+editLabel.value = tile.label || "";
+editSay.value = tile.say || "";
+editModal.classList.add("on");
+// focus label (nice for staff; harmless for patients)
+setTimeout(()=>editLabel.focus(), 80);
+}
+function closeEditor(){
+editModal.classList.remove("on");
+editingTile = null;
+}
+
+photoBtn.addEventListener("click", ()=>{
+if(!editingTile) return;
+filePick.value = "";
+filePick.click(); // direct user gesture -> works on iPad
+});
+
+removePhotoBtn.addEventListener("click", ()=>{
+if(!editingTile) return;
+editingTile.photo = null;
+saveAll();
+render();
+showToast("Photo removed");
+});
+
+cancelBtn.addEventListener("click", closeEditor);
+
+saveBtn.addEventListener("click", ()=>{
+if(!editingTile) return;
+const a = editLabel.value.trim();
+const b = editSay.value.trim();
+if(a) editingTile.label = a;
+if(b) editingTile.say = b;
+saveAll();
+render();
+showToast("Saved");
+closeEditor();
+});
+
+editModal.addEventListener("click", (e)=>{
+// tap outside the sheet closes
+if(e.target === editModal) closeEditor();
+});
+
+filePick.addEventListener("change", async (e)=>{
+const file = e.target.files && e.target.files[0];
+if(!file || !editingTile){
+filePick.value = "";
+return;
+}
+const dataUrl = await fileToDataURL(file);
+editingTile.photo = dataUrl;
+filePick.value = "";
+saveAll();
+render();
+showToast("Photo saved");
+});
+
+function fileToDataURL(file){
+return new Promise((resolve,reject)=>{
+const r = new FileReader();
+r.onload = ()=>resolve(r.result);
+r.onerror = reject;
+r.readAsDataURL(file);
+});
+}
+
+/* ===== Render grid ===== */
 function render(){
-// pain bar on/off
+// pain on/off
 if(currentPage === "pain"){
+painWrap.classList.add("on");
 renderPainBar();
 }else{
-painBar.classList.remove("on");
-painBar.innerHTML = "";
+painWrap.classList.remove("on");
+painRow.innerHTML = "";
 }
 
 grid.innerHTML = "";
@@ -508,16 +731,13 @@ const el = document.createElement("div");
 el.className = "tile";
 if(tile._yn === "yes") el.classList.add("yesTile");
 if(tile._yn === "no") el.classList.add("noTile");
-
 el.setAttribute("role","button");
 el.setAttribute("tabindex","0");
 
 const img = document.createElement("div");
 img.className = "img";
 
-// fixed Yes/No never use photos
 const effectivePhoto = tile._fixed ? null : tile.photo;
-
 if(effectivePhoto){
 const ph = document.createElement("div");
 ph.className = "photo";
@@ -543,7 +763,7 @@ if(tile._fixed){
 showToast("Yes/No are fixed");
 return;
 }
-editTile(tile);
+openEditor(tile);
 return;
 }
 
@@ -577,127 +797,7 @@ grid.appendChild(el);
 });
 }
 
-/* =================== EDIT MODE =================== */
-function renderPainBar(){
-painBar.innerHTML = "";
-painBar.classList.add("on");
-
-// wrapper
-painBar.style.display = "flex";
-painBar.style.gap = "6px";
-painBar.style.alignItems = "stretch";
-
-// Add a label strip above (optional but clearer)
-// If you don't want it, delete these 7 lines.
-const topHint = document.createElement("div");
-topHint.style.width = "100%";
-topHint.style.display = "flex";
-topHint.style.justifyContent = "space-between";
-topHint.style.marginBottom = "8px";
-topHint.style.color = "rgba(243,246,255,.85)";
-topHint.style.fontWeight = "900";
-topHint.innerHTML = `<span>No pain</span><span>Worst pain</span>`;
-// Insert as first item by temporarily switching to column layout
-painBar.style.flexDirection = "column";
-painBar.appendChild(topHint);
-
-const row = document.createElement("div");
-row.style.display = "flex";
-row.style.gap = "6px";
-row.style.width = "100%";
-row.style.alignItems = "stretch";
-row.style.flexDirection = "row";
-painBar.appendChild(row);
-
-function faceSVG(level){
-const S = `fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"`;
-if(level===0){
-return `<svg viewBox="0 0 256 256" width="26" height="26">
-<circle ${S} cx="128" cy="128" r="90"/>
-<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
-<path ${S} d="M92 162h72"/>
-</svg>`;
-}
-if(level===5){
-return `<svg viewBox="0 0 256 256" width="26" height="26">
-<circle ${S} cx="128" cy="128" r="90"/>
-<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
-<path ${S} d="M92 170c16-12 56-12 72 0"/>
-</svg>`;
-}
-// 10
-return `<svg viewBox="0 0 256 256" width="26" height="26">
-<circle ${S} cx="128" cy="128" r="90"/>
-<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
-<path ${S} d="M92 178c18-20 54-20 72 0"/>
-</svg>`;
-}
-
-for(let n=0; n<=10; n++){
-const b = document.createElement("button");
-b.className = "painBtn";
-b.type = "button";
-
-// colour gradient (green → yellow → orange → red)
-b.style.background = painColor(n);
-
-// make them look like a bar segment
-b.style.borderRadius = (n===0) ? "14px 0 0 14px" : (n===10 ? "0 14px 14px 0" : "0");
-b.style.flex = "1 1 0";
-b.style.display = "flex";
-b.style.alignItems = "center";
-b.style.justifyContent = "center";
-b.style.gap = "6px";
-
-// Add faces only at 0, 5, 10
-if(n===0 || n===5 || n===10){
-const wrap = document.createElement("span");
-wrap.innerHTML = faceSVG(n);
-b.appendChild(wrap);
-}
-
-const t = document.createElement("span");
-t.textContent = String(n);
-t.style.fontWeight = "950";
-t.style.fontSize = "20px";
-b.appendChild(t);
-
-b.addEventListener("click", ()=>{
-speak(`My pain is ${n}`);
-[...row.children].forEach(x=>x.classList.remove("active"));
-b.classList.add("active");
-});
-
-row.appendChild(b);
-}
-}
-
-
-filePick.addEventListener("change", async (e)=>{
-const file = e.target.files && e.target.files[0];
-if(!file || !pendingEditTile){
-filePick.value = "";
-return;
-}
-const dataUrl = await fileToDataURL(file);
-pendingEditTile.photo = dataUrl;
-pendingEditTile = null;
-filePick.value = "";
-saveAll();
-render();
-showToast("Photo saved");
-});
-
-function fileToDataURL(file){
-return new Promise((resolve,reject)=>{
-const r = new FileReader();
-r.onload = ()=>resolve(r.result);
-r.onerror = reject;
-r.readAsDataURL(file);
-});
-}
-
-/* =================== CONTROLS =================== */
+/* ===== Controls ===== */
 confirmChip.addEventListener("click", ()=>{
 confirmMode = !confirmMode;
 setChipState(confirmChip, confirmMode);
@@ -715,6 +815,7 @@ editChip.addEventListener("click", ()=>{
 editMode = !editMode;
 setChipState(editChip, editMode);
 showToast(editMode ? "Edit ON" : "Edit OFF");
+if(!editMode) closeEditor();
 saveAll();
 });
 
@@ -728,6 +829,7 @@ setChipState(confirmChip,false);
 setChipState(soundChip,true);
 setChipState(editChip,false);
 confirmPendingId = null;
+closeEditor();
 saveAll();
 render();
 showToast("Reset done");
@@ -738,19 +840,20 @@ if(!confirm("Clear ONLY custom photos?")) return;
 ["move","team","equipment","needs"].forEach(p=>{
 (state[p]||[]).forEach(t=> t.photo = null);
 });
+closeEditor();
 saveAll();
 render();
 showToast("Photos cleared");
 });
 
-/* =================== PAGE BUTTONS =================== */
+/* ===== Pages ===== */
 pageMove.addEventListener("click", ()=> setActivePage("move"));
 pageTeam.addEventListener("click", ()=> setActivePage("team"));
 pageEquipment.addEventListener("click", ()=> setActivePage("equipment"));
 pageNeeds.addEventListener("click", ()=> setActivePage("needs"));
 pagePain.addEventListener("click", ()=> setActivePage("pain"));
 
-/* =================== STARTUP =================== */
+/* ===== Startup ===== */
 loadFlags();
 setChipState(confirmChip, confirmMode);
 setChipState(soundChip, soundOn);
