@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Ward Talkboard</title>
+
 <style>
 :root{
 --bg:#0b1020;
@@ -25,20 +26,19 @@
 --ctrlPadY:10px;
 --ctrlPadX:14px;
 
-/* Tiles */
---labelFont:24px;
---iconSize:56px; /* small icons */
+/* ✅ Adjustable UI sizes */
+--tileSize: 210px; /* square tile side. adjust via Sizes panel */
+--iconSize: 52px; /* icon size */
+--frameW: 120px; /* photo frame width */
+--frameH: 92px; /* photo frame height */
+
 --gap:14px;
-
-/* ✅ Square tile sizing */
 --tileRadius:16px;
---tileMin:170px; /* try 160–190 depending on iPad */
---tileMax:220px;
 
-/* ✅ Photo frame */
---frameW:120px;
---frameH:100px;
---frameRadius:14px;
+/* ✅ label safe height so it never clips */
+--labelFont:24px;
+--labelAreaPad:10px;
+--labelMinH:72px;
 
 /* Pain bar */
 --painFont:20px;
@@ -124,27 +124,28 @@ main{
 padding:14px 14px calc(14px + env(safe-area-inset-bottom));
 }
 
-/* 3 columns */
+/* ✅ CAP TILE SIZE to avoid scroll on iPad */
 .grid{
 display:grid;
-grid-template-columns:repeat(3, 1fr);
+grid-template-columns:repeat(3, minmax(0, var(--tileSize)));
 gap:var(--gap);
+justify-content:center; /* centers grid so extra width doesn't enlarge tiles */
+align-content:start;
 }
 @media (max-width: 520px){
-.grid{ grid-template-columns:repeat(2, 1fr); }
+.grid{ grid-template-columns:repeat(2, minmax(0, var(--tileSize))); }
 }
 
-/* ✅ Square tile (aspect-ratio) */
+/* ✅ square tile */
 .tile{
+width:var(--tileSize);
+height:var(--tileSize);
 border:1px solid rgba(255,255,255,.12);
 border-radius:var(--tileRadius);
 background:linear-gradient(180deg, var(--tile), var(--tile2));
 overflow:hidden;
 display:flex;
 flex-direction:column;
-aspect-ratio: 1 / 1; /* ✅ square */
-min-height:var(--tileMin);
-max-height:var(--tileMax);
 touch-action:manipulation;
 }
 
@@ -157,7 +158,7 @@ background:linear-gradient(180deg, rgba(255,77,79,.22), rgba(16,34,71,1));
 border-color:rgba(255,77,79,.42);
 }
 
-/* ✅ Top area for frame (no overlap with label) */
+/* media area (top) */
 .mediaArea{
 flex:1 1 auto;
 display:flex;
@@ -166,11 +167,11 @@ justify-content:center;
 padding:10px;
 }
 
-/* ✅ photo frame in the middle */
+/* ✅ centered frame */
 .frame{
 width:var(--frameW);
 height:var(--frameH);
-border-radius:var(--frameRadius);
+border-radius:14px;
 border:1px solid rgba(255,255,255,.18);
 background:rgba(255,255,255,.06);
 overflow:hidden;
@@ -179,28 +180,30 @@ align-items:center;
 justify-content:center;
 }
 
-/* photo fits inside frame */
 .frame img{
 width:100%;
 height:100%;
-object-fit:contain; /* ✅ keep whole photo visible */
+object-fit:contain; /* change to cover if you prefer fill/crop */
 object-position:center;
 background:transparent;
 }
 
-/* icon inside frame */
 .frame svg{
 width:var(--iconSize);
 height:var(--iconSize);
 filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));
 }
 
-/* ✅ label area is separate block (no overlay) */
+/* ✅ label area (bottom) fixed safe height so border never clips */
 .labelArea{
 flex:0 0 auto;
-padding:10px;
+min-height:var(--labelMinH);
+padding:var(--labelAreaPad);
 border-top:1px solid rgba(255,255,255,.10);
 background:rgba(0,0,0,.18);
+display:flex;
+align-items:center;
+justify-content:center;
 }
 .label{
 width:100%;
@@ -212,6 +215,7 @@ padding:10px 12px;
 border-radius:14px;
 border:1px solid rgba(255,255,255,.16);
 background:rgba(255,255,255,.06);
+box-sizing:border-box;
 }
 
 .hint{
@@ -315,7 +319,7 @@ font-size:13px;
 color:rgba(243,246,255,.75);
 font-weight:800;
 }
-.field input{
+.field input, .field input[type="range"]{
 height:44px;
 border-radius:12px;
 border:1px solid rgba(255,255,255,.14);
@@ -325,6 +329,19 @@ padding:0 12px;
 font-size:16px;
 font-weight:700;
 outline:none;
+box-sizing:border-box;
+width:100%;
+}
+.rangeRow{
+display:flex;
+gap:10px;
+align-items:center;
+}
+.rangeValue{
+min-width:54px;
+text-align:right;
+font-weight:900;
+color:rgba(243,246,255,.85);
 }
 .sheetActions{
 display:flex;
@@ -362,6 +379,7 @@ background:rgba(255,77,79,.14);
 <button class="chip" id="confirmChip" type="button">Confirm</button>
 <button class="chip on" id="soundChip" type="button">Sound</button>
 <button class="chip" id="editChip" type="button">Edit</button>
+<button class="chip" id="sizeChip" type="button">Sizes</button>
 <button class="chip danger" id="resetBtn" type="button">Reset</button>
 <button class="chip danger" id="clearBtn" type="button">Clear Photos</button>
 </div>
@@ -374,7 +392,7 @@ background:rgba(255,77,79,.14);
 <button class="chip" id="pagePain" type="button">Pain</button>
 </div>
 
-<div class="hint">Edit ON → tap a tile → edit panel. Photos sit inside a centered frame. Text is separate (no overlap). Buttons are square.</div>
+<div class="hint">No scroll: tile size is capped. Sizes → adjust icon and tile size anytime.</div>
 </header>
 
 <main>
@@ -409,6 +427,42 @@ background:rgba(255,77,79,.14);
 <button class="btn danger" id="removePhotoBtn" type="button">Remove photo</button>
 <button class="btn" id="cancelBtn" type="button">Cancel</button>
 <button class="btn primary" id="saveBtn" type="button">Save</button>
+</div>
+</div>
+</div>
+
+<!-- Sizes Modal -->
+<div class="modal" id="sizeModal">
+<div class="sheet">
+<h3>Sizes</h3>
+
+<div class="field">
+<label>Tile size (square)</label>
+<div class="rangeRow">
+<input id="tileSizeRange" type="range" min="150" max="240" step="2" />
+<div class="rangeValue" id="tileSizeVal"></div>
+</div>
+</div>
+
+<div class="field">
+<label>Icon size</label>
+<div class="rangeRow">
+<input id="iconSizeRange" type="range" min="34" max="90" step="2" />
+<div class="rangeValue" id="iconSizeVal"></div>
+</div>
+</div>
+
+<div class="field">
+<label>Photo frame size</label>
+<div class="rangeRow">
+<input id="frameSizeRange" type="range" min="80" max="150" step="2" />
+<div class="rangeValue" id="frameSizeVal"></div>
+</div>
+</div>
+
+<div class="sheetActions">
+<button class="btn" id="sizeCancelBtn" type="button">Close</button>
+<button class="btn primary" id="sizeSaveBtn" type="button">Save</button>
 </div>
 </div>
 </div>
@@ -483,7 +537,8 @@ const YES_NO_END = [
 {id:"no_fixed", label:"No", say:"No", icon:"no", photo:null, _fixed:true, _yn:"no"},
 ];
 
-const STORAGE_KEY = "wardTalkboard_v8";
+const STORAGE_KEY = "wardTalkboard_v9";
+const UI_KEY = "wardTalkboard_ui_v1";
 
 /* ===== State ===== */
 let state = loadState();
@@ -507,6 +562,7 @@ const painRow = document.getElementById("painRow");
 const confirmChip = document.getElementById("confirmChip");
 const soundChip = document.getElementById("soundChip");
 const editChip = document.getElementById("editChip");
+const sizeChip = document.getElementById("sizeChip");
 const resetBtn = document.getElementById("resetBtn");
 const clearBtn = document.getElementById("clearBtn");
 
@@ -524,6 +580,17 @@ const photoBtn = document.getElementById("photoBtn");
 const removePhotoBtn = document.getElementById("removePhotoBtn");
 const cancelBtn = document.getElementById("cancelBtn");
 const saveBtn = document.getElementById("saveBtn");
+
+/* Sizes Modal */
+const sizeModal = document.getElementById("sizeModal");
+const tileSizeRange = document.getElementById("tileSizeRange");
+const iconSizeRange = document.getElementById("iconSizeRange");
+const frameSizeRange = document.getElementById("frameSizeRange");
+const tileSizeVal = document.getElementById("tileSizeVal");
+const iconSizeVal = document.getElementById("iconSizeVal");
+const frameSizeVal = document.getElementById("frameSizeVal");
+const sizeCancelBtn = document.getElementById("sizeCancelBtn");
+const sizeSaveBtn = document.getElementById("sizeSaveBtn");
 
 /* ===== Helpers ===== */
 function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
@@ -728,6 +795,82 @@ r.readAsDataURL(file);
 });
 }
 
+/* ===== Sizes ===== */
+function getCSSNum(varName){
+const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+return parseInt(v.replace("px",""), 10);
+}
+function setCSS(varName, px){
+document.documentElement.style.setProperty(varName, px + "px");
+}
+function openSizes(){
+// read current values
+const tile = getCSSNum("--tileSize");
+const icon = getCSSNum("--iconSize");
+const fw = getCSSNum("--frameW"); // we'll use frame slider to set both W and H proportionally
+tileSizeRange.value = tile;
+iconSizeRange.value = icon;
+frameSizeRange.value = fw;
+updateSizeLabels();
+sizeModal.classList.add("on");
+}
+function closeSizes(){
+sizeModal.classList.remove("on");
+}
+function updateSizeLabels(){
+tileSizeVal.textContent = tileSizeRange.value + "px";
+iconSizeVal.textContent = iconSizeRange.value + "px";
+frameSizeVal.textContent = frameSizeRange.value + "px";
+}
+function applySizesLive(){
+const tile = parseInt(tileSizeRange.value,10);
+const icon = parseInt(iconSizeRange.value,10);
+const fw = parseInt(frameSizeRange.value,10);
+
+setCSS("--tileSize", tile);
+setCSS("--iconSize", icon);
+setCSS("--frameW", fw);
+setCSS("--frameH", Math.round(fw * 0.77)); // keeps nice rectangle
+
+render();
+}
+
+tileSizeRange.addEventListener("input", ()=>{ updateSizeLabels(); applySizesLive(); });
+iconSizeRange.addEventListener("input", ()=>{ updateSizeLabels(); applySizesLive(); });
+frameSizeRange.addEventListener("input", ()=>{ updateSizeLabels(); applySizesLive(); });
+
+sizeChip.addEventListener("click", openSizes);
+sizeCancelBtn.addEventListener("click", closeSizes);
+
+sizeSaveBtn.addEventListener("click", ()=>{
+const ui = {
+tileSize: parseInt(tileSizeRange.value,10),
+iconSize: parseInt(iconSizeRange.value,10),
+frameW: parseInt(frameSizeRange.value,10),
+};
+localStorage.setItem(UI_KEY, JSON.stringify(ui));
+showToast("Sizes saved");
+closeSizes();
+});
+
+sizeModal.addEventListener("click", (e)=>{
+if(e.target === sizeModal) closeSizes();
+});
+
+function loadUISizes(){
+try{
+const raw = localStorage.getItem(UI_KEY);
+if(!raw) return;
+const ui = JSON.parse(raw);
+if(ui && ui.tileSize) setCSS("--tileSize", ui.tileSize);
+if(ui && ui.iconSize) setCSS("--iconSize", ui.iconSize);
+if(ui && ui.frameW){
+setCSS("--frameW", ui.frameW);
+setCSS("--frameH", Math.round(ui.frameW * 0.77));
+}
+}catch(e){}
+}
+
 /* ===== Render ===== */
 function render(){
 if(currentPage === "pain"){
@@ -749,11 +892,9 @@ if(tile._yn === "no") el.classList.add("noTile");
 el.setAttribute("role","button");
 el.setAttribute("tabindex","0");
 
-// ✅ media area
 const mediaArea = document.createElement("div");
 mediaArea.className = "mediaArea";
 
-// ✅ centered frame
 const frame = document.createElement("div");
 frame.className = "frame";
 
@@ -770,7 +911,6 @@ frame.innerHTML = iconSVG(tile.icon);
 
 mediaArea.appendChild(frame);
 
-// ✅ label area separate (no overlap)
 const labelArea = document.createElement("div");
 labelArea.className = "labelArea";
 
@@ -877,6 +1017,8 @@ pagePain.addEventListener("click", ()=> setActivePage("pain"));
 
 /* ===== Startup ===== */
 loadFlags();
+loadUISizes();
+
 setChipState(confirmChip, confirmMode);
 setChipState(soundChip, soundOn);
 setChipState(editChip, editMode);
