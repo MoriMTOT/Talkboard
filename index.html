@@ -14,24 +14,26 @@
 --muted:rgba(243,246,255,.75);
 --border:rgba(255,255,255,.16);
 
-/* sizes */
+/* Page chips */
 --chipFont:22px;
---chipPadY:16px;
---chipPadX:22px;
---chipMinH:64px;
+--chipPadY:14px;
+--chipPadX:20px;
+--chipMinH:58px;
 
+/* Control chips */
 --ctrlFont:16px;
 --ctrlPadY:10px;
 --ctrlPadX:14px;
 
---tileMinH:270px;
---labelFont:28px;
---labelPadY:14px;
+/* Tiles */
+--tileMinH:180px; /* smaller: reduces scrolling */
+--labelFont:30px; /* bigger label */
+--labelPadY:12px;
 --labelPadX:16px;
---iconSize:110px;
+--iconSize:118px; /* bigger icon */
 
---gap:22px;
---radius:22px;
+--gap:16px;
+--radius:20px;
 }
 
 html,body{height:100%}
@@ -59,7 +61,7 @@ color:var(--muted);
 font-size:16px;
 }
 
-/* controls chips (Confirm, Sound, Edit, Reset, Clear) */
+/* Controls: Confirm, Sound, Edit, Reset, Clear */
 .controls .chip{
 font-size:var(--ctrlFont);
 padding:var(--ctrlPadY) var(--ctrlPadX);
@@ -83,7 +85,7 @@ background:rgba(255,77,79,.14);
 border-color:rgba(255,77,79,.35);
 }
 
-/* page buttons */
+/* Page buttons */
 .pages{margin-top:12px}
 .pages .chip{
 font-size:var(--chipFont);
@@ -91,7 +93,7 @@ padding:var(--chipPadY) var(--chipPadX);
 min-height:var(--chipMinH);
 border-radius:999px;
 border:none;
-font-weight:900;
+font-weight:950;
 letter-spacing:.2px;
 touch-action:manipulation;
 user-select:none;
@@ -104,26 +106,23 @@ transform:translateY(-1px);
 
 /* fixed colours for page chips */
 #pageMove{ background:#2b7cff; color:white; }
-#pageTeam{ background:#2fe6b3; color:#072018; }
+#pageTeam{ background:#2fe6b3; color:#062218; }
 #pageEquipment{ background:#ffd43b; color:#2a2100; }
 #pageNeeds{ background:#ff4d4f; color:white; }
 #pagePain{ background:#b26bff; color:white; }
 
 main{
-padding:18px 18px calc(18px + env(safe-area-inset-bottom));
+padding:16px 16px calc(16px + env(safe-area-inset-bottom));
 }
 
-/* ✅ 1 column on iPad by default */
+/* ✅ iPad friendly: 2 columns by default (less scrolling) */
 .grid{
 display:grid;
-grid-template-columns:1fr;
+grid-template-columns:repeat(2, 1fr);
 gap:var(--gap);
 }
-/* allow 2 columns only on big desktop screens */
+/* 3 columns only on very large screens */
 @media (min-width: 1200px){
-.grid{ grid-template-columns:repeat(2, 1fr); }
-}
-@media (min-width: 1600px){
 .grid{ grid-template-columns:repeat(3, 1fr); }
 }
 
@@ -145,12 +144,13 @@ inset:0;
 display:flex;
 align-items:center;
 justify-content:center;
+padding:12px;
 }
 
 .img svg{
 width:var(--iconSize);
 height:var(--iconSize);
-opacity:.98;
+opacity:1;
 filter:drop-shadow(0 10px 18px rgba(0,0,0,.35));
 }
 
@@ -163,22 +163,22 @@ background-position:center;
 
 .labelWrap{
 margin-top:auto;
-padding:14px;
+padding:12px;
 display:flex;
 justify-content:center;
 }
 .label{
-max-width:100%;
+width:100%;
 text-align:center;
 font-weight:950;
 font-size:var(--labelFont);
 padding:var(--labelPadY) var(--labelPadX);
 border-radius:18px;
 border:1px solid rgba(255,255,255,.18);
-background:rgba(0,0,0,.28);
+background:rgba(0,0,0,.30);
 backdrop-filter: blur(6px);
 -webkit-backdrop-filter: blur(6px);
-line-height:1.12;
+line-height:1.10;
 }
 
 .hint{
@@ -239,37 +239,167 @@ z-index:50;
 <input id="filePick" type="file" accept="image/*" />
 
 <script>
-/* =================== CLEAR SIMPLE SVG ICONS (high contrast) =================== */
+/* =================== SUPER SIMPLE CLEAR ICONS ===================
+Goal: obvious pictograms (chair/bed/bell/toilet/glass/wheelchair/hand/yes/no)
+*/
 function iconSVG(name){
-const S = `fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"`;
+const S = `fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"`;
+
 const icons = {
-sit: `<svg viewBox="0 0 256 256"><circle ${S} cx="80" cy="64" r="26"/><path ${S} d="M80 90v70"/><path ${S} d="M62 160h110"/><path ${S} d="M150 160v62"/><path ${S} d="M62 160v62"/><path ${S} d="M44 222h168"/></svg>`,
-stand: `<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="56" r="26"/><path ${S} d="M128 82v78"/><path ${S} d="M92 124h72"/><path ${S} d="M128 160l-36 72"/><path ${S} d="M128 160l36 72"/></svg>`,
-outofbed: `<svg viewBox="0 0 256 256"><path ${S} d="M28 170V108h120v62"/><path ${S} d="M28 170h120"/><path ${S} d="M56 108V76h44v32"/><circle ${S} cx="190" cy="92" r="18"/><path ${S} d="M190 110v44"/><path ${S} d="M168 154h44"/><path ${S} d="M190 154l-26 62"/><path ${S} d="M190 154l26 62"/><path ${S} d="M214 92h28"/><path ${S} d="M228 78v28"/></svg>`,
-inbed: `<svg viewBox="0 0 256 256"><path ${S} d="M24 170V98h208v72"/><path ${S} d="M24 170h208"/><path ${S} d="M54 98V70h78v28"/><path ${S} d="M24 198v-28"/><path ${S} d="M232 198v-28"/></svg>`,
-rest: `<svg viewBox="0 0 256 256"><path ${S} d="M54 170c28 24 120 24 148 0"/><path ${S} d="M34 122c26-40 162-40 188 0"/><path ${S} d="M78 220v-26"/><path ${S} d="M178 220v-26"/><path ${S} d="M86 64l26-22"/><path ${S} d="M140 64l26-22"/></svg>`,
-stop: `<svg viewBox="0 0 256 256"><path ${S} d="M92 224V124c0-14 20-14 20 0v48"/><path ${S} d="M112 172V84c0-14 20-14 20 0v88"/><path ${S} d="M132 172V76c0-14 20-14 20 0v96"/><path ${S} d="M152 172V98c0-14 20-14 20 0v74"/><path ${S} d="M172 172V122c0-14 20-14 20 0v50"/><path ${S} d="M92 172c0 28 20 52 48 52h36"/></svg>`,
-nurse: `<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="62" r="26"/><path ${S} d="M86 220v-80c0-22 18-40 40-40h4c22 0 40 18 40 40v80"/><path ${S} d="M98 100V78h60v22"/><path ${S} d="M128 78v26"/><path ${S} d="M116 92h24"/></svg>`,
-doctor:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="58" r="26"/><path ${S} d="M86 220v-80c0-22 18-40 40-40h4c22 0 40 18 40 40v80"/><path ${S} d="M176 124h52"/><path ${S} d="M202 98v52"/></svg>`,
-ot:`<svg viewBox="0 0 256 256"><path ${S} d="M52 172c30 26 122 26 152 0"/><path ${S} d="M34 124c26-40 162-40 188 0"/><path ${S} d="M92 220v-26"/><path ${S} d="M164 220v-26"/><path ${S} d="M100 78h56"/></svg>`,
-pt:`<svg viewBox="0 0 256 256"><circle ${S} cx="96" cy="64" r="22"/><path ${S} d="M96 86l20 36 52 26"/><path ${S} d="M116 122l-44 62"/><path ${S} d="M72 184l-24 48"/><path ${S} d="M116 122l-12 62"/></svg>`,
-sp:`<svg viewBox="0 0 256 256"><path ${S} d="M44 74c0-18 14-32 32-32h104c18 0 32 14 32 32v56c0 18-14 32-32 32H124l-34 34v-34H76c-18 0-32-14-32-32V74z"/><path ${S} d="M84 92h88"/><path ${S} d="M84 124h56"/></svg>`,
-wheelchair:`<svg viewBox="0 0 256 256"><circle ${S} cx="108" cy="70" r="22"/><path ${S} d="M108 92v50h52l22 58"/><circle ${S} cx="112" cy="198" r="34"/><path ${S} d="M192 142h44"/></svg>`,
-bed:`<svg viewBox="0 0 256 256"><path ${S} d="M24 170V98h208v72"/><path ${S} d="M24 170h208"/><path ${S} d="M54 98V70h78v28"/><path ${S} d="M24 198v-28"/><path ${S} d="M232 198v-28"/></svg>`,
-callbell:`<svg viewBox="0 0 256 256"><path ${S} d="M128 44c-28 0-48 20-48 48v40l-16 28h128l-16-28V92c0-28-20-48-48-48z"/><path ${S} d="M108 198c4 18 36 18 40 0"/></svg>`,
-chair:`<svg viewBox="0 0 256 256"><path ${S} d="M84 70h88v70H84z"/><path ${S} d="M70 140h116v20H70z"/><path ${S} d="M84 160v66"/><path ${S} d="M172 160v66"/><path ${S} d="M58 226h140"/></svg>`,
-reposition:`<svg viewBox="0 0 256 256"><path ${S} d="M190 92c-16-22-42-36-72-36-48 0-88 40-88 88"/><path ${S} d="M36 132l-6 26 26-6"/><path ${S} d="M66 164c16 22 42 36 72 36 48 0 88-40 88-88"/><path ${S} d="M220 124l6-26-26 6"/></svg>`,
-toilet:`<svg viewBox="0 0 256 256"><path ${S} d="M86 54h60v40H86z"/><path ${S} d="M66 94h124v38c0 34-22 60-56 60h-12c-34 0-56-26-56-60V94z"/><path ${S} d="M98 192v26h60v-26"/></svg>`,
-drink:`<svg viewBox="0 0 256 256"><path ${S} d="M88 46h80l-12 164H100L88 46z"/><path ${S} d="M92 98h72"/></svg>`,
-food:`<svg viewBox="0 0 256 256"><path ${S} d="M72 58v86"/><path ${S} d="M104 58v86"/><path ${S} d="M72 102h32"/><path ${S} d="M146 58v64"/><path ${S} d="M176 58v64"/><path ${S} d="M146 122c0 38-18 64-18 98"/><path ${S} d="M54 220h148"/></svg>`,
-pain:`<svg viewBox="0 0 256 256"><path ${S} d="M128 220s-76-44-76-112c0-34 26-60 60-60 22 0 40 14 48 32 8-18 26-32 48-32 34 0 60 26 60 60 0 68-76 112-76 112z"/><path ${S} d="M128 102v44"/><path ${S} d="M128 170h0"/></svg>`,
-help:`<svg viewBox="0 0 256 256"><path ${S} d="M128 30l100 176H28L128 30z"/><path ${S} d="M128 92v58"/><path ${S} d="M128 182h0"/></svg>`,
-yes:`<svg viewBox="0 0 256 256"><path ${S} d="M54 130l44 44 104-120"/></svg>`,
+// Yes / No
+yes:`<svg viewBox="0 0 256 256"><path ${S} d="M54 134l44 44 104-120"/></svg>`,
 no:`<svg viewBox="0 0 256 256"><path ${S} d="M70 70l116 116"/><path ${S} d="M186 70L70 186"/></svg>`,
-face0:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="86"/><circle ${S} cx="96" cy="112" r="8"/><circle ${S} cx="160" cy="112" r="8"/><path ${S} d="M96 160h64"/></svg>`,
-face5:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="86"/><circle ${S} cx="96" cy="112" r="8"/><circle ${S} cx="160" cy="112" r="8"/><path ${S} d="M96 168c10-12 54-12 64 0"/></svg>`,
-face10:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="86"/><circle ${S} cx="96" cy="112" r="8"/><circle ${S} cx="160" cy="112" r="8"/><path ${S} d="M94 174c18-22 50-22 68 0"/></svg>`
+
+// Stop (big hand)
+stop:`<svg viewBox="0 0 256 256">
+<path ${S} d="M94 224V118c0-14 20-14 20 0v54"/>
+<path ${S} d="M114 172V78c0-14 20-14 20 0v94"/>
+<path ${S} d="M134 172V70c0-14 20-14 20 0v102"/>
+<path ${S} d="M154 172V98c0-14 20-14 20 0v74"/>
+<path ${S} d="M174 172V124c0-14 20-14 20 0v48"/>
+<path ${S} d="M94 172c0 30 22 52 52 52h34"/>
+</svg>`,
+
+// Chair (sit)
+sit:`<svg viewBox="0 0 256 256">
+<path ${S} d="M86 62h84v78H86z"/>
+<path ${S} d="M70 140h116v22H70z"/>
+<path ${S} d="M86 162v64"/>
+<path ${S} d="M170 162v64"/>
+<path ${S} d="M58 226h140"/>
+</svg>`,
+
+// Stand (person)
+stand:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="128" cy="56" r="26"/>
+<path ${S} d="M128 82v80"/>
+<path ${S} d="M92 126h72"/>
+<path ${S} d="M128 162l-34 66"/>
+<path ${S} d="M128 162l34 66"/>
+</svg>`,
+
+// Bed (in bed / bed adjust)
+bed:`<svg viewBox="0 0 256 256">
+<path ${S} d="M24 170V98h208v72"/>
+<path ${S} d="M24 170h208"/>
+<path ${S} d="M54 98V70h78v28"/>
+<path ${S} d="M24 198v-28"/>
+<path ${S} d="M232 198v-28"/>
+</svg>`,
+
+// Out of bed (bed + arrow)
+outofbed:`<svg viewBox="0 0 256 256">
+<path ${S} d="M24 176V110h128v66"/>
+<path ${S} d="M24 176h128"/>
+<path ${S} d="M54 110V78h58v32"/>
+<path ${S} d="M190 196V96"/>
+<path ${S} d="M162 124l28-28 28 28"/>
+</svg>`,
+
+// Rest (moon Z)
+rest:`<svg viewBox="0 0 256 256">
+<path ${S} d="M150 60c-26 6-46 30-46 58s20 52 46 58c-40 8-80-22-80-58s40-66 80-58z"/>
+<path ${S} d="M170 70h56"/>
+<path ${S} d="M226 70l-56 64h56"/>
+</svg>`,
+
+// Call bell (bell)
+callbell:`<svg viewBox="0 0 256 256">
+<path ${S} d="M128 44c-30 0-52 22-52 52v42l-16 28h136l-16-28V96c0-30-22-52-52-52z"/>
+<path ${S} d="M108 198c4 18 36 18 40 0"/>
+</svg>`,
+
+// Toilet
+toilet:`<svg viewBox="0 0 256 256">
+<path ${S} d="M86 54h60v40H86z"/>
+<path ${S} d="M66 94h124v40c0 34-22 60-56 60h-12c-34 0-56-26-56-60V94z"/>
+<path ${S} d="M98 194v26h60v-26"/>
+</svg>`,
+
+// Drink (cup)
+drink:`<svg viewBox="0 0 256 256">
+<path ${S} d="M86 54h84l-12 160H98L86 54z"/>
+<path ${S} d="M92 106h72"/>
+<path ${S} d="M176 90h18c14 0 22 10 22 22s-8 22-22 22h-10"/>
+</svg>`,
+
+// Food (plate)
+food:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="128" cy="138" r="64"/>
+<path ${S} d="M64 62h128"/>
+<path ${S} d="M92 62v34"/>
+<path ${S} d="M164 62v34"/>
+<path ${S} d="M128 74v30"/>
+</svg>`,
+
+// Wheelchair
+wheelchair:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="108" cy="72" r="22"/>
+<path ${S} d="M108 94v52h56l22 58"/>
+<circle ${S} cx="112" cy="198" r="34"/>
+<path ${S} d="M192 146h44"/>
+</svg>`,
+
+// Reposition (two arrows)
+reposition:`<svg viewBox="0 0 256 256">
+<path ${S} d="M188 92c-16-22-42-36-72-36-48 0-88 40-88 88"/>
+<path ${S} d="M36 132l-6 26 26-6"/>
+<path ${S} d="M68 164c16 22 42 36 72 36 48 0 88-40 88-88"/>
+<path ${S} d="M220 124l6-26-26 6"/>
+</svg>`,
+
+// Pain (lightning in circle)
+pain:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="128" cy="128" r="86"/>
+<path ${S} d="M126 72l-30 66h44l-10 46 46-74h-44z"/>
+</svg>`,
+
+// HELP (triangle)
+help:`<svg viewBox="0 0 256 256">
+<path ${S} d="M128 30l100 176H28L128 30z"/>
+<path ${S} d="M128 92v58"/>
+<path ${S} d="M128 182h0"/>
+</svg>`,
+
+// Clinician icons made clearer (simple head + stethoscope / speech bubble)
+nurse:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="128" cy="66" r="26"/>
+<path ${S} d="M86 220v-74c0-24 18-44 44-44h0c26 0 44 20 44 44v74"/>
+<path ${S} d="M104 108v-26h48v26"/>
+<path ${S} d="M116 92h24"/>
+<path ${S} d="M128 78v26"/>
+</svg>`,
+
+doctor:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="128" cy="64" r="26"/>
+<path ${S} d="M86 220v-76c0-24 18-42 42-42h0c24 0 42 18 42 42v76"/>
+<path ${S} d="M176 124h52"/>
+<path ${S} d="M202 98v52"/>
+</svg>`,
+
+ot:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="92" cy="84" r="18"/>
+<circle ${S} cx="164" cy="84" r="18"/>
+<path ${S} d="M74 140c20-22 88-22 108 0"/>
+<path ${S} d="M96 220v-34"/>
+<path ${S} d="M160 220v-34"/>
+<path ${S} d="M102 168h52"/>
+</svg>`,
+
+pt:`<svg viewBox="0 0 256 256">
+<circle ${S} cx="96" cy="64" r="22"/>
+<path ${S} d="M96 86l20 38 56 26"/>
+<path ${S} d="M116 124l-44 62"/>
+<path ${S} d="M72 186l-24 44"/>
+</svg>`,
+
+sp:`<svg viewBox="0 0 256 256">
+<path ${S} d="M44 78c0-18 14-32 32-32h104c18 0 32 14 32 32v54c0 18-14 32-32 32H124l-34 34v-34H76c-18 0-32-14-32-32V78z"/>
+<path ${S} d="M84 98h88"/>
+<path ${S} d="M84 128h56"/>
+</svg>`,
 };
+
 return icons[name] || icons.help;
 }
 
@@ -279,7 +409,7 @@ move: [
 {id:"sit", label:"Sit", say:"I want to sit up", icon:"sit", photo:null},
 {id:"stand", label:"Stand", say:"I want to stand", icon:"stand", photo:null},
 {id:"oob", label:"Out of Bed", say:"I want to get out of bed", icon:"outofbed", photo:null},
-{id:"inbed", label:"In Bed", say:"I want to stay in bed", icon:"inbed", photo:null},
+{id:"inbed", label:"In Bed", say:"I want to stay in bed", icon:"bed", photo:null},
 {id:"rest", label:"Rest", say:"I need a rest", icon:"rest", photo:null},
 {id:"stop", label:"Stop", say:"Stop please", icon:"stop", photo:null},
 ],
@@ -289,13 +419,13 @@ team: [
 {id:"ot", label:"OT", say:"I want occupational therapy", icon:"ot", photo:null},
 {id:"pt", label:"PT", say:"I want physiotherapy", icon:"pt", photo:null},
 {id:"sp", label:"SP", say:"I want speech pathology", icon:"sp", photo:null},
-{id:"call", label:"Call", say:"Please call someone", icon:"callbell", photo:null},
+{id:"call", label:"Call Bell", say:"Please use the call bell", icon:"callbell", photo:null},
 ],
 equipment: [
 {id:"wheelchair", label:"Wheelchair", say:"I want my wheelchair", icon:"wheelchair", photo:null},
 {id:"bed", label:"Bed", say:"Please adjust the bed", icon:"bed", photo:null},
 {id:"callbell", label:"Call Bell", say:"Please use the call bell", icon:"callbell", photo:null},
-{id:"chair", label:"Chair", say:"I want the chair", icon:"chair", photo:null},
+{id:"chair", label:"Chair", say:"I want the chair", icon:"sit", photo:null},
 {id:"reposition", label:"Reposition", say:"Please help me change position", icon:"reposition", photo:null},
 {id:"toilet", label:"Toilet", say:"I need the toilet", icon:"toilet", photo:null},
 ],
@@ -307,28 +437,23 @@ needs: [
 {id:"help", label:"HELP", say:"I need help now", icon:"help", photo:null},
 ],
 pain: [
-{id:"pain0", label:"Pain 0", say:"My pain is zero", icon:"face0", photo:null},
-{id:"pain1", label:"Pain 1", say:"My pain is one", icon:"face0", photo:null},
-{id:"pain2", label:"Pain 2", say:"My pain is two", icon:"face0", photo:null},
-{id:"pain3", label:"Pain 3", say:"My pain is three", icon:"face5", photo:null},
-{id:"pain4", label:"Pain 4", say:"My pain is four", icon:"face5", photo:null},
-{id:"pain5", label:"Pain 5", say:"My pain is five", icon:"face5", photo:null},
-{id:"pain6", label:"Pain 6", say:"My pain is six", icon:"face5", photo:null},
-{id:"pain7", label:"Pain 7", say:"My pain is seven", icon:"face10", photo:null},
-{id:"pain8", label:"Pain 8", say:"My pain is eight", icon:"face10", photo:null},
-{id:"pain9", label:"Pain 9", say:"My pain is nine", icon:"face10", photo:null},
-{id:"pain10", label:"Pain 10", say:"My pain is ten", icon:"face10", photo:null},
-{id:"where", label:"Where?", say:"My pain is here", icon:"pain", photo:null},
+{id:"pain0", label:"Pain 0", say:"My pain is zero", icon:"pain", photo:null},
+{id:"pain2", label:"Pain 2", say:"My pain is two", icon:"pain", photo:null},
+{id:"pain4", label:"Pain 4", say:"My pain is four", icon:"pain", photo:null},
+{id:"pain6", label:"Pain 6", say:"My pain is six", icon:"pain", photo:null},
+{id:"pain8", label:"Pain 8", say:"My pain is eight", icon:"pain", photo:null},
+{id:"pain10", label:"Pain 10", say:"My pain is ten", icon:"pain", photo:null},
+{id:"where", label:"Where?", say:"My pain is here", icon:"help", photo:null},
 ],
 };
 
-/* ✅ Yes/No fixed first buttons on every page */
+/* ✅ Yes/No fixed first on every page */
 const FIXED_YN = [
 {id:"yes_fixed", label:"Yes", say:"Yes", icon:"yes", photo:null, _fixed:true},
 {id:"no_fixed", label:"No", say:"No", icon:"no", photo:null, _fixed:true},
 ];
 
-const STORAGE_KEY = "wardTalkboard_v4";
+const STORAGE_KEY = "wardTalkboard_v5";
 
 /* =================== STATE =================== */
 let state = loadState();
@@ -432,10 +557,9 @@ render();
 saveAll();
 }
 
-/* =================== TILE LIST (Yes/No first) =================== */
+/* Yes/No first */
 function tilesForPage(page){
 const base = state[page] || [];
-// put Yes/No first, then the page tiles
 return [...FIXED_YN, ...base];
 }
 
@@ -453,7 +577,6 @@ el.setAttribute("tabindex","0");
 const img = document.createElement("div");
 img.className = "img";
 
-// fixed Yes/No never use photos
 const effectivePhoto = tile._fixed ? null : tile.photo;
 
 if(effectivePhoto){
