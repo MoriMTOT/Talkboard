@@ -26,11 +26,19 @@
 --ctrlPadX:14px;
 
 /* Tiles */
---tileMinH:160px;
---labelFont:26px;
---iconSize:58px; /* half size */
+--labelFont:24px;
+--iconSize:56px; /* small icons */
 --gap:14px;
---radius:18px;
+
+/* ✅ Square tile sizing */
+--tileRadius:16px;
+--tileMin:170px; /* try 160–190 depending on iPad */
+--tileMax:220px;
+
+/* ✅ Photo frame */
+--frameW:120px;
+--frameH:100px;
+--frameRadius:14px;
 
 /* Pain bar */
 --painFont:20px;
@@ -62,7 +70,7 @@ color:var(--muted);
 font-size:16px;
 }
 
-/* Controls: Confirm, Sound, Edit, Reset, Clear */
+/* Controls */
 .controls .chip{
 font-size:var(--ctrlFont);
 padding:var(--ctrlPadY) var(--ctrlPadX);
@@ -116,7 +124,7 @@ main{
 padding:14px 14px calc(14px + env(safe-area-inset-bottom));
 }
 
-/* 3 columns (less scrolling) */
+/* 3 columns */
 .grid{
 display:grid;
 grid-template-columns:repeat(3, 1fr);
@@ -126,15 +134,17 @@ gap:var(--gap);
 .grid{ grid-template-columns:repeat(2, 1fr); }
 }
 
+/* ✅ Square tile (aspect-ratio) */
 .tile{
 border:1px solid rgba(255,255,255,.12);
-border-radius:var(--radius);
+border-radius:var(--tileRadius);
 background:linear-gradient(180deg, var(--tile), var(--tile2));
-min-height:var(--tileMinH);
 overflow:hidden;
 display:flex;
 flex-direction:column;
-position:relative;
+aspect-ratio: 1 / 1; /* ✅ square */
+min-height:var(--tileMin);
+max-height:var(--tileMax);
 touch-action:manipulation;
 }
 
@@ -147,47 +157,61 @@ background:linear-gradient(180deg, rgba(255,77,79,.22), rgba(16,34,71,1));
 border-color:rgba(255,77,79,.42);
 }
 
-.img{
-position:absolute;
-inset:0;
+/* ✅ Top area for frame (no overlap with label) */
+.mediaArea{
+flex:1 1 auto;
 display:flex;
 align-items:center;
 justify-content:center;
 padding:10px;
 }
 
-.img svg{
+/* ✅ photo frame in the middle */
+.frame{
+width:var(--frameW);
+height:var(--frameH);
+border-radius:var(--frameRadius);
+border:1px solid rgba(255,255,255,.18);
+background:rgba(255,255,255,.06);
+overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+/* photo fits inside frame */
+.frame img{
+width:100%;
+height:100%;
+object-fit:contain; /* ✅ keep whole photo visible */
+object-position:center;
+background:transparent;
+}
+
+/* icon inside frame */
+.frame svg{
 width:var(--iconSize);
 height:var(--iconSize);
-opacity:1;
 filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));
 }
 
-.photo{
-position:absolute;
-inset:0;
-background-size:cover;
-background-position:center;
-}
-
-.labelWrap{
-margin-top:auto;
+/* ✅ label area is separate block (no overlay) */
+.labelArea{
+flex:0 0 auto;
 padding:10px;
-display:flex;
-justify-content:center;
+border-top:1px solid rgba(255,255,255,.10);
+background:rgba(0,0,0,.18);
 }
 .label{
 width:100%;
 text-align:center;
 font-weight:950;
 font-size:var(--labelFont);
-padding:10px 12px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,.18);
-background:rgba(0,0,0,.30);
-backdrop-filter: blur(6px);
--webkit-backdrop-filter: blur(6px);
 line-height:1.10;
+padding:10px 12px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.16);
+background:rgba(255,255,255,.06);
 }
 
 .hint{
@@ -256,7 +280,7 @@ box-shadow:0 0 0 4px rgba(255,255,255,.14) inset;
 border-color:rgba(255,255,255,.28);
 }
 
-/* EDIT PANEL (reliable on iPad) */
+/* EDIT PANEL */
 .modal{
 position:fixed; inset:0;
 background:rgba(0,0,0,.55);
@@ -350,7 +374,7 @@ background:rgba(255,77,79,.14);
 <button class="chip" id="pagePain" type="button">Pain</button>
 </div>
 
-<div class="hint">Edit ON → tap a tile → edit panel. Yes/No at the end. Pain scale is one line.</div>
+<div class="hint">Edit ON → tap a tile → edit panel. Photos sit inside a centered frame. Text is separate (no overlap). Buttons are square.</div>
 </header>
 
 <main>
@@ -459,7 +483,7 @@ const YES_NO_END = [
 {id:"no_fixed", label:"No", say:"No", icon:"no", photo:null, _fixed:true, _yn:"no"},
 ];
 
-const STORAGE_KEY = "wardTalkboard_v7";
+const STORAGE_KEY = "wardTalkboard_v8";
 
 /* ===== State ===== */
 let state = loadState();
@@ -471,7 +495,7 @@ let editMode = false;
 let confirmPendingId = null;
 let confirmTimer = null;
 
-let editingTile = null; // reference to tile currently being edited (not Yes/No)
+let editingTile = null;
 
 const grid = document.getElementById("grid");
 const toast = document.getElementById("toast");
@@ -492,7 +516,7 @@ const pageEquipment = document.getElementById("pageEquipment");
 const pageNeeds = document.getElementById("pageNeeds");
 const pagePain = document.getElementById("pagePain");
 
-/* Edit Modal elements */
+/* Edit Modal */
 const editModal = document.getElementById("editModal");
 const editLabel = document.getElementById("editLabel");
 const editSay = document.getElementById("editSay");
@@ -576,7 +600,6 @@ render();
 saveAll();
 }
 
-/* Yes/No at the END. Pain uses pain bar only. */
 function tilesForPage(page){
 const base = state[page] || [];
 if(page === "pain") return [];
@@ -593,20 +616,20 @@ return "rgba(255,77,79,.18)";
 function faceSVG(level){
 const S = `fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"`;
 if(level===0){
-return `<svg viewBox="0 0 256 256" width="26" height="26">
+return `<svg viewBox="0 0 256 256" width="22" height="22">
 <circle ${S} cx="128" cy="128" r="90"/>
 <circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
 <path ${S} d="M92 162h72"/>
 </svg>`;
 }
 if(level===5){
-return `<svg viewBox="0 0 256 256" width="26" height="26">
+return `<svg viewBox="0 0 256 256" width="22" height="22">
 <circle ${S} cx="128" cy="128" r="90"/>
 <circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
 <path ${S} d="M92 170c16-12 56-12 72 0"/>
 </svg>`;
 }
-return `<svg viewBox="0 0 256 256" width="26" height="26">
+return `<svg viewBox="0 0 256 256" width="22" height="22">
 <circle ${S} cx="128" cy="128" r="90"/>
 <circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
 <path ${S} d="M92 178c18-20 54-20 72 0"/>
@@ -648,7 +671,6 @@ editingTile = tile;
 editLabel.value = tile.label || "";
 editSay.value = tile.say || "";
 editModal.classList.add("on");
-// focus label (nice for staff; harmless for patients)
 setTimeout(()=>editLabel.focus(), 80);
 }
 function closeEditor(){
@@ -659,9 +681,8 @@ editingTile = null;
 photoBtn.addEventListener("click", ()=>{
 if(!editingTile) return;
 filePick.value = "";
-filePick.click(); // direct user gesture -> works on iPad
+filePick.click();
 });
-
 removePhotoBtn.addEventListener("click", ()=>{
 if(!editingTile) return;
 editingTile.photo = null;
@@ -669,9 +690,7 @@ saveAll();
 render();
 showToast("Photo removed");
 });
-
 cancelBtn.addEventListener("click", closeEditor);
-
 saveBtn.addEventListener("click", ()=>{
 if(!editingTile) return;
 const a = editLabel.value.trim();
@@ -683,9 +702,7 @@ render();
 showToast("Saved");
 closeEditor();
 });
-
 editModal.addEventListener("click", (e)=>{
-// tap outside the sheet closes
 if(e.target === editModal) closeEditor();
 });
 
@@ -702,7 +719,6 @@ saveAll();
 render();
 showToast("Photo saved");
 });
-
 function fileToDataURL(file){
 return new Promise((resolve,reject)=>{
 const r = new FileReader();
@@ -712,9 +728,8 @@ r.readAsDataURL(file);
 });
 }
 
-/* ===== Render grid ===== */
+/* ===== Render ===== */
 function render(){
-// pain on/off
 if(currentPage === "pain"){
 painWrap.classList.add("on");
 renderPainBar();
@@ -734,28 +749,39 @@ if(tile._yn === "no") el.classList.add("noTile");
 el.setAttribute("role","button");
 el.setAttribute("tabindex","0");
 
-const img = document.createElement("div");
-img.className = "img";
+// ✅ media area
+const mediaArea = document.createElement("div");
+mediaArea.className = "mediaArea";
+
+// ✅ centered frame
+const frame = document.createElement("div");
+frame.className = "frame";
 
 const effectivePhoto = tile._fixed ? null : tile.photo;
+
 if(effectivePhoto){
-const ph = document.createElement("div");
-ph.className = "photo";
-ph.style.backgroundImage = `url(${effectivePhoto})`;
-img.appendChild(ph);
+const img = document.createElement("img");
+img.src = effectivePhoto;
+img.alt = "";
+frame.appendChild(img);
 }else{
-img.innerHTML = iconSVG(tile.icon);
+frame.innerHTML = iconSVG(tile.icon);
 }
 
-const labelWrap = document.createElement("div");
-labelWrap.className = "labelWrap";
+mediaArea.appendChild(frame);
+
+// ✅ label area separate (no overlap)
+const labelArea = document.createElement("div");
+labelArea.className = "labelArea";
+
 const label = document.createElement("div");
 label.className = "label";
 label.textContent = tile.label;
-labelWrap.appendChild(label);
 
-el.appendChild(img);
-el.appendChild(labelWrap);
+labelArea.appendChild(label);
+
+el.appendChild(mediaArea);
+el.appendChild(labelArea);
 
 const activate = ()=>{
 if(editMode){
@@ -803,14 +829,12 @@ confirmMode = !confirmMode;
 setChipState(confirmChip, confirmMode);
 saveAll();
 });
-
 soundChip.addEventListener("click", ()=>{
 soundOn = !soundOn;
 setChipState(soundChip, soundOn);
 showToast(soundOn ? "Sound ON" : "Sound OFF");
 saveAll();
 });
-
 editChip.addEventListener("click", ()=>{
 editMode = !editMode;
 setChipState(editChip, editMode);
@@ -818,7 +842,6 @@ showToast(editMode ? "Edit ON" : "Edit OFF");
 if(!editMode) closeEditor();
 saveAll();
 });
-
 resetBtn.addEventListener("click", ()=>{
 if(!confirm("Reset everything to default?")) return;
 state = deepCopy(DEFAULT);
@@ -834,7 +857,6 @@ saveAll();
 render();
 showToast("Reset done");
 });
-
 clearBtn.addEventListener("click", ()=>{
 if(!confirm("Clear ONLY custom photos?")) return;
 ["move","team","equipment","needs"].forEach(p=>{
