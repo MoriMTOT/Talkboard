@@ -2,712 +2,624 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Ward Talkboard (iPad)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Ward Talkboard</title>
 <style>
 :root{
---bg:#0b1020; --panel:#121a33; --tile:#1b2a57; --tile2:#21346c;
---text:#f2f6ff; --muted:#b7c3e6; --accent:#76a7ff; --danger:#ff6b6b;
---radius:18px;
+--bg:#0b1020;
+--panel:#121a33;
+--tile:#172a55;
+--tile2:#102247;
+--text:#f3f6ff;
+--muted:rgba(243,246,255,.75);
+--border:rgba(255,255,255,.16);
+
+/* sizes */
+--chipFont:22px;
+--chipPadY:16px;
+--chipPadX:22px;
+--chipMinH:64px;
+
+--ctrlFont:16px;
+--ctrlPadY:10px;
+--ctrlPadX:14px;
+
+--tileMinH:270px;
+--labelFont:28px;
+--labelPadY:14px;
+--labelPadX:16px;
+--iconSize:110px;
+
+--gap:22px;
+--radius:22px;
 }
-*{ box-sizing:border-box; }
+
+html,body{height:100%}
 body{
-margin:0; background:var(--bg); color:var(--text);
-font-family:-apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
--webkit-font-smoothing:antialiased;
-padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
+margin:0;
+font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial;
+background:var(--bg);
+color:var(--text);
 }
+
 header{
-display:flex; align-items:flex-start; justify-content:space-between;
-gap:10px; padding:10px 6px 12px 6px;
+position:sticky; top:0; z-index:20;
+background:linear-gradient(180deg, var(--panel), rgba(18,26,51,.92));
+border-bottom:1px solid rgba(255,255,255,.10);
+padding:14px 14px calc(12px + env(safe-area-inset-top));
 }
-.left{ display:flex; flex-direction:column; gap:2px; }
-.title{ font-size:18px; font-weight:800; letter-spacing:.2px; }
-.sub{ font-size:13px; color:var(--muted); }
-.controls{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-button, .chip{
-border:none; border-radius:999px; padding:18px 26px;
-background:var(--panel); color:var(--text); font-size:22px; min-height:65px; font-weight:700;
+
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+.title{
+margin-right:auto;
+font-weight:800;
+letter-spacing:.2px;
+color:var(--muted);
+font-size:16px;
+}
+
+/* controls chips (Confirm, Sound, Edit, Reset, Clear) */
+.controls .chip{
+font-size:var(--ctrlFont);
+padding:var(--ctrlPadY) var(--ctrlPadX);
+min-height:44px;
+border-radius:999px;
+background:rgba(255,255,255,.06);
+border:1px solid var(--border);
+color:var(--text);
+font-weight:800;
 touch-action:manipulation;
+user-select:none;
+-webkit-user-select:none;
 }
-button:active{ transform:scale(0.985); }
-.chip{ background:transparent; border:1px solid rgba(255,255,255,.15); }
-.chip.on{ border-color:var(--accent); box-shadow:0 0 0 2px rgba(118,167,255,.18) inset; }
-main{ max-width:1050px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
-.saybar{
-background:var(--panel); border-radius:var(--radius); padding:12px;
-display:flex; gap:10px; align-items:center; justify-content:space-between;
-border:1px solid rgba(255,255,255,.08);
+.controls .chip.on{
+border-color:rgba(118,167,255,.65);
+box-shadow:0 0 0 3px rgba(118,167,255,.20) inset;
+background:rgba(118,167,255,.10);
 }
-.saytext{ display:flex; flex-direction:column; gap:4px; }
-#message{ font-size:22px; font-weight:900; line-height:1.12; }
-#messageSmall{ font-size:13px; color:var(--muted); font-weight:650; }
-.saybtns{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-.big{
-border-radius:16px; padding:12px 14px; background:var(--tile2);
-font-size:16px; font-weight:900;
-border:1px solid rgba(255,255,255,.10);
-min-width:110px;
+.controls .danger{
+background:rgba(255,77,79,.14);
+border-color:rgba(255,77,79,.35);
 }
-.danger{ background:rgba(255,107,107,.20); border-color:rgba(255,107,107,.35); }
-.row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; }
-.tabbar{ display:flex; gap:8px; flex-wrap:wrap; }
-.tab{ background:transparent; border:1px solid rgba(255,255,255,.14); }
-.tab.on{
-border-color:var(--accent);
-box-shadow:0 0 0 2px rgba(118,167,255,.16) inset;
+
+/* page buttons */
+.pages{margin-top:12px}
+.pages .chip{
+font-size:var(--chipFont);
+padding:var(--chipPadY) var(--chipPadX);
+min-height:var(--chipMinH);
+border-radius:999px;
+border:none;
+font-weight:900;
+letter-spacing:.2px;
+touch-action:manipulation;
+user-select:none;
+-webkit-user-select:none;
 }
+.pages .chip.active{
+box-shadow:0 0 0 5px rgba(255,255,255,.18) inset;
+transform:translateY(-1px);
+}
+
+/* fixed colours for page chips */
+#pageMove{ background:#2b7cff; color:white; }
+#pageTeam{ background:#2fe6b3; color:#072018; }
+#pageEquipment{ background:#ffd43b; color:#2a2100; }
+#pageNeeds{ background:#ff4d4f; color:white; }
+#pagePain{ background:#b26bff; color:white; }
+
+main{
+padding:18px 18px calc(18px + env(safe-area-inset-bottom));
+}
+
+/* ✅ 1 column on iPad by default */
 .grid{
-display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+display:grid;
+grid-template-columns:1fr;
+gap:var(--gap);
 }
-@media (min-width:700px){ .grid{ grid-template-columns:repeat(3, 1fr); } }
-@media (min-width:980px){ .grid{ grid-template-columns:repeat(4, 1fr); } }
+/* allow 2 columns only on big desktop screens */
+@media (min-width: 1200px){
+.grid{ grid-template-columns:repeat(2, 1fr); }
+}
+@media (min-width: 1600px){
+.grid{ grid-template-columns:repeat(3, 1fr); }
+}
 
 .tile{
-background:var(--tile);
+border:1px solid rgba(255,255,255,.12);
 border-radius:var(--radius);
-border:1px solid rgba(255,255,255,.10);
+background:linear-gradient(180deg, var(--tile), var(--tile2));
+min-height:var(--tileMinH);
 overflow:hidden;
-min-height:150px;
-display:flex; flex-direction:column;
-user-select:none; -webkit-user-select:none;
+display:flex;
+flex-direction:column;
+position:relative;
 touch-action:manipulation;
 }
+
 .img{
-flex:1;
+position:absolute;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.img svg{
+width:var(--iconSize);
+height:var(--iconSize);
+opacity:.98;
+filter:drop-shadow(0 10px 18px rgba(0,0,0,.35));
+}
+
+.photo{
+position:absolute;
+inset:0;
 background-size:cover;
 background-position:center;
-display:flex; align-items:flex-end;
-padding:10px;
-position:relative;
 }
-.img::before{
-content:"";
-position:absolute; inset:0;
-background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.05));
-pointer-events:none;
+
+.labelWrap{
+margin-top:auto;
+padding:14px;
+display:flex;
+justify-content:center;
 }
 .label{
-position:relative;
-font-size:18px; font-weight:950; letter-spacing:.2px;
-padding:10px 12px;
-background:rgba(0,0,0,.18);
-border-radius:14px;
-border:1px solid rgba(255,255,255,.12);
 max-width:100%;
-}
-.hint{
-padding:10px 12px 12px 12px;
-font-size:12px; color:rgba(242,246,255,.78);
-font-weight:650;
-}
-.footer{ color:var(--muted); font-size:12px; padding:6px 6px 16px 6px; }
-
-/* Edit overlay */
-.modalBack{
-position:fixed; inset:0; background:rgba(0,0,0,.55);
-display:none; align-items:center; justify-content:center;
-padding:16px; z-index:50;
-}
-.modal{
-width:min(560px, 100%);
-background:var(--panel);
-border:1px solid rgba(255,255,255,.12);
+text-align:center;
+font-weight:950;
+font-size:var(--labelFont);
+padding:var(--labelPadY) var(--labelPadX);
 border-radius:18px;
-padding:14px;
+border:1px solid rgba(255,255,255,.18);
+background:rgba(0,0,0,.28);
+backdrop-filter: blur(6px);
+-webkit-backdrop-filter: blur(6px);
+line-height:1.12;
 }
-.modal h3{ margin:0 0 8px 0; font-size:16px; }
-.field{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
-.field label{ font-size:12px; color:var(--muted); font-weight:700; }
-.field input[type="text"]{
-border-radius:12px; border:1px solid rgba(255,255,255,.14);
-background:#0e1530; color:var(--text);
-padding:12px; font-size:16px; font-weight:700;
-outline:none;
+
+.hint{
+margin-top:10px;
+color:var(--muted);
+font-size:13px;
 }
-.modalBtns{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:12px; }
-.ghost{ background:transparent; border:1px solid rgba(255,255,255,.16); }
-  /* Colour the 4 page buttons */
-.chip:nth-of-type(1){background:#2b7cff;color:white;}
-.chip:nth-of-type(2){background:#2fe6b3;color:white;}
-.chip:nth-of-type(3){background:#ffd43b;color:black;}
-.chip:nth-of-type(4){background:#ff4d4f;color:white;}
+
+.toast{
+position:fixed;
+left:50%; transform:translateX(-50%);
+bottom:16px;
+background:rgba(0,0,0,.75);
+border:1px solid rgba(255,255,255,.18);
+color:#fff;
+padding:10px 14px;
+border-radius:999px;
+font-weight:800;
+opacity:0;
+pointer-events:none;
+transition:opacity .18s ease;
+z-index:50;
+}
+.toast.on{opacity:1}
+
+#filePick{display:none}
 </style>
 </head>
+
 <body>
 <header>
-<div class="left">
+<div class="row controls">
 <div class="title">Ward Talkboard</div>
-<div class="sub" id="subline">Tap a tile. It will speak.</div>
+
+<button class="chip" id="confirmChip" type="button">Confirm</button>
+<button class="chip on" id="soundChip" type="button">Sound</button>
+<button class="chip" id="editChip" type="button">Edit</button>
+<button class="chip danger" id="resetBtn" type="button">Reset</button>
+<button class="chip danger" id="clearBtn" type="button">Clear Photos</button>
 </div>
-<div class="controls">
-<button class="chip" id="confirmChip" title="Tap twice to confirm speaking">Confirm</button>
-<button class="chip" id="soundChip" title="Speech on/off">Sound: On</button>
-<button class="chip" id="editChip" title="Edit tiles (add real photos)">Edit: Off</button>
-<button class="chip" id="resetBtn" title="Reset to default tiles">Reset</button>
-<button class="chip" id="clearBtn" title="Clear message">Clear</button>
+
+<div class="row pages" id="pageRow">
+<button class="chip active" id="pageMove" type="button">Move</button>
+<button class="chip" id="pageTeam" type="button">Team</button>
+<button class="chip" id="pageEquipment" type="button">Equipment</button>
+<button class="chip" id="pageNeeds" type="button">Needs</button>
+<button class="chip" id="pagePain" type="button">Pain</button>
 </div>
+
+<div class="hint">Tap a tile to speak. <b>Confirm</b> = double-tap. <b>Edit</b> = change label/phrase/photo. Yes/No always first.</div>
 </header>
 
 <main>
-<section class="saybar" aria-label="Message bar">
-<div class="saytext">
-<div id="message">Tap a picture</div>
-<div id="messageSmall">Use Confirm if accidental taps happen.</div>
-</div>
-<div class="saybtns">
-<button class="big" id="speakBtn">Speak</button>
-<button class="big danger" id="helpBtn">HELP</button>
-</div>
-</section>
-
-<section class="row">
-<div class="tabbar" id="tabs"></div>
-</section>
-
-<section class="grid" id="grid"></section>
-
-<div class="footer">
-iPad tip: Share → <b>Add to Home Screen</b> (works like an app icon).<br/>
-Edit mode lets you replace any tile with a real photo from the iPad.
-</div>
+<div class="grid" id="grid"></div>
 </main>
 
-<!-- Edit Modal -->
-<div class="modalBack" id="modalBack" role="dialog" aria-modal="true">
-<div class="modal">
-<h3>Edit tile</h3>
-
-<div class="field">
-<label>Label (big text on tile)</label>
-<input type="text" id="editLabel" />
-</div>
-
-<div class="field">
-<label>Spoken phrase (what it says out loud)</label>
-<input type="text" id="editSay" />
-</div>
-
-<div class="field">
-<label>Photo (optional) — choose a real image</label>
-<input type="file" id="editFile" accept="image/*" />
-</div>
-
-<div class="modalBtns">
-<button class="ghost" id="cancelEdit">Cancel</button>
-<button class="ghost danger" id="removePhoto">Remove photo</button>
-<button id="saveEdit">Save</button>
-</div>
-</div>
-</div>
+<div class="toast" id="toast">Saved</div>
+<input id="filePick" type="file" accept="image/*" />
 
 <script>
-/* ---------- Simple built-in “photo-style” images (SVG data URIs) ---------- */
-function svgDataUri(svg){
-return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+/* =================== CLEAR SIMPLE SVG ICONS (high contrast) =================== */
+function iconSVG(name){
+const S = `fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"`;
+const icons = {
+sit: `<svg viewBox="0 0 256 256"><circle ${S} cx="80" cy="64" r="26"/><path ${S} d="M80 90v70"/><path ${S} d="M62 160h110"/><path ${S} d="M150 160v62"/><path ${S} d="M62 160v62"/><path ${S} d="M44 222h168"/></svg>`,
+stand: `<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="56" r="26"/><path ${S} d="M128 82v78"/><path ${S} d="M92 124h72"/><path ${S} d="M128 160l-36 72"/><path ${S} d="M128 160l36 72"/></svg>`,
+outofbed: `<svg viewBox="0 0 256 256"><path ${S} d="M28 170V108h120v62"/><path ${S} d="M28 170h120"/><path ${S} d="M56 108V76h44v32"/><circle ${S} cx="190" cy="92" r="18"/><path ${S} d="M190 110v44"/><path ${S} d="M168 154h44"/><path ${S} d="M190 154l-26 62"/><path ${S} d="M190 154l26 62"/><path ${S} d="M214 92h28"/><path ${S} d="M228 78v28"/></svg>`,
+inbed: `<svg viewBox="0 0 256 256"><path ${S} d="M24 170V98h208v72"/><path ${S} d="M24 170h208"/><path ${S} d="M54 98V70h78v28"/><path ${S} d="M24 198v-28"/><path ${S} d="M232 198v-28"/></svg>`,
+rest: `<svg viewBox="0 0 256 256"><path ${S} d="M54 170c28 24 120 24 148 0"/><path ${S} d="M34 122c26-40 162-40 188 0"/><path ${S} d="M78 220v-26"/><path ${S} d="M178 220v-26"/><path ${S} d="M86 64l26-22"/><path ${S} d="M140 64l26-22"/></svg>`,
+stop: `<svg viewBox="0 0 256 256"><path ${S} d="M92 224V124c0-14 20-14 20 0v48"/><path ${S} d="M112 172V84c0-14 20-14 20 0v88"/><path ${S} d="M132 172V76c0-14 20-14 20 0v96"/><path ${S} d="M152 172V98c0-14 20-14 20 0v74"/><path ${S} d="M172 172V122c0-14 20-14 20 0v50"/><path ${S} d="M92 172c0 28 20 52 48 52h36"/></svg>`,
+nurse: `<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="62" r="26"/><path ${S} d="M86 220v-80c0-22 18-40 40-40h4c22 0 40 18 40 40v80"/><path ${S} d="M98 100V78h60v22"/><path ${S} d="M128 78v26"/><path ${S} d="M116 92h24"/></svg>`,
+doctor:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="58" r="26"/><path ${S} d="M86 220v-80c0-22 18-40 40-40h4c22 0 40 18 40 40v80"/><path ${S} d="M176 124h52"/><path ${S} d="M202 98v52"/></svg>`,
+ot:`<svg viewBox="0 0 256 256"><path ${S} d="M52 172c30 26 122 26 152 0"/><path ${S} d="M34 124c26-40 162-40 188 0"/><path ${S} d="M92 220v-26"/><path ${S} d="M164 220v-26"/><path ${S} d="M100 78h56"/></svg>`,
+pt:`<svg viewBox="0 0 256 256"><circle ${S} cx="96" cy="64" r="22"/><path ${S} d="M96 86l20 36 52 26"/><path ${S} d="M116 122l-44 62"/><path ${S} d="M72 184l-24 48"/><path ${S} d="M116 122l-12 62"/></svg>`,
+sp:`<svg viewBox="0 0 256 256"><path ${S} d="M44 74c0-18 14-32 32-32h104c18 0 32 14 32 32v56c0 18-14 32-32 32H124l-34 34v-34H76c-18 0-32-14-32-32V74z"/><path ${S} d="M84 92h88"/><path ${S} d="M84 124h56"/></svg>`,
+wheelchair:`<svg viewBox="0 0 256 256"><circle ${S} cx="108" cy="70" r="22"/><path ${S} d="M108 92v50h52l22 58"/><circle ${S} cx="112" cy="198" r="34"/><path ${S} d="M192 142h44"/></svg>`,
+bed:`<svg viewBox="0 0 256 256"><path ${S} d="M24 170V98h208v72"/><path ${S} d="M24 170h208"/><path ${S} d="M54 98V70h78v28"/><path ${S} d="M24 198v-28"/><path ${S} d="M232 198v-28"/></svg>`,
+callbell:`<svg viewBox="0 0 256 256"><path ${S} d="M128 44c-28 0-48 20-48 48v40l-16 28h128l-16-28V92c0-28-20-48-48-48z"/><path ${S} d="M108 198c4 18 36 18 40 0"/></svg>`,
+chair:`<svg viewBox="0 0 256 256"><path ${S} d="M84 70h88v70H84z"/><path ${S} d="M70 140h116v20H70z"/><path ${S} d="M84 160v66"/><path ${S} d="M172 160v66"/><path ${S} d="M58 226h140"/></svg>`,
+reposition:`<svg viewBox="0 0 256 256"><path ${S} d="M190 92c-16-22-42-36-72-36-48 0-88 40-88 88"/><path ${S} d="M36 132l-6 26 26-6"/><path ${S} d="M66 164c16 22 42 36 72 36 48 0 88-40 88-88"/><path ${S} d="M220 124l6-26-26 6"/></svg>`,
+toilet:`<svg viewBox="0 0 256 256"><path ${S} d="M86 54h60v40H86z"/><path ${S} d="M66 94h124v38c0 34-22 60-56 60h-12c-34 0-56-26-56-60V94z"/><path ${S} d="M98 192v26h60v-26"/></svg>`,
+drink:`<svg viewBox="0 0 256 256"><path ${S} d="M88 46h80l-12 164H100L88 46z"/><path ${S} d="M92 98h72"/></svg>`,
+food:`<svg viewBox="0 0 256 256"><path ${S} d="M72 58v86"/><path ${S} d="M104 58v86"/><path ${S} d="M72 102h32"/><path ${S} d="M146 58v64"/><path ${S} d="M176 58v64"/><path ${S} d="M146 122c0 38-18 64-18 98"/><path ${S} d="M54 220h148"/></svg>`,
+pain:`<svg viewBox="0 0 256 256"><path ${S} d="M128 220s-76-44-76-112c0-34 26-60 60-60 22 0 40 14 48 32 8-18 26-32 48-32 34 0 60 26 60 60 0 68-76 112-76 112z"/><path ${S} d="M128 102v44"/><path ${S} d="M128 170h0"/></svg>`,
+help:`<svg viewBox="0 0 256 256"><path ${S} d="M128 30l100 176H28L128 30z"/><path ${S} d="M128 92v58"/><path ${S} d="M128 182h0"/></svg>`,
+yes:`<svg viewBox="0 0 256 256"><path ${S} d="M54 130l44 44 104-120"/></svg>`,
+no:`<svg viewBox="0 0 256 256"><path ${S} d="M70 70l116 116"/><path ${S} d="M186 70L70 186"/></svg>`,
+face0:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="86"/><circle ${S} cx="96" cy="112" r="8"/><circle ${S} cx="160" cy="112" r="8"/><path ${S} d="M96 160h64"/></svg>`,
+face5:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="86"/><circle ${S} cx="96" cy="112" r="8"/><circle ${S} cx="160" cy="112" r="8"/><path ${S} d="M96 168c10-12 54-12 64 0"/></svg>`,
+face10:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="86"/><circle ${S} cx="96" cy="112" r="8"/><circle ${S} cx="160" cy="112" r="8"/><path ${S} d="M94 174c18-22 50-22 68 0"/></svg>`
+};
+return icons[name] || icons.help;
 }
-const IMG = {
-yes: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a6d"/><stop offset="1" stop-color="#2f6cff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/><circle cx="610" cy="145" r="78" fill="#76a7ff" opacity=".25"/>
-<path d="M210 270l110 110 270-270" fill="none" stroke="#f2f6ff" stroke-width="70" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`),
-no: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#5a1020"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/><circle cx="180" cy="150" r="78" fill="#ffffff" opacity=".18"/>
-<path d="M260 170l280 280M540 170L260 450" stroke="#f2f6ff" stroke-width="70" stroke-linecap="round"/>
-</svg>`),
-help: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#30103f"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<path d="M400 90c-95 0-170 52-170 130 0 55 35 89 88 110 25 10 32 20 32 45v10h100v-18c0-62-22-82-58-96-28-11-52-24-52-51 0-30 25-50 63-50 36 0 60 18 70 48l90-30C545 128 485 90 400 90z" fill="#f2f6ff"/>
-<circle cx="400" cy="420" r="38" fill="#f2f6ff"/>
-</svg>`),
-bed: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b2a3a"/><stop offset="1" stop-color="#2b7cff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<rect x="120" y="250" width="560" height="120" rx="22" fill="#f2f6ff" opacity=".9"/>
-<rect x="120" y="200" width="220" height="90" rx="22" fill="#f2f6ff" opacity=".9"/>
-<rect x="120" y="370" width="560" height="28" rx="14" fill="#76a7ff" opacity=".55"/>
-<rect x="145" y="398" width="36" height="60" rx="10" fill="#f2f6ff" opacity=".85"/>
-<rect x="619" y="398" width="36" height="60" rx="10" fill="#f2f6ff" opacity=".85"/>
-</svg>`),
-sit: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#10203a"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="300" cy="160" r="55" fill="#f2f6ff"/>
-<path d="M280 230c0-50 40-80 90-80h10" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
-<path d="M370 190v140h150" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="470" y="290" width="190" height="40" rx="18" fill="#f2f6ff"/>
-<rect x="470" y="330" width="50" height="110" rx="18" fill="#f2f6ff"/>
-</svg>`),
-stand: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a2a"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="380" cy="145" r="55" fill="#f2f6ff"/>
-<path d="M380 205v170" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
-<path d="M380 265l-90 90M380 265l90 90" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
-<path d="M380 230l-90 40M380 230l90 40" stroke="#f2f6ff" stroke-width="46" stroke-linecap="round"/>
-<rect x="180" y="420" width="440" height="26" rx="13" fill="#f2f6ff" opacity=".55"/>
-</svg>`),
-oob: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b1b3a"/><stop offset="1" stop-color="#ffcf5a"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<rect x="120" y="280" width="380" height="90" rx="20" fill="#f2f6ff" opacity=".85"/>
-<rect x="120" y="240" width="180" height="70" rx="20" fill="#f2f6ff" opacity=".85"/>
-<path d="M520 180l130 0 0 60" stroke="#f2f6ff" stroke-width="34" stroke-linecap="round"/>
-<path d="M610 160l60 50-60 50" fill="none" stroke="#f2f6ff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="610" cy="400" r="56" fill="#f2f6ff"/>
-<rect x="580" y="280" width="60" height="110" rx="25" fill="#f2f6ff"/>
-</svg>`),
-rest: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#6b7cff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<path d="M250 320c0-80 65-145 145-145 45 0 85 20 112 52-18-6-37-9-58-9-80 0-145 65-145 145 0 35 13 67 34 92-53-18-88-69-88-135z" fill="#f2f6ff" opacity=".92"/>
-<path d="M520 120l30 30-30 30h60l30 30-30 30" fill="none" stroke="#f2f6ff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
-</svg>`),
-nurse: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a6d"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="400" cy="165" r="70" fill="#f2f6ff"/>
-<path d="M250 420c15-110 95-170 150-170s135 60 150 170" fill="#f2f6ff" opacity=".9"/>
-<rect x="335" y="85" width="130" height="55" rx="18" fill="#0b1020" opacity=".25"/>
-<path d="M400 98v30M385 113h30" stroke="#f2f6ff" stroke-width="10" stroke-linecap="round"/>
-</svg>`),
-doctor: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b2a57"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="330" cy="165" r="70" fill="#f2f6ff"/>
-<path d="M220 420c12-120 80-180 160-180 90 0 150 60 160 180" fill="#f2f6ff" opacity=".9"/>
-<path d="M500 170c40 0 70 30 70 70 0 30-20 56-40 68v40" fill="none" stroke="#f2f6ff" stroke-width="20" stroke-linecap="round"/>
-<circle cx="530" cy="395" r="14" fill="#f2f6ff"/>
-</svg>`),
-ot: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a3a"/><stop offset="1" stop-color="#ffcf5a"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="300" cy="160" r="65" fill="#f2f6ff"/>
-<path d="M210 430c10-120 85-190 160-190 85 0 150 70 160 190" fill="#f2f6ff" opacity=".9"/>
-<path d="M520 190l120 120" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
-<path d="M600 185c0 40-32 72-72 72s-72-32-72-72 32-72 72-72 72 32 72 72z" fill="none" stroke="#f2f6ff" stroke-width="20" opacity=".85"/>
-</svg>`),
-pt: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#10203a"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="320" cy="155" r="65" fill="#f2f6ff"/>
-<path d="M220 420c10-120 85-190 160-190 85 0 150 70 160 190" fill="#f2f6ff" opacity=".9"/>
-<path d="M520 180l150 0" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
-<path d="M560 145v70" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
-</svg>`),
-sp: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#30103f"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="310" cy="165" r="65" fill="#f2f6ff"/>
-<path d="M215 420c10-120 85-190 160-190 85 0 150 70 160 190" fill="#f2f6ff" opacity=".9"/>
-<path d="M520 150c70 0 130 40 130 90s-60 90-130 90c-15 0-30-2-44-6l-46 32 12-54c-32-18-52-45-52-72 0-50 60-90 130-90z" fill="#f2f6ff" opacity=".9"/>
-</svg>`),
-wheelchair: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#2b7cff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="330" cy="165" r="55" fill="#f2f6ff"/>
-<path d="M330 220v115h160" stroke="#f2f6ff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="520" cy="360" r="92" fill="none" stroke="#f2f6ff" stroke-width="26"/>
-<circle cx="520" cy="360" r="18" fill="#f2f6ff"/>
-<path d="M520 360l60-50" stroke="#f2f6ff" stroke-width="18" stroke-linecap="round"/>
-<path d="M470 300h95" stroke="#f2f6ff" stroke-width="18" stroke-linecap="round"/>
-</svg>`),
-toilet: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b2a57"/><stop offset="1" stop-color="#ffcf5a"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<rect x="260" y="140" width="280" height="120" rx="28" fill="#f2f6ff" opacity=".95"/>
-<path d="M290 260h220c0 120-40 170-110 170s-110-50-110-170z" fill="#f2f6ff" opacity=".95"/>
-<rect x="520" y="170" width="40" height="70" rx="12" fill="#f2f6ff" opacity=".8"/>
-</svg>`),
-pain: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#5a1020"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<path d="M400 430s-170-110-170-230c0-55 45-100 100-100 30 0 58 14 75 36 17-22 45-36 75-36 55 0 100 45 100 100 0 120-170 230-170 230z" fill="#f2f6ff" opacity=".92"/>
-<path d="M520 110l30 40-46 10 30 35-45-6 10 45-40-25-20 40-10-45-45 6 30-35-46-10 30-40 35 25 10-45 25 38 25-38 10 45z" fill="#f2f6ff" opacity=".78"/>
-</svg>`),
-drink: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0f2a6d"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<path d="M300 120h200l-30 300c-2 20-18 35-38 35h-64c-20 0-36-15-38-35l-30-300z" fill="#f2f6ff" opacity=".92"/>
-<path d="M520 170h40c40 0 70 30 70 70s-30 70-70 70h-20" fill="none" stroke="#f2f6ff" stroke-width="20" stroke-linecap="round"/>
-</svg>`),
-reposition: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#10203a"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<rect x="160" y="270" width="480" height="110" rx="22" fill="#f2f6ff" opacity=".92"/>
-<rect x="160" y="220" width="190" height="80" rx="22" fill="#f2f6ff" opacity=".92"/>
-<path d="M520 170c60 0 110 50 110 110" fill="none" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
-<path d="M610 280l40-30-10 50" fill="none" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`),
-stop: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#5a1020"/><stop offset="1" stop-color="#ff6b6b"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<path d="M400 110l150 90v200l-150 90-150-90V200l150-90z" fill="#f2f6ff" opacity=".92"/>
-<text x="400" y="320" text-anchor="middle" font-size="90" font-weight="900" fill="#5a1020">STOP</text>
-</svg>`),
-wait: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#76a7ff"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<circle cx="400" cy="260" r="160" fill="none" stroke="#f2f6ff" stroke-width="26" opacity=".95"/>
-<path d="M400 170v105l85 55" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`),
-again: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1b2a57"/><stop offset="1" stop-color="#2fe6b3"/></linearGradient></defs>
-<rect width="800" height="500" fill="url(#g)"/>
-<path d="M520 165l90 0 0 90" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
-<path d="M610 165l-80 80" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
-<path d="M540 210c-40-40-105-55-160-35-90 33-135 132-102 222 33 90 132 135 222 102 38-14 70-40 90-73" fill="none" stroke="#f2f6ff" stroke-width="26" stroke-linecap="round"/>
-</svg>`)
+
+/* =================== DEFAULT DATA =================== */
+const DEFAULT = {
+move: [
+{id:"sit", label:"Sit", say:"I want to sit up", icon:"sit", photo:null},
+{id:"stand", label:"Stand", say:"I want to stand", icon:"stand", photo:null},
+{id:"oob", label:"Out of Bed", say:"I want to get out of bed", icon:"outofbed", photo:null},
+{id:"inbed", label:"In Bed", say:"I want to stay in bed", icon:"inbed", photo:null},
+{id:"rest", label:"Rest", say:"I need a rest", icon:"rest", photo:null},
+{id:"stop", label:"Stop", say:"Stop please", icon:"stop", photo:null},
+],
+team: [
+{id:"nurse", label:"Nurse", say:"I want the nurse", icon:"nurse", photo:null},
+{id:"doctor", label:"Doctor", say:"I want the doctor", icon:"doctor", photo:null},
+{id:"ot", label:"OT", say:"I want occupational therapy", icon:"ot", photo:null},
+{id:"pt", label:"PT", say:"I want physiotherapy", icon:"pt", photo:null},
+{id:"sp", label:"SP", say:"I want speech pathology", icon:"sp", photo:null},
+{id:"call", label:"Call", say:"Please call someone", icon:"callbell", photo:null},
+],
+equipment: [
+{id:"wheelchair", label:"Wheelchair", say:"I want my wheelchair", icon:"wheelchair", photo:null},
+{id:"bed", label:"Bed", say:"Please adjust the bed", icon:"bed", photo:null},
+{id:"callbell", label:"Call Bell", say:"Please use the call bell", icon:"callbell", photo:null},
+{id:"chair", label:"Chair", say:"I want the chair", icon:"chair", photo:null},
+{id:"reposition", label:"Reposition", say:"Please help me change position", icon:"reposition", photo:null},
+{id:"toilet", label:"Toilet", say:"I need the toilet", icon:"toilet", photo:null},
+],
+needs: [
+{id:"drink", label:"Drink", say:"I want a drink", icon:"drink", photo:null},
+{id:"food", label:"Food", say:"I am hungry", icon:"food", photo:null},
+{id:"toilet", label:"Toilet", say:"I need the toilet", icon:"toilet", photo:null},
+{id:"pain", label:"Pain", say:"I have pain", icon:"pain", photo:null},
+{id:"help", label:"HELP", say:"I need help now", icon:"help", photo:null},
+],
+pain: [
+{id:"pain0", label:"Pain 0", say:"My pain is zero", icon:"face0", photo:null},
+{id:"pain1", label:"Pain 1", say:"My pain is one", icon:"face0", photo:null},
+{id:"pain2", label:"Pain 2", say:"My pain is two", icon:"face0", photo:null},
+{id:"pain3", label:"Pain 3", say:"My pain is three", icon:"face5", photo:null},
+{id:"pain4", label:"Pain 4", say:"My pain is four", icon:"face5", photo:null},
+{id:"pain5", label:"Pain 5", say:"My pain is five", icon:"face5", photo:null},
+{id:"pain6", label:"Pain 6", say:"My pain is six", icon:"face5", photo:null},
+{id:"pain7", label:"Pain 7", say:"My pain is seven", icon:"face10", photo:null},
+{id:"pain8", label:"Pain 8", say:"My pain is eight", icon:"face10", photo:null},
+{id:"pain9", label:"Pain 9", say:"My pain is nine", icon:"face10", photo:null},
+{id:"pain10", label:"Pain 10", say:"My pain is ten", icon:"face10", photo:null},
+{id:"where", label:"Where?", say:"My pain is here", icon:"pain", photo:null},
+],
 };
 
-/* ---------- Default pages + items (what you asked + essentials) ---------- */
-const DEFAULT_PAGES = [
-{
-name: "Move",
-items: [
-{ img: IMG.bed, label: "In bed", say: "I want to stay in bed" },
-{ img: IMG.sit, label: "Sit", say: "I want to sit up" },
-{ img: IMG.stand, label: "Stand", say: "I want to stand" },
-{ img: IMG.oob, label: "Out of bed", say: "I want to get out of bed" },
-{ img: IMG.rest, label: "Rest", say: "I need a rest" },
-{ img: IMG.reposition, label: "Reposition", say: "Please help me change position" },
-{ img: IMG.wait, label: "Wait", say: "Please wait" },
-{ img: IMG.stop, label: "Stop", say: "Stop please" }
-]
-},
-{
-name: "Team",
-items: [
-{ img: IMG.nurse, label: "Nurse", say: "I want the nurse please" },
-{ img: IMG.doctor, label: "Doctor", say: "I want the doctor please" },
-{ img: IMG.ot, label: "OT", say: "I want occupational therapy please" },
-{ img: IMG.pt, label: "PT", say: "I want physiotherapy please" },
-{ img: IMG.sp, label: "SP", say: "I want speech pathology please" },
-{ img: IMG.help, label: "Call help", say: "I need help now" },
-{ img: IMG.again, label: "Again", say: "Please say that again" },
-{ img: IMG.wait, label: "Later", say: "Later please" }
-]
-},
-{
-name: "Equipment",
-items: [
-{ img: IMG.wheelchair, label: "Wheelchair", say: "I want my wheelchair" },
-{ img: IMG.bed, label: "Bed", say: "I want the bed adjusted" },
-{ img: IMG.reposition, label: "Pillows", say: "I need pillows adjusted" },
-{ img: IMG.help, label: "Call bell", say: "Please use the call bell" },
-{ img: IMG.stop, label: "Too fast", say: "Please slow down" },
-{ img: IMG.wait, label: "Hold", say: "Hold on please" },
-{ img: IMG.yes, label: "Yes", say: "Yes" },
-{ img: IMG.no, label: "No", say: "No" }
-]
-},
-{
-name: "Needs",
-items: [
-{ img: IMG.toilet, label: "Toilet", say: "I need the toilet" },
-{ img: IMG.drink, label: "Drink", say: "I want a drink" },
-{ img: IMG.pain, label: "Pain", say: "I have pain" },
-{ img: IMG.help, label: "Help", say: "I need help now" },
-{ img: IMG.yes, label: "Yes", say: "Yes" },
-{ img: IMG.no, label: "No", say: "No" },
-{ img: IMG.again, label: "Again", say: "Again please" },
-{ img: IMG.wait, label: "Wait", say: "Please wait" }
-]
-}
+/* ✅ Yes/No fixed first buttons on every page */
+const FIXED_YN = [
+{id:"yes_fixed", label:"Yes", say:"Yes", icon:"yes", photo:null, _fixed:true},
+{id:"no_fixed", label:"No", say:"No", icon:"no", photo:null, _fixed:true},
 ];
 
-/* ---------- State ---------- */
-let pages = loadSavedPages() || structuredClone(DEFAULT_PAGES);
-let currentPage = 0;
+const STORAGE_KEY = "wardTalkboard_v4";
+
+/* =================== STATE =================== */
+let state = loadState();
+let currentPage = "move";
 let confirmMode = false;
 let soundOn = true;
 let editMode = false;
-let pending = null;
 
-const messageEl = document.getElementById("message");
-const messageSmallEl = document.getElementById("messageSmall");
-const sublineEl = document.getElementById("subline");
-const gridEl = document.getElementById("grid");
-const tabsEl = document.getElementById("tabs");
+let pendingEditTile = null;
+let confirmPendingId = null;
+let confirmTimer = null;
+
+const grid = document.getElementById("grid");
+const toast = document.getElementById("toast");
+const filePick = document.getElementById("filePick");
 
 const confirmChip = document.getElementById("confirmChip");
 const soundChip = document.getElementById("soundChip");
 const editChip = document.getElementById("editChip");
 const resetBtn = document.getElementById("resetBtn");
 const clearBtn = document.getElementById("clearBtn");
-const speakBtn = document.getElementById("speakBtn");
-const helpBtn = document.getElementById("helpBtn");
 
-/* ---------- Speech ---------- */
+const pageMove = document.getElementById("pageMove");
+const pageTeam = document.getElementById("pageTeam");
+const pageEquipment = document.getElementById("pageEquipment");
+const pageNeeds = document.getElementById("pageNeeds");
+const pagePain = document.getElementById("pagePain");
+
+/* =================== HELPERS =================== */
+function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
+
+function showToast(msg){
+toast.textContent = msg;
+toast.classList.add("on");
+clearTimeout(showToast._t);
+showToast._t = setTimeout(()=>toast.classList.remove("on"), 900);
+}
+
+function saveAll(){
+try{
+localStorage.setItem(STORAGE_KEY, JSON.stringify({
+state, currentPage, confirmMode, soundOn, editMode
+}));
+}catch(e){
+showToast("Save blocked");
+}
+}
+
+function loadState(){
+try{
+const raw = localStorage.getItem(STORAGE_KEY);
+if(raw){
+const parsed = JSON.parse(raw);
+if(parsed && parsed.state && parsed.state.move) return parsed.state;
+}
+}catch(e){}
+return deepCopy(DEFAULT);
+}
+
+function loadFlags(){
+try{
+const raw = localStorage.getItem(STORAGE_KEY);
+if(!raw) return;
+const parsed = JSON.parse(raw);
+if(parsed){
+if(typeof parsed.currentPage === "string") currentPage = parsed.currentPage;
+if(typeof parsed.confirmMode === "boolean") confirmMode = parsed.confirmMode;
+if(typeof parsed.soundOn === "boolean") soundOn = parsed.soundOn;
+if(typeof parsed.editMode === "boolean") editMode = parsed.editMode;
+}
+}catch(e){}
+}
+
 function speak(text){
 if(!soundOn) return;
 try{
 window.speechSynthesis.cancel();
 const u = new SpeechSynthesisUtterance(text);
-u.rate = 0.95; // slightly slower
+u.rate = 0.95;
 u.pitch = 1.0;
+u.volume = 1.0;
 window.speechSynthesis.speak(u);
 }catch(e){
-console.log(e);
+showToast("Speech blocked");
 }
 }
 
-/* ---------- UI ---------- */
-function setMessage(text, small=""){
-messageEl.textContent = text || "…";
-messageSmallEl.textContent = small;
+function setChipState(btn, on){
+btn.classList.toggle("on", !!on);
 }
 
-function renderTabs(){
-tabsEl.innerHTML = "";
-pages.forEach((p, idx) => {
-const b = document.createElement("button");
-b.className = "tab chip" + (idx===currentPage ? " on" : "");
-b.textContent = p.name;
-b.onclick = () => { currentPage = idx; pending=null; render(); };
-tabsEl.appendChild(b);
-});
+function setActivePage(page){
+currentPage = page;
+[pageMove,pageTeam,pageEquipment,pageNeeds,pagePain].forEach(b=>b.classList.remove("active"));
+if(page==="move") pageMove.classList.add("active");
+if(page==="team") pageTeam.classList.add("active");
+if(page==="equipment") pageEquipment.classList.add("active");
+if(page==="needs") pageNeeds.classList.add("active");
+if(page==="pain") pagePain.classList.add("active");
+render();
+saveAll();
 }
 
-function renderGrid(){
-gridEl.innerHTML = "";
-const items = pages[currentPage].items;
+/* =================== TILE LIST (Yes/No first) =================== */
+function tilesForPage(page){
+const base = state[page] || [];
+// put Yes/No first, then the page tiles
+return [...FIXED_YN, ...base];
+}
 
-items.forEach((item, idx) => {
-const tile = document.createElement("div");
-tile.className = "tile";
-tile.setAttribute("role","button");
-tile.setAttribute("tabindex","0");
+/* =================== RENDER =================== */
+function render(){
+grid.innerHTML = "";
+const tiles = tilesForPage(currentPage);
+
+tiles.forEach(tile=>{
+const el = document.createElement("div");
+el.className = "tile";
+el.setAttribute("role","button");
+el.setAttribute("tabindex","0");
 
 const img = document.createElement("div");
 img.className = "img";
-img.style.backgroundImage = `url('${item.img}')`;
 
+// fixed Yes/No never use photos
+const effectivePhoto = tile._fixed ? null : tile.photo;
+
+if(effectivePhoto){
+const ph = document.createElement("div");
+ph.className = "photo";
+ph.style.backgroundImage = `url(${effectivePhoto})`;
+img.appendChild(ph);
+}else{
+img.innerHTML = iconSVG(tile.icon);
+}
+
+const labelWrap = document.createElement("div");
+labelWrap.className = "labelWrap";
 const label = document.createElement("div");
 label.className = "label";
-label.textContent = item.label;
+label.textContent = tile.label;
+labelWrap.appendChild(label);
 
-img.appendChild(label);
+el.appendChild(img);
+el.appendChild(labelWrap);
 
-const hint = document.createElement("div");
-hint.className = "hint";
-hint.textContent = editMode
-? "Tap to edit photo/phrase"
-: (confirmMode ? "Tap twice to speak" : "Tap to speak");
-
-tile.appendChild(img);
-tile.appendChild(hint);
-
-tile.onclick = () => {
+const activate = ()=>{
 if(editMode){
-openEditModal(currentPage, idx);
+if(tile._fixed){
+showToast("Yes/No are fixed");
+return;
+}
+editTile(tile);
 return;
 }
 
 if(confirmMode){
-if(pending && pending.p === currentPage && pending.i === idx){
-pending = null;
-setMessage(item.say, "");
-speak(item.say);
+if(confirmPendingId === tile.id){
+clearTimeout(confirmTimer);
+confirmPendingId = null;
+speak(tile.say);
+showToast("Spoken");
 }else{
-pending = { p: currentPage, i: idx };
-setMessage(item.label, "Tap again to confirm");
-speak(item.label);
+confirmPendingId = tile.id;
+showToast("Tap again to confirm");
+clearTimeout(confirmTimer);
+confirmTimer = setTimeout(()=>{ confirmPendingId = null; }, 2200);
 }
-}else{
-pending = null;
-setMessage(item.say, "");
-speak(item.say);
+return;
 }
+
+speak(tile.say);
 };
 
-gridEl.appendChild(tile);
+el.addEventListener("click", activate);
+el.addEventListener("keydown", (ev)=>{
+if(ev.key==="Enter" || ev.key===" "){
+ev.preventDefault();
+activate();
+}
+});
+
+grid.appendChild(el);
 });
 }
 
-function render(){
-renderTabs();
-renderGrid();
-
-sublineEl.textContent = editMode
-? "Edit mode: tap a tile to add a real photo / change phrase."
-: (confirmMode ? "Tap once to select. Tap again to speak." : "Tap a tile. It will speak.");
-
-confirmChip.classList.toggle("on", confirmMode);
-soundChip.classList.toggle("on", soundOn);
-editChip.classList.toggle("on", editMode);
-
-soundChip.textContent = soundOn ? "Sound: On" : "Sound: Off";
-editChip.textContent = editMode ? "Edit: On" : "Edit: Off";
+/* =================== EDIT MODE =================== */
+function editTile(tile){
+const newLabel = prompt("Button name:", tile.label);
+if(newLabel !== null && newLabel.trim() !== ""){
+tile.label = newLabel.trim();
 }
 
-/* ---------- Storage ---------- */
-function savePages(){
-try{ localStorage.setItem("wardTalkboard.pages.v1", JSON.stringify(pages)); }catch(e){}
-}
-function loadSavedPages(){
-try{
-const raw = localStorage.getItem("wardTalkboard.pages.v1");
-return raw ? JSON.parse(raw) : null;
-}catch(e){ return null; }
+const newSay = prompt("What it should say:", tile.say);
+if(newSay !== null && newSay.trim() !== ""){
+tile.say = newSay.trim();
 }
 
-/* ---------- Controls ---------- */
-confirmChip.onclick = () => { confirmMode = !confirmMode; pending=null; render(); };
-soundChip.onclick = () => { soundOn = !soundOn; render(); if(soundOn) speak("Sound on"); };
-editChip.onclick = () => { editMode = !editMode; pending=null; render(); };
-clearBtn.onclick = () => { pending=null; setMessage("…",""); window.speechSynthesis.cancel(); };
-speakBtn.onclick = () => { speak(messageEl.textContent === "…" ? " " : messageEl.textContent); };
-helpBtn.onclick = () => { pending=null; setMessage("I need help now",""); speak("I need help now"); };
+pendingEditTile = tile;
+setTimeout(()=> filePick.click(), 80);
 
-resetBtn.onclick = () => {
-pages = structuredClone(DEFAULT_PAGES);
-savePages();
-pending=null;
-setMessage("Reset done", "Default tiles restored.");
-speak("Reset done");
+saveAll();
 render();
-};
-
-/* ---------- Edit Modal ---------- */
-const modalBack = document.getElementById("modalBack");
-const editLabel = document.getElementById("editLabel");
-const editSay = document.getElementById("editSay");
-const editFile = document.getElementById("editFile");
-const cancelEdit = document.getElementById("cancelEdit");
-const saveEditBtn = document.getElementById("saveEdit");
-const removePhotoBtn = document.getElementById("removePhoto");
-
-let editing = null;
-
-function openEditModal(pageIndex, itemIndex){
-editing = { p: pageIndex, i: itemIndex };
-const item = pages[pageIndex].items[itemIndex];
-editLabel.value = item.label || "";
-editSay.value = item.say || "";
-editFile.value = "";
-modalBack.style.display = "flex";
+showToast("Saved text (photo optional)");
 }
 
-function closeEditModal(){
-modalBack.style.display = "none";
-editing = null;
+filePick.addEventListener("change", async (e)=>{
+const file = e.target.files && e.target.files[0];
+if(!file || !pendingEditTile){
+filePick.value = "";
+return;
 }
-
-cancelEdit.onclick = () => closeEditModal();
-
-removePhotoBtn.onclick = () => {
-if(!editing) return;
-const item = pages[editing.p].items[editing.i];
-// If you removed a custom photo, revert to a reasonable default look:
-// keep current image if it's one of our IMG, otherwise set a neutral background.
-item.img = item.img.startsWith("data:image/svg+xml") ? item.img : IMG.help;
-savePages();
-setMessage("Photo removed", "");
+const dataUrl = await fileToDataURL(file);
+pendingEditTile.photo = dataUrl;
+pendingEditTile = null;
+filePick.value = "";
+saveAll();
 render();
-closeEditModal();
-};
+showToast("Photo saved");
+});
 
-saveEditBtn.onclick = async () => {
-if(!editing) return;
-const item = pages[editing.p].items[editing.i];
-
-item.label = (editLabel.value || "").trim() || item.label;
-item.say = (editSay.value || "").trim() || item.say;
-
-// If a file selected, convert to base64 data URL and store.
-const file = editFile.files && editFile.files[0];
-if(file){
-const dataUrl = await fileToDataUrl(file, 1200); // resize-ish for storage
-item.img = dataUrl;
+function fileToDataURL(file){
+return new Promise((resolve,reject)=>{
+const r = new FileReader();
+r.onload = ()=>resolve(r.result);
+r.onerror = reject;
+r.readAsDataURL(file);
+});
 }
 
-pages[editing.p].items[editing.i] = item;
-savePages();
-setMessage("Saved", item.say);
-speak("Saved");
+/* =================== CONTROLS =================== */
+confirmChip.addEventListener("click", ()=>{
+confirmMode = !confirmMode;
+setChipState(confirmChip, confirmMode);
+saveAll();
+});
+
+soundChip.addEventListener("click", ()=>{
+soundOn = !soundOn;
+setChipState(soundChip, soundOn);
+showToast(soundOn ? "Sound ON" : "Sound OFF");
+saveAll();
+});
+
+editChip.addEventListener("click", ()=>{
+editMode = !editMode;
+setChipState(editChip, editMode);
+showToast(editMode ? "Edit ON" : "Edit OFF");
+saveAll();
+});
+
+resetBtn.addEventListener("click", ()=>{
+if(!confirm("Reset everything to default?")) return;
+state = deepCopy(DEFAULT);
+confirmMode = false;
+soundOn = true;
+editMode = false;
+setChipState(confirmChip,false);
+setChipState(soundChip,true);
+setChipState(editChip,false);
+confirmPendingId = null;
+saveAll();
 render();
-closeEditModal();
-};
-
-modalBack.addEventListener("click", (e) => {
-if(e.target === modalBack) closeEditModal();
+showToast("Reset done");
 });
 
-function fileToDataUrl(file, maxWidth){
-return new Promise((resolve, reject) => {
-const reader = new FileReader();
-reader.onerror = reject;
-reader.onload = () => {
-const img = new Image();
-img.onload = () => {
-// Simple resize to reduce storage (keeps aspect ratio).
-const scale = Math.min(1, maxWidth / img.width);
-const w = Math.round(img.width * scale);
-const h = Math.round(img.height * scale);
-
-const canvas = document.createElement("canvas");
-canvas.width = w; canvas.height = h;
-const ctx = canvas.getContext("2d");
-ctx.drawImage(img, 0, 0, w, h);
-
-// JPEG is smaller than PNG for photos.
-resolve(canvas.toDataURL("image/jpeg", 0.85));
-};
-img.onerror = reject;
-img.src = reader.result;
-};
-reader.readAsDataURL(file);
+clearBtn.addEventListener("click", ()=>{
+if(!confirm("Clear ONLY custom photos?")) return;
+["move","team","equipment","needs","pain"].forEach(p=>{
+(state[p]||[]).forEach(t=> t.photo = null);
 });
-}
-
-/* ---------- Start ---------- */
-setMessage("Tap a picture", "You can switch to Confirm or add real photos in Edit mode.");
+saveAll();
 render();
-  // --- Colour the 4 page chips (Move/Team/Equipment/Needs) by their text ---
-function colourPageChips(){
-document.querySelectorAll('button.chip').forEach(b=>{
-const t = (b.textContent || "").trim().toLowerCase();
-
-if(t === "move"){
-b.style.background = "#2b7cff"; // blue
-b.style.color = "white";
-b.style.border = "none";
-}
-if(t === "team"){
-b.style.background = "#2fe6b3"; // green
-b.style.color = "white";
-b.style.border = "none";
-}
-if(t === "equipment"){
-b.style.background = "#ffd43b"; // yellow
-b.style.color = "black"; // readable
-b.style.border = "none";
-}
-if(t === "needs"){
-b.style.background = "#ff4d4f"; // red
-b.style.color = "white";
-b.style.border = "none";
-}
-});
-}
-
-// run now + again after page builds (chips are dynamic)
-// Run once now
-colourPageChips();
-
-// Re-apply colours whenever anything is clicked (after the app re-renders)
-document.addEventListener("click", () => {
-setTimeout(colourPageChips, 0);
-setTimeout(colourPageChips, 50);
+showToast("Photos cleared");
 });
 
-// Also keep it alive in case of other re-renders
-setInterval(colourPageChips, 500);
+/* =================== PAGE BUTTONS =================== */
+pageMove.addEventListener("click", ()=> setActivePage("move"));
+pageTeam.addEventListener("click", ()=> setActivePage("team"));
+pageEquipment.addEventListener("click", ()=> setActivePage("equipment"));
+pageNeeds.addEventListener("click", ()=> setActivePage("needs"));
+pagePain.addEventListener("click", ()=> setActivePage("pain"));
 
+/* =================== STARTUP =================== */
+loadFlags();
+setChipState(confirmChip, confirmMode);
+setChipState(soundChip, soundOn);
+setChipState(editChip, editMode);
+
+setActivePage(currentPage);
+render();
 </script>
 </body>
 </html>
