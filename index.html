@@ -3,27 +3,21 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Ward Talkboard</title>
+<title>MCU Talkboard</title>
 
 <style>
 :root{
-/* ✅ Higher-contrast background */
---bg:#06121f;
---panel:#0b1e35;
+/* ✅ White background + black text */
+--bg:#ffffff;
+--panel:#f5f5f5;
 
-/* ✅ Tile colours (blue) */
---tile:#0f3a8a;
---tile2:#0a2a66;
+/* ✅ Blue tiles */
+--tile:#2b7cff;
+--tile2:#1f66db;
 
-/* Text */
---text:#f3f6ff;
---muted:rgba(243,246,255,.80);
---border:rgba(255,255,255,.18);
-
-/* ✅ End-of-row (last column) scanning marker (yellow) */
---endCol1:#ffd43b;
---endCol2:#e0b800;
---endColBorder:rgba(255,212,59,.95);
+--text:#000000;
+--muted:rgba(0,0,0,.70);
+--border:rgba(0,0,0,.25);
 
 /* Page chips */
 --chipFont:22px;
@@ -37,10 +31,10 @@
 --ctrlPadX:14px;
 
 /* ✅ Adjustable UI sizes */
---tileSize: 210px; /* square tile side. adjust via Sizes panel */
---iconSize: 52px; /* icon size */
---frameW: 120px; /* photo frame width */
---frameH: 92px; /* photo frame height */
+--tileSize: 210px;
+--iconSize: 52px;
+--frameW: 120px;
+--frameH: 92px;
 
 --gap:14px;
 --tileRadius:16px;
@@ -53,6 +47,9 @@
 /* Pain bar */
 --painFont:20px;
 --painMinH:56px;
+
+/* ✅ Orange last column */
+--endColOrange:#ff8c00;
 }
 
 html,body{height:100%}
@@ -65,8 +62,8 @@ color:var(--text);
 
 header{
 position:sticky; top:0; z-index:20;
-background:linear-gradient(180deg, var(--panel), rgba(11,30,53,.92));
-border-bottom:1px solid rgba(255,255,255,.10);
+background:var(--panel);
+border-bottom:2px solid rgba(0,0,0,.15);
 padding:14px 14px calc(12px + env(safe-area-inset-top));
 }
 
@@ -74,9 +71,9 @@ padding:14px 14px calc(12px + env(safe-area-inset-top));
 
 .title{
 margin-right:auto;
-font-weight:800;
+font-weight:900;
 letter-spacing:.2px;
-color:var(--muted);
+color:rgba(0,0,0,.75);
 font-size:16px;
 }
 
@@ -86,22 +83,22 @@ font-size:var(--ctrlFont);
 padding:var(--ctrlPadY) var(--ctrlPadX);
 min-height:44px;
 border-radius:999px;
-background:rgba(255,255,255,.06);
-border:1px solid var(--border);
-color:var(--text);
-font-weight:800;
+background:#ffffff;
+border:2px solid rgba(0,0,0,.25);
+color:#000000;
+font-weight:900;
 touch-action:manipulation;
 user-select:none;
 -webkit-user-select:none;
 }
 .controls .chip.on{
-border-color:rgba(118,167,255,.65);
-box-shadow:0 0 0 3px rgba(118,167,255,.20) inset;
-background:rgba(118,167,255,.10);
+border-color:rgba(43,124,255,.95);
+box-shadow:0 0 0 3px rgba(43,124,255,.18) inset;
+background:rgba(43,124,255,.08);
 }
 .controls .danger{
-background:rgba(255,77,79,.14);
-border-color:rgba(255,77,79,.35);
+background:rgba(255,77,79,.12);
+border-color:rgba(255,77,79,.55);
 }
 
 /* Page buttons */
@@ -119,11 +116,11 @@ user-select:none;
 -webkit-user-select:none;
 }
 .pages .chip.active{
-box-shadow:0 0 0 5px rgba(255,255,255,.18) inset;
+box-shadow:0 0 0 5px rgba(0,0,0,.18) inset;
 transform:translateY(-1px);
 }
 
-/* fixed colours for page chips */
+/* fixed colours for page chips (kept) */
 #pageMove{ background:#2b7cff; color:white; }
 #pageTeam{ background:#2fe6b3; color:#062218; }
 #pageEquipment{ background:#ffd43b; color:#2a2100; }
@@ -146,11 +143,11 @@ align-content:start;
 .grid{ grid-template-columns:repeat(2, minmax(0, var(--tileSize))); }
 }
 
-/* ✅ square tile */
+/* ✅ square tile (blue) */
 .tile{
 width:var(--tileSize);
 height:var(--tileSize);
-border:1px solid rgba(255,255,255,.14);
+border:2px solid rgba(0,0,0,.30);
 border-radius:var(--tileRadius);
 background:linear-gradient(180deg, var(--tile), var(--tile2));
 overflow:hidden;
@@ -159,20 +156,20 @@ flex-direction:column;
 touch-action:manipulation;
 }
 
-/* ✅ LAST COLUMN (end of row) = YELLOW for scanning
-- does NOT override Yes/No colours */
+/* ✅ last column orange for scanning (does NOT override yes/no) */
 .grid .tile:nth-child(3n):not(.yesTile):not(.noTile){
-background:linear-gradient(180deg, var(--endCol1), var(--endCol2));
-border-color:var(--endColBorder);
+background:var(--endColOrange);
+border-color:rgba(0,0,0,.35);
 }
 
+/* Yes/No kept distinct */
 .tile.yesTile{
-background:linear-gradient(180deg, rgba(47,230,179,.26), rgba(16,34,71,1));
-border-color:rgba(47,230,179,.55);
+background:linear-gradient(180deg, rgba(47,230,179,.28), rgba(47,230,179,.18));
+border-color:rgba(0,0,0,.30);
 }
 .tile.noTile{
-background:linear-gradient(180deg, rgba(255,77,79,.26), rgba(16,34,71,1));
-border-color:rgba(255,77,79,.55);
+background:linear-gradient(180deg, rgba(255,77,79,.28), rgba(255,77,79,.18));
+border-color:rgba(0,0,0,.30);
 }
 
 /* media area (top) */
@@ -189,8 +186,8 @@ padding:10px;
 width:var(--frameW);
 height:var(--frameH);
 border-radius:14px;
-border:1px solid rgba(255,255,255,.20);
-background:rgba(255,255,255,.06);
+border:2px solid rgba(0,0,0,.22);
+background:#ffffff;
 overflow:hidden;
 display:flex;
 align-items:center;
@@ -208,16 +205,16 @@ background:transparent;
 .frame svg{
 width:var(--iconSize);
 height:var(--iconSize);
-filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));
+filter:none;
 }
 
-/* ✅ label area (bottom) fixed safe height so border never clips */
+/* ✅ label area */
 .labelArea{
 flex:0 0 auto;
 min-height:var(--labelMinH);
 padding:var(--labelAreaPad);
-border-top:1px solid rgba(255,255,255,.12);
-background:rgba(0,0,0,.18);
+border-top:2px solid rgba(0,0,0,.18);
+background:#ffffff;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -230,8 +227,9 @@ font-size:var(--labelFont);
 line-height:1.10;
 padding:10px 12px;
 border-radius:14px;
-border:1px solid rgba(255,255,255,.18);
-background:rgba(255,255,255,.08);
+border:2px solid rgba(0,0,0,.30);
+background:#ffffff;
+color:#000000;
 box-sizing:border-box;
 }
 
@@ -245,12 +243,12 @@ font-size:13px;
 position:fixed;
 left:50%; transform:translateX(-50%);
 bottom:16px;
-background:rgba(0,0,0,.75);
-border:1px solid rgba(255,255,255,.18);
+background:rgba(0,0,0,.85);
+border:1px solid rgba(0,0,0,.2);
 color:#fff;
 padding:10px 14px;
 border-radius:999px;
-font-weight:800;
+font-weight:900;
 opacity:0;
 pointer-events:none;
 transition:opacity .18s ease;
@@ -267,7 +265,7 @@ z-index:50;
 display:flex;
 justify-content:space-between;
 margin-bottom:8px;
-color:rgba(243,246,255,.85);
+color:rgba(0,0,0,.75);
 font-weight:900;
 font-size:14px;
 }
@@ -280,9 +278,9 @@ width:100%;
 flex:1 1 0;
 min-height:var(--painMinH);
 border-radius:0;
-border:1px solid rgba(255,255,255,.14);
-background:rgba(255,255,255,.06);
-color:var(--text);
+border:2px solid rgba(0,0,0,.22);
+background:#ffffff;
+color:#000000;
 font-weight:950;
 font-size:var(--painFont);
 touch-action:manipulation;
@@ -297,8 +295,8 @@ padding:0;
 .painBtn.left{ border-radius:14px 0 0 14px; }
 .painBtn.right{ border-radius:0 14px 14px 0; }
 .painBtn.active{
-box-shadow:0 0 0 4px rgba(255,255,255,.14) inset;
-border-color:rgba(255,255,255,.28);
+box-shadow:0 0 0 4px rgba(0,0,0,.12) inset;
+border-color:rgba(0,0,0,.35);
 }
 
 /* EDIT PANEL */
@@ -314,16 +312,17 @@ padding:12px 12px calc(12px + env(safe-area-inset-bottom));
 .modal.on{ display:flex; }
 .sheet{
 width:min(720px, 100%);
-background:rgba(18,26,51,.98);
-border:1px solid rgba(255,255,255,.16);
+background:#ffffff;
+border:2px solid rgba(0,0,0,.18);
 border-radius:20px;
 padding:14px;
 }
 .sheet h3{
 margin:0 0 10px 0;
 font-size:16px;
-color:rgba(243,246,255,.85);
+color:rgba(0,0,0,.80);
 letter-spacing:.2px;
+font-weight:950;
 }
 .field{
 display:flex;
@@ -333,18 +332,18 @@ margin-bottom:10px;
 }
 .field label{
 font-size:13px;
-color:rgba(243,246,255,.75);
-font-weight:800;
+color:rgba(0,0,0,.70);
+font-weight:900;
 }
 .field input, .field input[type="range"]{
 height:44px;
 border-radius:12px;
-border:1px solid rgba(255,255,255,.14);
-background:rgba(255,255,255,.06);
-color:var(--text);
+border:2px solid rgba(0,0,0,.18);
+background:#ffffff;
+color:#000000;
 padding:0 12px;
 font-size:16px;
-font-weight:700;
+font-weight:800;
 outline:none;
 box-sizing:border-box;
 width:100%;
@@ -357,8 +356,8 @@ align-items:center;
 .rangeValue{
 min-width:54px;
 text-align:right;
-font-weight:900;
-color:rgba(243,246,255,.85);
+font-weight:950;
+color:rgba(0,0,0,.75);
 }
 .sheetActions{
 display:flex;
@@ -369,22 +368,22 @@ margin-top:10px;
 }
 .btn{
 border-radius:999px;
-border:1px solid rgba(255,255,255,.16);
-background:rgba(255,255,255,.08);
-color:var(--text);
+border:2px solid rgba(0,0,0,.18);
+background:#ffffff;
+color:#000000;
 height:44px;
 padding:0 14px;
-font-weight:900;
+font-weight:950;
 font-size:14px;
 touch-action:manipulation;
 }
 .btn.primary{
-border-color:rgba(118,167,255,.55);
-background:rgba(118,167,255,.14);
+border-color:rgba(43,124,255,.65);
+background:rgba(43,124,255,.10);
 }
 .btn.danger{
-border-color:rgba(255,77,79,.45);
-background:rgba(255,77,79,.14);
+border-color:rgba(255,77,79,.60);
+background:rgba(255,77,79,.12);
 }
 </style>
 </head>
@@ -392,7 +391,7 @@ background:rgba(255,77,79,.14);
 <body>
 <header>
 <div class="row controls">
-<div class="title">Ward Talkboard</div>
+<div class="title">MCU Talkboard</div>
 <button class="chip" id="confirmChip" type="button">Confirm</button>
 <button class="chip on" id="soundChip" type="button">Sound</button>
 <button class="chip" id="editChip" type="button">Edit</button>
@@ -487,7 +486,8 @@ background:rgba(255,77,79,.14);
 <script>
 /* ===== Icons ===== */
 function iconSVG(name){
-const S = `fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"`;
+/* ✅ icon stroke now BLACK for high contrast */
+const S = `fill="none" stroke="#000000" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"`;
 const icons = {
 yes:`<svg viewBox="0 0 256 256"><path ${S} d="M54 134l44 44 104-120"/></svg>`,
 no:`<svg viewBox="0 0 256 256"><path ${S} d="M70 70l116 116"/><path ${S} d="M186 70L70 186"/></svg>`,
@@ -698,7 +698,8 @@ if(n <= 7) return "rgba(255,140,0,.18)";
 return "rgba(255,77,79,.18)";
 }
 function faceSVG(level){
-const S = `fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"`;
+/* ✅ pain faces stroke now BLACK */
+const S = `fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"`;
 if(level===0){
 return `<svg viewBox="0 0 256 256" width="22" height="22">
 <circle ${S} cx="128" cy="128" r="90"/>
