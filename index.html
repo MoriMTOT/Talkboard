@@ -3,17 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>M C U Talkboard</title>
+<title>Ward Talkboard</title>
 
 <style>
 :root{
---bg:#0b1020;
---panel:#121a33;
---tile:#172a55;
---tile2:#102247;
+/* ✅ Higher-contrast background */
+--bg:#06121f;
+--panel:#0b1e35;
+
+/* ✅ Tile colours (blue) */
+--tile:#0f3a8a;
+--tile2:#0a2a66;
+
+/* Text */
 --text:#f3f6ff;
---muted:rgba(243,246,255,.75);
---border:rgba(255,255,255,.16);
+--muted:rgba(243,246,255,.80);
+--border:rgba(255,255,255,.18);
+
+/* ✅ End-of-row (last column) scanning marker (yellow) */
+--endCol1:#ffd43b;
+--endCol2:#e0b800;
+--endColBorder:rgba(255,212,59,.95);
 
 /* Page chips */
 --chipFont:22px;
@@ -55,7 +65,7 @@ color:var(--text);
 
 header{
 position:sticky; top:0; z-index:20;
-background:linear-gradient(180deg, var(--panel), rgba(18,26,51,.92));
+background:linear-gradient(180deg, var(--panel), rgba(11,30,53,.92));
 border-bottom:1px solid rgba(255,255,255,.10);
 padding:14px 14px calc(12px + env(safe-area-inset-top));
 }
@@ -129,7 +139,7 @@ padding:14px 14px calc(14px + env(safe-area-inset-bottom));
 display:grid;
 grid-template-columns:repeat(3, minmax(0, var(--tileSize)));
 gap:var(--gap);
-justify-content:center; /* centers grid so extra width doesn't enlarge tiles */
+justify-content:center;
 align-content:start;
 }
 @media (max-width: 520px){
@@ -140,7 +150,7 @@ align-content:start;
 .tile{
 width:var(--tileSize);
 height:var(--tileSize);
-border:1px solid rgba(255,255,255,.12);
+border:1px solid rgba(255,255,255,.14);
 border-radius:var(--tileRadius);
 background:linear-gradient(180deg, var(--tile), var(--tile2));
 overflow:hidden;
@@ -149,13 +159,20 @@ flex-direction:column;
 touch-action:manipulation;
 }
 
+/* ✅ LAST COLUMN (end of row) = YELLOW for scanning
+- does NOT override Yes/No colours */
+.grid .tile:nth-child(3n):not(.yesTile):not(.noTile){
+background:linear-gradient(180deg, var(--endCol1), var(--endCol2));
+border-color:var(--endColBorder);
+}
+
 .tile.yesTile{
-background:linear-gradient(180deg, rgba(47,230,179,.22), rgba(16,34,71,1));
-border-color:rgba(47,230,179,.42);
+background:linear-gradient(180deg, rgba(47,230,179,.26), rgba(16,34,71,1));
+border-color:rgba(47,230,179,.55);
 }
 .tile.noTile{
-background:linear-gradient(180deg, rgba(255,77,79,.22), rgba(16,34,71,1));
-border-color:rgba(255,77,79,.42);
+background:linear-gradient(180deg, rgba(255,77,79,.26), rgba(16,34,71,1));
+border-color:rgba(255,77,79,.55);
 }
 
 /* media area (top) */
@@ -172,7 +189,7 @@ padding:10px;
 width:var(--frameW);
 height:var(--frameH);
 border-radius:14px;
-border:1px solid rgba(255,255,255,.18);
+border:1px solid rgba(255,255,255,.20);
 background:rgba(255,255,255,.06);
 overflow:hidden;
 display:flex;
@@ -183,7 +200,7 @@ justify-content:center;
 .frame img{
 width:100%;
 height:100%;
-object-fit:contain; /* change to cover if you prefer fill/crop */
+object-fit:contain;
 object-position:center;
 background:transparent;
 }
@@ -199,7 +216,7 @@ filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));
 flex:0 0 auto;
 min-height:var(--labelMinH);
 padding:var(--labelAreaPad);
-border-top:1px solid rgba(255,255,255,.10);
+border-top:1px solid rgba(255,255,255,.12);
 background:rgba(0,0,0,.18);
 display:flex;
 align-items:center;
@@ -213,8 +230,8 @@ font-size:var(--labelFont);
 line-height:1.10;
 padding:10px 12px;
 border-radius:14px;
-border:1px solid rgba(255,255,255,.16);
-background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.18);
+background:rgba(255,255,255,.08);
 box-sizing:border-box;
 }
 
@@ -804,10 +821,9 @@ function setCSS(varName, px){
 document.documentElement.style.setProperty(varName, px + "px");
 }
 function openSizes(){
-// read current values
 const tile = getCSSNum("--tileSize");
 const icon = getCSSNum("--iconSize");
-const fw = getCSSNum("--frameW"); // we'll use frame slider to set both W and H proportionally
+const fw = getCSSNum("--frameW");
 tileSizeRange.value = tile;
 iconSizeRange.value = icon;
 frameSizeRange.value = fw;
@@ -830,7 +846,7 @@ const fw = parseInt(frameSizeRange.value,10);
 setCSS("--tileSize", tile);
 setCSS("--iconSize", icon);
 setCSS("--frameW", fw);
-setCSS("--frameH", Math.round(fw * 0.77)); // keeps nice rectangle
+setCSS("--frameH", Math.round(fw * 0.77));
 
 render();
 }
