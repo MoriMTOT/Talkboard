@@ -405,6 +405,23 @@ background:rgba(43,124,255,.10);
 border-color:rgba(255,77,79,.60);
 background:rgba(255,77,79,.12);
 }
+  /* ✅ FIX: Yes/No tiles were too short, label was clipping */
+.ynRow .tile{
+height: calc(var(--tileSize) * 0.90) !important; /* was ~0.72 */
+}
+
+/* ✅ Make the label area smaller ONLY in Yes/No row */
+.ynRow .labelArea{
+min-height: 64px !important;
+padding: 8px !important;
+}
+
+/* ✅ Make the white label fit nicely */
+.ynRow .label{
+font-size: 28px !important;
+padding: 10px 12px !important;
+}
+
 </style>
 </head>
 
