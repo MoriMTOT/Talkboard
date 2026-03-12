@@ -7,47 +7,39 @@
 
 <style>
 :root{
-/* ✅ Theme */
 --bg:#ffffff;
 --panel:#f5f5f5;
 
-/* ✅ Blue tiles */
 --tile:#2b7cff;
 --tile2:#1f66db;
 
 --text:#000000;
 --muted:rgba(0,0,0,.70);
 
-/* Page chips */
 --chipFont:22px;
 --chipPadY:14px;
 --chipPadX:20px;
 --chipMinH:58px;
 
-/* Control chips */
 --ctrlFont:16px;
 --ctrlPadY:10px;
 --ctrlPadX:14px;
 
-/* ✅ Adjustable UI sizes */
---tileSize: 210px; /* square tile side */
---iconSize: 52px; /* icon size */
---frameW: 120px; /* photo frame width */
---frameH: 92px; /* photo frame height */
+--tileSize: 210px;
+--iconSize: 52px;
+--frameW: 120px;
+--frameH: 92px;
 
 --gap:14px;
 --tileRadius:16px;
 
-/* ✅ label safe height so it never clips */
 --labelFont:24px;
 --labelAreaPad:10px;
 --labelMinH:72px;
 
-/* Pain bar */
 --painFont:20px;
 --painMinH:56px;
 
-/* ✅ Orange last column */
 --endColOrange:#ff8c00;
 }
 
@@ -71,12 +63,10 @@ padding:14px 14px calc(12px + env(safe-area-inset-top));
 .title{
 margin-right:auto;
 font-weight:900;
-letter-spacing:.2px;
 color:rgba(0,0,0,.75);
 font-size:16px;
 }
 
-/* Controls */
 .controls .chip{
 font-size:var(--ctrlFont);
 padding:var(--ctrlPadY) var(--ctrlPadX);
@@ -96,7 +86,6 @@ box-shadow:0 0 0 3px rgba(43,124,255,.18) inset;
 background:rgba(43,124,255,.08);
 }
 
-/* Page buttons */
 .pages{margin-top:12px}
 .pages .chip{
 font-size:var(--chipFont);
@@ -105,7 +94,6 @@ min-height:var(--chipMinH);
 border-radius:999px;
 border:none;
 font-weight:950;
-letter-spacing:.2px;
 touch-action:manipulation;
 user-select:none;
 -webkit-user-select:none;
@@ -115,18 +103,19 @@ box-shadow:0 0 0 5px rgba(0,0,0,.18) inset;
 transform:translateY(-1px);
 }
 
-/* fixed colours for page chips */
 #pageMove{ background:#2b7cff; color:white; }
 #pageTeam{ background:#2fe6b3; color:#062218; }
 #pageEquipment{ background:#ffd43b; color:#2a2100; }
 #pageNeeds{ background:#ff4d4f; color:white; }
 #pagePain{ background:#b26bff; color:white; }
+#pageFeelings{ background:#ff8ad6; color:#330022; }
+#pageFaces{ background:#4dd2ff; color:#002333; }
+#pageFavorites{ background:#8cff66; color:#133300; }
 
 main{
 padding:14px 14px calc(14px + env(safe-area-inset-bottom));
 }
 
-/* ✅ grid tiles */
 .grid{
 display:grid;
 grid-template-columns:repeat(3, minmax(0, var(--tileSize)));
@@ -150,13 +139,11 @@ flex-direction:column;
 touch-action:manipulation;
 }
 
-/* ✅ last column orange for scanning (only main grid) */
 .grid .tile:nth-child(3n){
 background:var(--endColOrange);
 border-color:rgba(0,0,0,.35);
 }
 
-/* Yes/No tiles */
 .tile.yesTile{
 background:linear-gradient(180deg, rgba(47,230,179,.28), rgba(47,230,179,.18));
 border-color:rgba(0,0,0,.30);
@@ -166,7 +153,6 @@ background:linear-gradient(180deg, rgba(255,77,79,.28), rgba(255,77,79,.18));
 border-color:rgba(0,0,0,.30);
 }
 
-/* media area */
 .mediaArea{
 flex:1 1 auto;
 display:flex;
@@ -191,15 +177,12 @@ width:100%;
 height:100%;
 object-fit:contain;
 object-position:center;
-background:transparent;
 }
 .frame svg{
 width:var(--iconSize);
 height:var(--iconSize);
-filter:none;
 }
 
-/* ✅ label area: same colour as tile (transparent), only label is white */
 .labelArea{
 flex:0 0 auto;
 min-height:var(--labelMinH);
@@ -245,10 +228,8 @@ transition:opacity .18s ease;
 z-index:50;
 }
 .toast.on{opacity:1}
-
 #filePick{display:none}
 
-/* Pain */
 .painWrap{ display:none; margin-bottom:14px; }
 .painWrap.on{ display:block; }
 .painTop{
@@ -260,7 +241,6 @@ font-weight:900;
 font-size:14px;
 }
 .painRow{ display:flex; gap:6px; width:100%; }
-
 .painBtn{
 flex:1 1 0;
 min-height:var(--painMinH);
@@ -273,11 +253,8 @@ font-size:var(--painFont);
 display:flex;
 align-items:center;
 justify-content:center;
-gap:6px;
 padding:0;
 touch-action:manipulation;
-user-select:none;
--webkit-user-select:none;
 }
 .painBtn.left{ border-radius:14px 0 0 14px; }
 .painBtn.right{ border-radius:0 14px 14px 0; }
@@ -286,20 +263,18 @@ box-shadow:0 0 0 4px rgba(0,0,0,.12) inset;
 border-color:rgba(0,0,0,.35);
 }
 
-/* ✅ Big emoji area under bar, centered in the empty space */
 .painFaceBig{
 margin-top:14px;
-height:150px; /* ✅ this creates the “empty space” */
+height:170px;
 display:flex;
-align-items:center; /* ✅ vertical center */
-justify-content:center; /* ✅ horizontal center */
-font-size:110px; /* ✅ bigger emoji */
+align-items:center;
+justify-content:center;
+font-size:130px;
 line-height:1;
 user-select:none;
 -webkit-user-select:none;
 }
 
-/* ✅ YES/NO fixed row (always side-by-side) */
 .ynRow{
 margin-top:14px;
 display:flex;
@@ -311,14 +286,7 @@ flex-wrap:nowrap;
 width:calc(var(--tileSize));
 height:calc(var(--tileSize) * 0.72);
 }
-@media (max-width: 520px){
-.ynRow .tile{
-width:calc(var(--tileSize));
-height:calc(var(--tileSize) * 0.70);
-}
-}
 
-/* Modals */
 .modal{
 position:fixed; inset:0;
 background:rgba(0,0,0,.55);
@@ -341,7 +309,6 @@ padding:14px;
 margin:0 0 10px 0;
 font-size:16px;
 color:rgba(0,0,0,.80);
-letter-spacing:.2px;
 font-weight:950;
 }
 .field{
@@ -405,23 +372,6 @@ background:rgba(43,124,255,.10);
 border-color:rgba(255,77,79,.60);
 background:rgba(255,77,79,.12);
 }
-  /* ✅ FIX: Yes/No tiles were too short, label was clipping */
-.ynRow .tile{
-height: calc(var(--tileSize) * 0.90) !important; /* was ~0.72 */
-}
-
-/* ✅ Make the label area smaller ONLY in Yes/No row */
-.ynRow .labelArea{
-min-height: 64px !important;
-padding: 8px !important;
-}
-
-/* ✅ Make the white label fit nicely */
-.ynRow .label{
-font-size: 28px !important;
-padding: 10px 12px !important;
-}
-
 </style>
 </head>
 
@@ -441,6 +391,9 @@ padding: 10px 12px !important;
 <button class="chip" id="pageEquipment" type="button">Equipment</button>
 <button class="chip" id="pageNeeds" type="button">Needs</button>
 <button class="chip" id="pagePain" type="button">Pain</button>
+<button class="chip" id="pageFeelings" type="button">Feelings</button>
+<button class="chip" id="pageFaces" type="button">People</button>
+<button class="chip" id="pageFavorites" type="button">Favorites</button>
 </div>
 
 <div class="hint">Yes/No are always at the bottom. Sizes → adjust tile/icon anytime.</div>
@@ -454,15 +407,12 @@ padding: 10px 12px !important;
 </div>
 
 <div class="grid" id="grid"></div>
-
-<!-- ✅ fixed Yes/No row -->
 <div class="ynRow" id="ynRow"></div>
 </main>
 
 <div class="toast" id="toast">Saved</div>
 <input id="filePick" type="file" accept="image/*" />
 
-<!-- Edit Modal -->
 <div class="modal" id="editModal">
 <div class="sheet">
 <h3>Edit button</h3>
@@ -486,7 +436,6 @@ padding: 10px 12px !important;
 </div>
 </div>
 
-<!-- Sizes Modal -->
 <div class="modal" id="sizeModal">
 <div class="sheet">
 <h3>Sizes</h3>
@@ -523,7 +472,6 @@ padding: 10px 12px !important;
 </div>
 
 <script>
-/* ===== Icons ===== */
 function iconSVG(name){
 const S = `fill="none" stroke="#000000" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"`;
 const icons = {
@@ -547,11 +495,16 @@ doctor:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="64" r="26"/><path $
 ot:`<svg viewBox="0 0 256 256"><circle ${S} cx="92" cy="84" r="18"/><circle ${S} cx="164" cy="84" r="18"/><path ${S} d="M74 140c20-22 88-22 108 0"/></svg>`,
 pt:`<svg viewBox="0 0 256 256"><circle ${S} cx="96" cy="64" r="22"/><path ${S} d="M96 86l20 38 56 26"/></svg>`,
 sp:`<svg viewBox="0 0 256 256"><path ${S} d="M44 78c0-18 14-32 32-32h104c18 0 32 14 32 32v54c0 18-14 32-32 32H124l-34 34v-34H76c-18 0-32-14-32-32V78z"/></svg>`,
+happy:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="90"/><circle ${S} cx="96" cy="110" r="6"/><circle ${S} cx="160" cy="110" r="6"/><path ${S} d="M90 150c18 22 58 22 76 0"/></svg>`,
+sad:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="90"/><circle ${S} cx="96" cy="110" r="6"/><circle ${S} cx="160" cy="110" r="6"/><path ${S} d="M90 172c18-20 58-20 76 0"/></svg>`,
+frustrated:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="90"/><path ${S} d="M86 98l20 8"/><path ${S} d="M170 98l-20 8"/><circle ${S} cx="100" cy="116" r="5"/><circle ${S} cx="156" cy="116" r="5"/><path ${S} d="M92 170c16-10 56-10 72 0"/></svg>`,
+tired:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="90"/><path ${S} d="M84 112h24"/><path ${S} d="M148 112h24"/><path ${S} d="M96 170h64"/></svg>`,
+anxious:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="90"/><circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/><path ${S} d="M104 170l48-20"/></svg>`,
+confused:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="90"/><circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/><path ${S} d="M96 166c12 8 20-8 32 0s20-8 32 0"/></svg>`,
 };
 return icons[name] || icons.help;
 }
 
-/* ===== Defaults ===== */
 const DEFAULT = {
 move: [
 {id:"sit", label:"Sit", say:"I want to sit up", icon:"sit", photo:null},
@@ -582,16 +535,42 @@ needs: [
 {id:"toilet", label:"Toilet", say:"I need the toilet", icon:"toilet", photo:null},
 {id:"pain", label:"Pain", say:"I have pain", icon:"pain", photo:null},
 {id:"help", label:"HELP", say:"I need help now", icon:"help", photo:null},
+{id:"dontunderstand", label:"I don't understand", say:"I don't understand", icon:"help", photo:null},
+{id:"repeatplease", label:"Repeat please", say:"Please repeat", icon:"help", photo:null},
+{id:"slowdown", label:"Slow down", say:"Please slow down", icon:"help", photo:null},
+],
+feelings: [
+{id:"happy", label:"Happy", say:"I feel happy", icon:"happy", photo:null},
+{id:"sad", label:"Sad", say:"I feel sad", icon:"sad", photo:null},
+{id:"frustrated", label:"Frustrated", say:"I feel frustrated", icon:"frustrated", photo:null},
+{id:"tired", label:"Exhausted", say:"I feel very tired", icon:"tired", photo:null},
+{id:"anxious", label:"Anxious", say:"I feel anxious", icon:"anxious", photo:null},
+{id:"confused", label:"Confused", say:"I feel confused", icon:"confused", photo:null},
+],
+faces: [
+{id:"person1", label:"Family", say:"I want to see my family", icon:"help", photo:null},
+{id:"person2", label:"Friend", say:"I want to see my friend", icon:"help", photo:null},
+{id:"person3", label:"Partner", say:"I want my partner", icon:"help", photo:null},
+{id:"person4", label:"Child", say:"I want my child", icon:"help", photo:null},
+{id:"person5", label:"Mum", say:"I want my mum", icon:"help", photo:null},
+{id:"person6", label:"Dad", say:"I want my dad", icon:"help", photo:null},
+],
+favorites: [
+{id:"lipstick", label:"Lipstick", say:"I want my lipstick", icon:"help", photo:null},
+{id:"clothes", label:"Clothes", say:"I want my clothes", icon:"help", photo:null},
+{id:"phone", label:"Phone", say:"I want my phone", icon:"help", photo:null},
+{id:"music", label:"Music", say:"I want music", icon:"help", photo:null},
+{id:"glasses", label:"Glasses", say:"I want my glasses", icon:"help", photo:null},
+{id:"blanket", label:"Blanket", say:"I want my blanket", icon:"help", photo:null},
 ],
 };
 
 const YES_TILE = {id:"yes_fixed", label:"Yes", say:"Yes", icon:"yes", photo:null, _fixed:true, _yn:"yes"};
 const NO_TILE = {id:"no_fixed", label:"No", say:"No", icon:"no", photo:null, _fixed:true, _yn:"no"};
 
-const STORAGE_KEY = "wardTalkboard_v10";
+const STORAGE_KEY = "wardTalkboard_v11";
 const UI_KEY = "wardTalkboard_ui_v1";
 
-/* ===== State ===== */
 let state = loadState();
 let currentPage = "move";
 let confirmMode = false;
@@ -621,8 +600,10 @@ const pageTeam = document.getElementById("pageTeam");
 const pageEquipment = document.getElementById("pageEquipment");
 const pageNeeds = document.getElementById("pageNeeds");
 const pagePain = document.getElementById("pagePain");
+const pageFeelings = document.getElementById("pageFeelings");
+const pageFaces = document.getElementById("pageFaces");
+const pageFavorites = document.getElementById("pageFavorites");
 
-/* Edit Modal */
 const editModal = document.getElementById("editModal");
 const editLabel = document.getElementById("editLabel");
 const editSay = document.getElementById("editSay");
@@ -631,7 +612,6 @@ const removePhotoBtn = document.getElementById("removePhotoBtn");
 const cancelBtn = document.getElementById("cancelBtn");
 const saveBtn = document.getElementById("saveBtn");
 
-/* Sizes Modal */
 const sizeModal = document.getElementById("sizeModal");
 const tileSizeRange = document.getElementById("tileSizeRange");
 const iconSizeRange = document.getElementById("iconSizeRange");
@@ -642,7 +622,6 @@ const frameSizeVal = document.getElementById("frameSizeVal");
 const sizeCancelBtn = document.getElementById("sizeCancelBtn");
 const sizeSaveBtn = document.getElementById("sizeSaveBtn");
 
-/* ===== Helpers ===== */
 function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
 
 function showToast(msg){
@@ -693,8 +672,6 @@ try{
 window.speechSynthesis.cancel();
 const u = new SpeechSynthesisUtterance(text);
 u.rate = 0.95;
-u.pitch = 1.0;
-u.volume = 1.0;
 window.speechSynthesis.speak(u);
 }catch(e){
 showToast("Speech blocked");
@@ -707,12 +684,15 @@ btn.classList.toggle("on", !!on);
 
 function setActivePage(page){
 currentPage = page;
-[pageMove,pageTeam,pageEquipment,pageNeeds,pagePain].forEach(b=>b.classList.remove("active"));
+[pageMove,pageTeam,pageEquipment,pageNeeds,pagePain,pageFeelings,pageFaces,pageFavorites].forEach(b=>b.classList.remove("active"));
 if(page==="move") pageMove.classList.add("active");
 if(page==="team") pageTeam.classList.add("active");
 if(page==="equipment") pageEquipment.classList.add("active");
 if(page==="needs") pageNeeds.classList.add("active");
 if(page==="pain") pagePain.classList.add("active");
+if(page==="feelings") pageFeelings.classList.add("active");
+if(page==="faces") pageFaces.classList.add("active");
+if(page==="favorites") pageFavorites.classList.add("active");
 render();
 saveAll();
 }
@@ -723,14 +703,12 @@ if(page === "pain") return [];
 return [...base];
 }
 
-/* ===== Pain bar + big emoji ===== */
 function painColor(n){
 if(n <= 2) return "rgba(47,230,179,.18)";
 if(n <= 5) return "rgba(255,212,59,.18)";
 if(n <= 7) return "rgba(255,140,0,.18)";
 return "rgba(255,77,79,.18)";
 }
-
 function renderPainBar(){
 const EMO = ["😊","🤨","🥺","😑","😕","☹️","😓","😣","😖","😫","😭"];
 
@@ -760,7 +738,6 @@ painRow.appendChild(b);
 }
 }
 
-/* ===== Edit modal ===== */
 function openEditor(tile){
 editingTile = tile;
 editLabel.value = tile.label || "";
@@ -823,7 +800,6 @@ r.readAsDataURL(file);
 });
 }
 
-/* ===== Sizes ===== */
 function getCSSNum(varName){
 const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
 return parseInt(v.replace("px",""), 10);
@@ -841,9 +817,7 @@ frameSizeRange.value = fw;
 updateSizeLabels();
 sizeModal.classList.add("on");
 }
-function closeSizes(){
-sizeModal.classList.remove("on");
-}
+function closeSizes(){ sizeModal.classList.remove("on"); }
 function updateSizeLabels(){
 tileSizeVal.textContent = tileSizeRange.value + "px";
 iconSizeVal.textContent = iconSizeRange.value + "px";
@@ -853,12 +827,10 @@ function applySizesLive(){
 const tile = parseInt(tileSizeRange.value,10);
 const icon = parseInt(iconSizeRange.value,10);
 const fw = parseInt(frameSizeRange.value,10);
-
 setCSS("--tileSize", tile);
 setCSS("--iconSize", icon);
 setCSS("--frameW", fw);
 setCSS("--frameH", Math.round(fw * 0.77));
-
 render();
 }
 tileSizeRange.addEventListener("input", ()=>{ updateSizeLabels(); applySizesLive(); });
@@ -894,7 +866,6 @@ setCSS("--frameH", Math.round(ui.frameW * 0.77));
 }catch(e){}
 }
 
-/* ===== Tile builder ===== */
 function buildTile(tile, extraClass){
 const el = document.createElement("div");
 el.className = "tile" + (extraClass ? (" " + extraClass) : "");
@@ -917,7 +888,6 @@ frame.appendChild(img);
 }else{
 frame.innerHTML = iconSVG(tile.icon);
 }
-
 mediaArea.appendChild(frame);
 
 const labelArea = document.createElement("div");
@@ -971,7 +941,6 @@ activate();
 return el;
 }
 
-/* ===== Render ===== */
 function render(){
 if(currentPage === "pain"){
 painWrap.classList.add("on");
@@ -986,32 +955,23 @@ grid.innerHTML = "";
 ynRow.innerHTML = "";
 
 const tiles = tilesForPage(currentPage);
-tiles.forEach(tile=>{
-grid.appendChild(buildTile(tile, ""));
-});
+tiles.forEach(tile=> grid.appendChild(buildTile(tile, "")));
 
-/* ✅ Yes/No always shown at bottom, side-by-side */
-const yesEl = buildTile(YES_TILE, "yesTile");
-const noEl = buildTile(NO_TILE, "noTile");
-ynRow.appendChild(yesEl);
-ynRow.appendChild(noEl);
+ynRow.appendChild(buildTile(YES_TILE, "yesTile"));
+ynRow.appendChild(buildTile(NO_TILE, "noTile"));
 }
 
-/* ===== Controls ===== */
 confirmChip.addEventListener("click", ()=>{
 confirmMode = !confirmMode;
 setChipState(confirmChip, confirmMode);
 saveAll();
 });
-
 soundChip.addEventListener("click", ()=>{
 soundOn = !soundOn;
 setChipState(soundChip, soundOn);
 showToast(soundOn ? "Sound ON" : "Sound OFF");
 saveAll();
 });
-
-/* ✅ Confirmation question when pressing Edit */
 editChip.addEventListener("click", ()=>{
 if(!editMode){
 const ok = confirm("Turn Edit ON? (This allows changes to buttons and photos)");
@@ -1020,7 +980,6 @@ editMode = true;
 setChipState(editChip, true);
 showToast("Edit ON");
 saveAll();
-return;
 }else{
 const ok = confirm("Turn Edit OFF?");
 if(!ok) return;
@@ -1029,25 +988,23 @@ setChipState(editChip, false);
 closeEditor();
 showToast("Edit OFF");
 saveAll();
-return;
 }
 });
 
-/* ===== Pages ===== */
 pageMove.addEventListener("click", ()=> setActivePage("move"));
 pageTeam.addEventListener("click", ()=> setActivePage("team"));
 pageEquipment.addEventListener("click", ()=> setActivePage("equipment"));
 pageNeeds.addEventListener("click", ()=> setActivePage("needs"));
 pagePain.addEventListener("click", ()=> setActivePage("pain"));
+pageFeelings.addEventListener("click", ()=> setActivePage("feelings"));
+pageFaces.addEventListener("click", ()=> setActivePage("faces"));
+pageFavorites.addEventListener("click", ()=> setActivePage("favorites"));
 
-/* ===== Startup ===== */
 loadFlags();
 loadUISizes();
-
 setChipState(confirmChip, confirmMode);
 setChipState(soundChip, soundOn);
 setChipState(editChip, editMode);
-
 setActivePage(currentPage);
 render();
 </script>
