@@ -522,50 +522,57 @@
 </div>
 
 <script>
-  const IMAGE_FILES = {
-    sit: "F1C4F043-AF25-4C4D-B81B-AF938240816E.jpeg",
-    stand: "7A8C0987-ED71-4CA8-A622-C22248D387F4.jpeg",
-    outofbed: "487F9EB5-DAE9-4867-BB8B-F90200D0B433.jpeg",
-    inbed: "D35CC066-943B-4BD2-8E84-8276936FE8E9.jpeg",
-    stop: "F60570C9-2F68-4618-9C1B-E6C99FB67925.jpeg",
-    nurse: "3E6EB5F9-BCC8-4DC9-AB22-5BFB3897B900.jpeg",
-    doctor: "23E7588B-3606-4530-B496-C71BBE067874.jpeg",
-    ot: "F0809EB4-EEB3-4BA1-AE0D-A3E725D18E76.jpeg",
-    pt: "2B9FC82E-BCC7-4343-A832-C9CC1A78D762.jpeg",
-    speech: "FD7BE56D-5260-44C4-8483-0C2A0368BD8B.jpeg",
-    callbell: "8FCD849C-3C21-4E59-8A50-197480C75D58.jpeg",
-    wheelchair: "9123EF1F-FBA3-40F5-B823-E23D89ECEEB5.jpeg",
-    bed: "ADB476A4-043A-4668-85CE-EA44DE4D995C.jpeg",
-    reposition: "A1141A93-D0D7-44D1-9DC6-5213F542B886.jpeg",
-    toilet: "30DD9D82-03FA-4438-929E-E2B69BAF9E81.jpeg",
-    chair: "2257C5C2-9E5E-49D6-8660-BE6B422F0978.jpeg",
-    drink: "11D74A41-B51C-43AB-8AB3-22546EFAD14A.jpeg",
-    food: "59629798-1D7D-49B2-9F1A-7B19E7E4C7FF.jpeg",
-    pain: "384718BA-888C-4728-9679-B4B64B85389B.jpeg",
-    help: "30F7A8D1-F56D-4642-BC12-39716522E4A5.jpeg",
-    dontunderstand: "93D1903B-F1C1-4498-AD4B-575326027463.jpeg",
-    repeat: "F177487C-47C9-4E5F-BCDB-A149BF219555.jpeg",
-    slowdown: "73C589C7-4CB6-4E80-BEF1-A1F38C3BCAF7.jpeg",
-    happy: "5AE1A48F-20BC-40DF-AED8-4CF729E36F36.jpeg",
-    sad: "3148B3B9-5C02-466D-BE7B-7E81CD9F7AE0.jpeg",
-    frustrated: "48DFDBF3-3FDD-43BD-A433-642CE2D9760E.jpeg",
-    exhausted: "ECD44CAA-325C-4A8F-8BFE-3A4A72503AB8.jpeg",
-    anxious: "EAB406D7-84C1-4762-A186-F97CDE0A3A5A.jpeg",
-    confused: "07003AFE-4FD0-479F-8E22-17A8B3E5ED83.jpeg",
-    family: "896AFE1B-6EE6-4866-9B70-AB8EE3A12DCF.jpeg",
-    friend: "13966D00-E598-4B2B-B391-C0C28C1BD9AB.jpeg",
-    partner: "86445E16-DD43-4F17-BC75-31634C699EBE.jpeg",
-    child: "83686965-EE2D-4243-85E4-AFEF0531664B.jpeg",
-    mum: "B267D2A4-7EA2-4177-B224-5ECC41922BB6.jpeg",
-    dad: "6EC42158-16BE-4BA8-8EAD-5253E7A885AE.jpeg",
-    lipstick: "F1A3FB6B-CE10-4B57-AEAE-75279FE4215D.jpeg",
-    clothes: "F4BAA167-4E0A-4970-A785-ED95C40767DD.jpeg",
-    phone: "0817DCDA-CA7B-43C9-BF8F-B034A5D37D6A.jpeg",
-    music: "4E822F6E-2057-457C-9D76-2B0DDD770EAF.jpeg",
-    glasses: "07E7EEE1-F112-4362-ACE5-CD57717D4A24.jpeg",
-    blanket: "6345F2C8-B266-4F85-A7F0-9E8F32328B75.jpeg"
-  };
+ const IMAGE_FILES = {
+sit: "sit.png",
+stand: "stand.png",
+outofbed: "outofbed.png",
+inbed: "inbed.png",
+stop: "stop.png",
 
+nurse: "nurse.png",
+doctor: "doctor.png",
+ot: "ot.png",
+pt: "pt.png",
+speech: "speech.png",
+callbell: "callbell.png",
+
+wheelchair: "wheelchair.png",
+bed: "bed.png",
+reposition: "reposition.png",
+toilet: "toilet.png",
+chair: "chair.png",
+
+drink: "drink.png",
+food: "food.png",
+pain: "pain.png",
+help: "help.png",
+
+dontunderstand: "dontunderstand.png",
+repeat: "repeat.png",
+slowdown: "slowdown.png",
+
+happy: "happy.png",
+sad: "sad.png",
+frustrated: "frustrated.png",
+exhausted: "exhausted.png",
+anxious: "anxious.png",
+confused: "confused.png",
+
+family: "family.png",
+friend: "friend.png",
+partner: "partner.png",
+child: "child.png",
+mum: "mum.png",
+dad: "dad.png",
+
+lipstick: "lipstick.png",
+clothes: "clothes.png",
+phone: "phone.png",
+music: "music.png",
+glasses: "glasses.png",
+blanket: "blanket.png"
+};
+  
   const DEFAULT = {
     move: [
       { id:"sit", label:"Sit", say:"I want to sit up", photo:IMAGE_FILES.sit },
