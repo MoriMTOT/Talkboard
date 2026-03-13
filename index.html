@@ -1,1013 +1,1137 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Ward Talkboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>MCU Talkboard</title>
 
-<style>
-:root{
---bg:#0b1020;
---panel:#121a33;
---tile:#172a55;
---tile2:#102247;
---text:#f3f6ff;
---muted:rgba(243,246,255,.75);
---border:rgba(255,255,255,.16);
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --tileBlue1:#2b7cff;
+      --tileBlue2:#1f66db;
+      --tileOrange1:#ffb347;
+      --tileOrange2:#ff8c00;
+      --text:#f3f6ff;
+      --muted:rgba(243,246,255,.75);
+      --border:rgba(255,255,255,.16);
 
---chipFont:22px;
---chipPadY:14px;
---chipPadX:20px;
---chipMinH:58px;
+      --chipFont:22px;
+      --chipPadY:14px;
+      --chipPadX:20px;
+      --chipMinH:58px;
 
---ctrlFont:16px;
---ctrlPadY:10px;
---ctrlPadX:14px;
+      --ctrlFont:16px;
+      --ctrlPadY:10px;
+      --ctrlPadX:14px;
 
---tileSize: 210px;
---iconSize: 52px;
---frameW: 120px;
---frameH: 92px;
+      --tileSize:210px;
+      --frameW:160px;
+      --frameH:140px;
 
---gap:14px;
---tileRadius:16px;
+      --gap:14px;
+      --tileRadius:16px;
 
---labelFont:24px;
---labelAreaPad:10px;
---labelMinH:72px;
+      --labelFont:24px;
+      --labelAreaPad:10px;
+      --labelMinH:72px;
 
---painFont:20px;
---painMinH:56px;
-}
+      --painFont:20px;
+      --painMinH:56px;
+    }
 
-html,body{height:100%}
-body{
-margin:0;
-font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial;
-background:var(--bg);
-color:var(--text);
-}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-header{
-position:sticky; top:0; z-index:20;
-background:linear-gradient(180deg, var(--panel), rgba(18,26,51,.92));
-border-bottom:1px solid rgba(255,255,255,.10);
-padding:14px 14px calc(12px + env(safe-area-inset-top));
-}
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:linear-gradient(180deg,var(--panel),rgba(18,26,51,.92));
+      border-bottom:1px solid rgba(255,255,255,.10);
+      padding:14px 14px calc(12px + env(safe-area-inset-top));
+    }
 
-.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
-.title{
-margin-right:auto;
-font-weight:800;
-letter-spacing:.2px;
-color:var(--muted);
-font-size:16px;
-}
+    .title{
+      margin-right:auto;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:var(--muted);
+      font-size:16px;
+    }
 
-.controls .chip{
-font-size:var(--ctrlFont);
-padding:var(--ctrlPadY) var(--ctrlPadX);
-min-height:44px;
-border-radius:999px;
-background:rgba(255,255,255,.06);
-border:1px solid var(--border);
-color:var(--text);
-font-weight:800;
-touch-action:manipulation;
-user-select:none;
--webkit-user-select:none;
-}
-.controls .chip.on{
-border-color:rgba(118,167,255,.65);
-box-shadow:0 0 0 3px rgba(118,167,255,.20) inset;
-background:rgba(118,167,255,.10);
-}
-.controls .danger{
-background:rgba(255,77,79,.14);
-border-color:rgba(255,77,79,.35);
-}
+    .controls .chip{
+      font-size:var(--ctrlFont);
+      padding:var(--ctrlPadY) var(--ctrlPadX);
+      min-height:44px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:800;
+      touch-action:manipulation;
+      user-select:none;
+      -webkit-user-select:none;
+    }
 
-.pages{margin-top:12px}
-.pages .chip{
-font-size:var(--chipFont);
-padding:var(--chipPadY) var(--chipPadX);
-min-height:var(--chipMinH);
-border-radius:999px;
-border:none;
-font-weight:950;
-letter-spacing:.2px;
-touch-action:manipulation;
-user-select:none;
--webkit-user-select:none;
-}
-.pages .chip.active{
-box-shadow:0 0 0 5px rgba(255,255,255,.18) inset;
-transform:translateY(-1px);
-}
+    .controls .chip.on{
+      border-color:rgba(118,167,255,.65);
+      box-shadow:0 0 0 3px rgba(118,167,255,.20) inset;
+      background:rgba(118,167,255,.10);
+    }
 
-#pageMove{ background:#2b7cff; color:white; }
-#pageTeam{ background:#2fe6b3; color:#062218; }
-#pageEquipment{ background:#ffd43b; color:#2a2100; }
-#pageNeeds{ background:#ff4d4f; color:white; }
-#pagePain{ background:#b26bff; color:white; }
+    .controls .danger{
+      background:rgba(255,77,79,.14);
+      border-color:rgba(255,77,79,.35);
+    }
 
-main{
-padding:14px 14px calc(14px + env(safe-area-inset-bottom));
-}
+    .pages{margin-top:12px}
 
-.grid{
-display:grid;
-grid-template-columns:repeat(3, minmax(0, var(--tileSize)));
-gap:var(--gap);
-justify-content:center;
-align-content:start;
-}
-@media (max-width: 520px){
-.grid{ grid-template-columns:repeat(2, minmax(0, var(--tileSize))); }
-}
+    .pages .chip{
+      font-size:var(--chipFont);
+      padding:var(--chipPadY) var(--chipPadX);
+      min-height:var(--chipMinH);
+      border-radius:999px;
+      border:none;
+      font-weight:950;
+      letter-spacing:.2px;
+      touch-action:manipulation;
+      user-select:none;
+      -webkit-user-select:none;
+    }
 
-.tile{
-width:var(--tileSize);
-height:var(--tileSize);
-border:1px solid rgba(255,255,255,.12);
-border-radius:var(--tileRadius);
-background:linear-gradient(180deg, var(--tile), var(--tile2));
-overflow:hidden;
-display:flex;
-flex-direction:column;
-touch-action:manipulation;
-}
+    .pages .chip.active{
+      box-shadow:0 0 0 5px rgba(255,255,255,.18) inset;
+      transform:translateY(-1px);
+    }
 
-.tile.yesTile{
-background:linear-gradient(180deg, rgba(47,230,179,.22), rgba(16,34,71,1));
-border-color:rgba(47,230,179,.42);
-}
-.tile.noTile{
-background:linear-gradient(180deg, rgba(255,77,79,.22), rgba(16,34,71,1));
-border-color:rgba(255,77,79,.42);
-}
+    #pageMove{ background:#2b7cff; color:white; }
+    #pageTeam{ background:#2fe6b3; color:#062218; }
+    #pageEquipment{ background:#ffd43b; color:#2a2100; }
+    #pageNeeds{ background:#ff4d4f; color:white; }
+    #pageFeelings{ background:#ff8ad6; color:#330022; }
+    #pagePeople{ background:#4dd2ff; color:#002333; }
+    #pageFavorites{ background:#8cff66; color:#133300; }
+    #pagePain{ background:#b26bff; color:white; }
 
-.mediaArea{
-flex:1 1 auto;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:10px;
-}
+    main{
+      padding:14px 14px calc(14px + env(safe-area-inset-bottom));
+    }
 
-.frame{
-width:var(--frameW);
-height:var(--frameH);
-border-radius:14px;
-border:1px solid rgba(255,255,255,.18);
-background:rgba(255,255,255,.06);
-overflow:hidden;
-display:flex;
-align-items:center;
-justify-content:center;
-}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,var(--tileSize)));
+      gap:var(--gap);
+      justify-content:center;
+      align-content:start;
+    }
 
-.frame img{
-width:100%;
-height:100%;
-object-fit:contain;
-object-position:center;
-background:transparent;
-}
+    @media (max-width:520px){
+      .grid{ grid-template-columns:repeat(2,minmax(0,var(--tileSize))); }
+    }
 
-.frame svg{
-width:var(--iconSize);
-height:var(--iconSize);
-filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));
-}
+    .tile{
+      width:var(--tileSize);
+      height:var(--tileSize);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--tileRadius);
+      background:linear-gradient(180deg,var(--tileBlue1),var(--tileBlue2));
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      touch-action:manipulation;
+    }
 
-.labelArea{
-flex:0 0 auto;
-min-height:var(--labelMinH);
-padding:var(--labelAreaPad);
-border-top:1px solid rgba(255,255,255,.10);
-background:rgba(0,0,0,.18);
-display:flex;
-align-items:center;
-justify-content:center;
-}
-.label{
-width:100%;
-text-align:center;
-font-weight:950;
-font-size:var(--labelFont);
-line-height:1.10;
-padding:10px 12px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.16);
-background:rgba(255,255,255,.06);
-box-sizing:border-box;
-}
+    .grid .tile:nth-child(3n){
+      background:linear-gradient(180deg,var(--tileOrange1),var(--tileOrange2));
+    }
 
-.hint{
-margin-top:10px;
-color:var(--muted);
-font-size:13px;
-}
+    @media (max-width:520px){
+      .grid .tile:nth-child(3n){
+        background:linear-gradient(180deg,var(--tileBlue1),var(--tileBlue2));
+      }
+      .grid .tile:nth-child(2n){
+        background:linear-gradient(180deg,var(--tileOrange1),var(--tileOrange2));
+      }
+    }
 
-.toast{
-position:fixed;
-left:50%; transform:translateX(-50%);
-bottom:16px;
-background:rgba(0,0,0,.75);
-border:1px solid rgba(255,255,255,.18);
-color:#fff;
-padding:10px 14px;
-border-radius:999px;
-font-weight:800;
-opacity:0;
-pointer-events:none;
-transition:opacity .18s ease;
-z-index:50;
-}
-.toast.on{opacity:1}
+    .mediaArea{
+      flex:1 1 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+    }
 
-#filePick{display:none}
+    .frame{
+      width:var(--frameW);
+      height:var(--frameH);
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.painWrap{ display:none; margin-bottom:14px; }
-.painWrap.on{ display:block; }
-.painTop{
-display:flex;
-justify-content:space-between;
-margin-bottom:8px;
-color:rgba(243,246,255,.85);
-font-weight:900;
-font-size:14px;
-}
-.painRow{
-display:flex;
-gap:6px;
-width:100%;
-}
-.painBtn{
-flex:1 1 0;
-min-height:var(--painMinH);
-border-radius:0;
-border:1px solid rgba(255,255,255,.14);
-background:rgba(255,255,255,.06);
-color:var(--text);
-font-weight:950;
-font-size:var(--painFont);
-touch-action:manipulation;
-user-select:none;
--webkit-user-select:none;
-display:flex;
-align-items:center;
-justify-content:center;
-gap:6px;
-padding:0;
-}
-.painBtn.left{ border-radius:14px 0 0 14px; }
-.painBtn.right{ border-radius:0 14px 14px 0; }
-.painBtn.active{
-box-shadow:0 0 0 4px rgba(255,255,255,.14) inset;
-border-color:rgba(255,255,255,.28);
-}
+    .frame img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center;
+      background:#fff;
+    }
 
-.modal{
-position:fixed; inset:0;
-background:rgba(0,0,0,.55);
-display:none;
-align-items:flex-end;
-justify-content:center;
-z-index:100;
-padding:12px 12px calc(12px + env(safe-area-inset-bottom));
-}
-.modal.on{ display:flex; }
-.sheet{
-width:min(720px, 100%);
-background:rgba(18,26,51,.98);
-border:1px solid rgba(255,255,255,.16);
-border-radius:20px;
-padding:14px;
-}
-.sheet h3{
-margin:0 0 10px 0;
-font-size:16px;
-color:rgba(243,246,255,.85);
-letter-spacing:.2px;
-}
-.field{
-display:flex;
-flex-direction:column;
-gap:6px;
-margin-bottom:10px;
-}
-.field label{
-font-size:13px;
-color:rgba(243,246,255,.75);
-font-weight:800;
-}
-.field input, .field input[type="range"]{
-height:44px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,.14);
-background:rgba(255,255,255,.06);
-color:var(--text);
-padding:0 12px;
-font-size:16px;
-font-weight:700;
-outline:none;
-box-sizing:border-box;
-width:100%;
-}
-.rangeRow{
-display:flex;
-gap:10px;
-align-items:center;
-}
-.rangeValue{
-min-width:54px;
-text-align:right;
-font-weight:900;
-color:rgba(243,246,255,.85);
-}
-.sheetActions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-justify-content:flex-end;
-margin-top:10px;
-}
-.btn{
-border-radius:999px;
-border:1px solid rgba(255,255,255,.16);
-background:rgba(255,255,255,.08);
-color:var(--text);
-height:44px;
-padding:0 14px;
-font-weight:900;
-font-size:14px;
-touch-action:manipulation;
-}
-.btn.primary{
-border-color:rgba(118,167,255,.55);
-background:rgba(118,167,255,.14);
-}
-.btn.danger{
-border-color:rgba(255,77,79,.45);
-background:rgba(255,77,79,.14);
-}
-</style>
+    .labelArea{
+      flex:0 0 auto;
+      min-height:var(--labelMinH);
+      padding:var(--labelAreaPad);
+      border-top:1px solid rgba(255,255,255,.10);
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .label{
+      width:100%;
+      text-align:center;
+      font-weight:950;
+      font-size:var(--labelFont);
+      line-height:1.08;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.16);
+      background:#fff;
+      color:#000;
+      box-sizing:border-box;
+    }
+
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:16px;
+      background:rgba(0,0,0,.75);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:800;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+      z-index:50;
+    }
+
+    .toast.on{opacity:1}
+    #filePick{display:none}
+
+    .painWrap{display:none;margin-bottom:14px}
+    .painWrap.on{display:block}
+
+    .painTop{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:8px;
+      color:rgba(243,246,255,.85);
+      font-weight:900;
+      font-size:14px;
+    }
+
+    .painRow{
+      display:flex;
+      gap:6px;
+      width:100%;
+    }
+
+    .painBtn{
+      flex:1 1 0;
+      min-height:var(--painMinH);
+      border-radius:0;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:950;
+      font-size:var(--painFont);
+      touch-action:manipulation;
+      user-select:none;
+      -webkit-user-select:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:0;
+    }
+
+    .painBtn.left{border-radius:14px 0 0 14px}
+    .painBtn.right{border-radius:0 14px 14px 0}
+
+    .painBtn.active{
+      box-shadow:0 0 0 4px rgba(255,255,255,.14) inset;
+      border-color:rgba(255,255,255,.28);
+    }
+
+    .painFaceBig{
+      margin-top:14px;
+      height:170px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:130px;
+      line-height:1;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    .ynRow{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+      gap:40px;
+      flex-wrap:nowrap;
+    }
+
+    .ynBtn{
+      width:100px;
+      height:100px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:34px;
+      font-weight:900;
+      border:none;
+      color:#fff;
+      touch-action:manipulation;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    .ynYes{background:#28c840}
+    .ynNo{background:#ff3b30}
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      z-index:100;
+      padding:12px 12px calc(12px + env(safe-area-inset-bottom));
+    }
+
+    .modal.on{display:flex}
+
+    .sheet{
+      width:min(720px,100%);
+      background:rgba(18,26,51,.98);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:20px;
+      padding:14px;
+    }
+
+    .sheet h3{
+      margin:0 0 10px 0;
+      font-size:16px;
+      color:rgba(243,246,255,.85);
+      letter-spacing:.2px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom:10px;
+    }
+
+    .field label{
+      font-size:13px;
+      color:rgba(243,246,255,.75);
+      font-weight:800;
+    }
+
+    .field input,.field input[type="range"]{
+      height:44px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:0 12px;
+      font-size:16px;
+      font-weight:700;
+      outline:none;
+      box-sizing:border-box;
+      width:100%;
+    }
+
+    .rangeRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    .rangeValue{
+      min-width:54px;
+      text-align:right;
+      font-weight:900;
+      color:rgba(243,246,255,.85);
+    }
+
+    .sheetActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      margin-top:10px;
+    }
+
+    .btn{
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      height:44px;
+      padding:0 14px;
+      font-weight:900;
+      font-size:14px;
+      touch-action:manipulation;
+    }
+
+    .btn.primary{
+      border-color:rgba(118,167,255,.55);
+      background:rgba(118,167,255,.14);
+    }
+
+    .btn.danger{
+      border-color:rgba(255,77,79,.45);
+      background:rgba(255,77,79,.14);
+    }
+  </style>
 </head>
 
 <body>
 <header>
-<div class="row controls">
-<div class="title">Ward Talkboard</div>
-<button class="chip" id="confirmChip" type="button">Confirm</button>
-<button class="chip on" id="soundChip" type="button">Sound</button>
-<button class="chip" id="editChip" type="button">Edit</button>
-<button class="chip" id="sizeChip" type="button">Sizes</button>
-<button class="chip danger" id="resetBtn" type="button">Reset</button>
-<button class="chip danger" id="clearBtn" type="button">Clear Photos</button>
-</div>
+  <div class="row controls">
+    <div class="title">MCU Talkboard</div>
+    <button class="chip" id="confirmChip" type="button">Confirm</button>
+    <button class="chip on" id="soundChip" type="button">Sound</button>
+    <button class="chip" id="editChip" type="button">Edit</button>
+    <button class="chip" id="sizeChip" type="button">Sizes</button>
+    <button class="chip danger" id="resetBtn" type="button">Reset</button>
+    <button class="chip danger" id="clearBtn" type="button">Clear Photos</button>
+  </div>
 
-<div class="row pages" id="pageRow">
-<button class="chip active" id="pageMove" type="button">Move</button>
-<button class="chip" id="pageTeam" type="button">Team</button>
-<button class="chip" id="pageEquipment" type="button">Equipment</button>
-<button class="chip" id="pageNeeds" type="button">Needs</button>
-<button class="chip" id="pagePain" type="button">Pain</button>
-</div>
+  <div class="row pages" id="pageRow">
+    <button class="chip active" id="pageMove" type="button">Move</button>
+    <button class="chip" id="pageTeam" type="button">Team</button>
+    <button class="chip" id="pageEquipment" type="button">Equipment</button>
+    <button class="chip" id="pageNeeds" type="button">Needs</button>
+    <button class="chip" id="pageFeelings" type="button">Feelings</button>
+    <button class="chip" id="pagePeople" type="button">People</button>
+    <button class="chip" id="pageFavorites" type="button">Favorites</button>
+    <button class="chip" id="pagePain" type="button">Pain</button>
+  </div>
 
-<div class="hint">No scroll: tile size is capped. Sizes → adjust icon and tile size anytime.</div>
+  <div class="hint">Pain page is last. Yes/No are circles. Edit is password protected.</div>
 </header>
 
 <main>
-<div class="painWrap" id="painWrap">
-<div class="painTop"><span>No pain</span><span>Worst pain</span></div>
-<div class="painRow" id="painRow"></div>
-</div>
+  <div class="painWrap" id="painWrap">
+    <div class="painTop"><span>No pain</span><span>Worst pain</span></div>
+    <div class="painRow" id="painRow"></div>
+    <div class="painFaceBig" id="painFaceBig">😊</div>
+  </div>
 
-<div class="grid" id="grid"></div>
+  <div class="grid" id="grid"></div>
+  <div class="ynRow" id="ynRow"></div>
 </main>
 
 <div class="toast" id="toast">Saved</div>
 <input id="filePick" type="file" accept="image/*" />
 
 <div class="modal" id="editModal">
-<div class="sheet">
-<h3>Edit button</h3>
+  <div class="sheet">
+    <h3>Edit button</h3>
 
-<div class="field">
-<label for="editLabel">Button name</label>
-<input id="editLabel" autocomplete="off" />
-</div>
+    <div class="field">
+      <label for="editLabel">Button name</label>
+      <input id="editLabel" autocomplete="off" />
+    </div>
 
-<div class="field">
-<label for="editSay">What it should say</label>
-<input id="editSay" autocomplete="off" />
-</div>
+    <div class="field">
+      <label for="editSay">What it should say</label>
+      <input id="editSay" autocomplete="off" />
+    </div>
 
-<div class="sheetActions">
-<button class="btn" id="photoBtn" type="button">Choose photo</button>
-<button class="btn danger" id="removePhotoBtn" type="button">Remove photo</button>
-<button class="btn" id="cancelBtn" type="button">Cancel</button>
-<button class="btn primary" id="saveBtn" type="button">Save</button>
-</div>
-</div>
+    <div class="sheetActions">
+      <button class="btn" id="photoBtn" type="button">Choose photo</button>
+      <button class="btn danger" id="removePhotoBtn" type="button">Remove photo</button>
+      <button class="btn" id="cancelBtn" type="button">Cancel</button>
+      <button class="btn primary" id="saveBtn" type="button">Save</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="sizeModal">
-<div class="sheet">
-<h3>Sizes</h3>
+  <div class="sheet">
+    <h3>Sizes</h3>
 
-<div class="field">
-<label>Tile size (square)</label>
-<div class="rangeRow">
-<input id="tileSizeRange" type="range" min="150" max="240" step="2" />
-<div class="rangeValue" id="tileSizeVal"></div>
-</div>
-</div>
+    <div class="field">
+      <label>Tile size (square)</label>
+      <div class="rangeRow">
+        <input id="tileSizeRange" type="range" min="150" max="240" step="2" />
+        <div class="rangeValue" id="tileSizeVal"></div>
+      </div>
+    </div>
 
-<div class="field">
-<label>Icon size</label>
-<div class="rangeRow">
-<input id="iconSizeRange" type="range" min="34" max="90" step="2" />
-<div class="rangeValue" id="iconSizeVal"></div>
-</div>
-</div>
+    <div class="field">
+      <label>Photo frame size</label>
+      <div class="rangeRow">
+        <input id="frameSizeRange" type="range" min="100" max="180" step="2" />
+        <div class="rangeValue" id="frameSizeVal"></div>
+      </div>
+    </div>
 
-<div class="field">
-<label>Photo frame size</label>
-<div class="rangeRow">
-<input id="frameSizeRange" type="range" min="80" max="150" step="2" />
-<div class="rangeValue" id="frameSizeVal"></div>
-</div>
-</div>
-
-<div class="sheetActions">
-<button class="btn" id="sizeCancelBtn" type="button">Close</button>
-<button class="btn primary" id="sizeSaveBtn" type="button">Save</button>
-</div>
-</div>
+    <div class="sheetActions">
+      <button class="btn" id="sizeCancelBtn" type="button">Close</button>
+      <button class="btn primary" id="sizeSaveBtn" type="button">Save</button>
+    </div>
+  </div>
 </div>
 
 <script>
-function iconSVG(name){
-const S = `fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"`;
-const icons = {
-yes:`<svg viewBox="0 0 256 256"><path ${S} d="M54 134l44 44 104-120"/></svg>`,
-no:`<svg viewBox="0 0 256 256"><path ${S} d="M70 70l116 116"/><path ${S} d="M186 70L70 186"/></svg>`,
-stop:`<svg viewBox="0 0 256 256"><path ${S} d="M94 224V118c0-14 20-14 20 0v54"/><path ${S} d="M114 172V78c0-14 20-14 20 0v94"/><path ${S} d="M134 172V70c0-14 20-14 20 0v102"/><path ${S} d="M154 172V98c0-14 20-14 20 0v74"/><path ${S} d="M174 172V124c0-14 20-14 20 0v48"/><path ${S} d="M94 172c0 30 22 52 52 52h34"/></svg>`,
-sit:`<svg viewBox="0 0 256 256"><path ${S} d="M86 62h84v78H86z"/><path ${S} d="M70 140h116v22H70z"/><path ${S} d="M86 162v64"/><path ${S} d="M170 162v64"/></svg>`,
-stand:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="56" r="26"/><path ${S} d="M128 82v80"/><path ${S} d="M92 126h72"/><path ${S} d="M128 162l-34 66"/><path ${S} d="M128 162l34 66"/></svg>`,
-bed:`<svg viewBox="0 0 256 256"><path ${S} d="M24 170V98h208v72"/><path ${S} d="M24 170h208"/><path ${S} d="M54 98V70h78v28"/></svg>`,
-outofbed:`<svg viewBox="0 0 256 256"><path ${S} d="M24 176V110h128v66"/><path ${S} d="M24 176h128"/><path ${S} d="M190 196V96"/><path ${S} d="M162 124l28-28 28 28"/></svg>`,
-rest:`<svg viewBox="0 0 256 256"><path ${S} d="M150 60c-26 6-46 30-46 58s20 52 46 58c-40 8-80-22-80-58s40-66 80-58z"/><path ${S} d="M170 70h56"/></svg>`,
-callbell:`<svg viewBox="0 0 256 256"><path ${S} d="M128 44c-30 0-52 22-52 52v42l-16 28h136l-16-28V96c0-30-22-52-52-52z"/><path ${S} d="M108 198c4 18 36 18 40 0"/></svg>`,
-toilet:`<svg viewBox="0 0 256 256"><path ${S} d="M86 54h60v40H86z"/><path ${S} d="M66 94h124v40c0 34-22 60-56 60h-12c-34 0-56-26-56-60V94z"/></svg>`,
-drink:`<svg viewBox="0 0 256 256"><path ${S} d="M86 54h84l-12 160H98L86 54z"/><path ${S} d="M92 106h72"/></svg>`,
-food:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="140" r="62"/><path ${S} d="M72 70h112"/></svg>`,
-wheelchair:`<svg viewBox="0 0 256 256"><circle ${S} cx="108" cy="72" r="22"/><path ${S} d="M108 94v52h56l22 58"/><circle ${S} cx="112" cy="198" r="34"/></svg>`,
-reposition:`<svg viewBox="0 0 256 256"><path ${S} d="M188 92c-16-22-42-36-72-36-48 0-88 40-88 88"/><path ${S} d="M68 164c16 22 42 36 72 36 48 0 88-40 88-88"/></svg>`,
-pain:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="128" r="86"/><path ${S} d="M126 72l-30 66h44l-10 46 46-74h-44z"/></svg>`,
-help:`<svg viewBox="0 0 256 256"><path ${S} d="M128 30l100 176H28L128 30z"/><path ${S} d="M128 92v58"/></svg>`,
-nurse:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="66" r="26"/><path ${S} d="M86 220v-74c0-24 18-44 44-44h0c26 0 44 20 44 44v74"/></svg>`,
-doctor:`<svg viewBox="0 0 256 256"><circle ${S} cx="128" cy="64" r="26"/><path ${S} d="M86 220v-76c0-24 18-42 42-42h0c24 0 42 18 42 42v76"/></svg>`,
-ot:`<svg viewBox="0 0 256 256"><circle ${S} cx="92" cy="84" r="18"/><circle ${S} cx="164" cy="84" r="18"/><path ${S} d="M74 140c20-22 88-22 108 0"/></svg>`,
-pt:`<svg viewBox="0 0 256 256"><circle ${S} cx="96" cy="64" r="22"/><path ${S} d="M96 86l20 38 56 26"/></svg>`,
-sp:`<svg viewBox="0 0 256 256"><path ${S} d="M44 78c0-18 14-32 32-32h104c18 0 32 14 32 32v54c0 18-14 32-32 32H124l-34 34v-34H76c-18 0-32-14-32-32V78z"/></svg>`,
-};
-return icons[name] || icons.help;
-}
+  const IMAGE_FILES = {
+    sit: "F1C4F043-AF25-4C4D-B81B-AF938240816E.jpeg",
+    stand: "7A8C0987-ED71-4CA8-A622-C22248D387F4.jpeg",
+    outofbed: "487F9EB5-DAE9-4867-BB8B-F90200D0B433.jpeg",
+    inbed: "D35CC066-943B-4BD2-8E84-8276936FE8E9.jpeg",
+    stop: "F60570C9-2F68-4618-9C1B-E6C99FB67925.jpeg",
+    nurse: "3E6EB5F9-BCC8-4DC9-AB22-5BFB3897B900.jpeg",
+    doctor: "23E7588B-3606-4530-B496-C71BBE067874.jpeg",
+    ot: "F0809EB4-EEB3-4BA1-AE0D-A3E725D18E76.jpeg",
+    pt: "2B9FC82E-BCC7-4343-A832-C9CC1A78D762.jpeg",
+    speech: "FD7BE56D-5260-44C4-8483-0C2A0368BD8B.jpeg",
+    callbell: "8FCD849C-3C21-4E59-8A50-197480C75D58.jpeg",
+    wheelchair: "9123EF1F-FBA3-40F5-B823-E23D89ECEEB5.jpeg",
+    bed: "ADB476A4-043A-4668-85CE-EA44DE4D995C.jpeg",
+    reposition: "A1141A93-D0D7-44D1-9DC6-5213F542B886.jpeg",
+    toilet: "30DD9D82-03FA-4438-929E-E2B69BAF9E81.jpeg",
+    chair: "2257C5C2-9E5E-49D6-8660-BE6B422F0978.jpeg",
+    drink: "11D74A41-B51C-43AB-8AB3-22546EFAD14A.jpeg",
+    food: "59629798-1D7D-49B2-9F1A-7B19E7E4C7FF.jpeg",
+    pain: "384718BA-888C-4728-9679-B4B64B85389B.jpeg",
+    help: "30F7A8D1-F56D-4642-BC12-39716522E4A5.jpeg",
+    dontunderstand: "93D1903B-F1C1-4498-AD4B-575326027463.jpeg",
+    repeat: "F177487C-47C9-4E5F-BCDB-A149BF219555.jpeg",
+    slowdown: "73C589C7-4CB6-4E80-BEF1-A1F38C3BCAF7.jpeg",
+    happy: "5AE1A48F-20BC-40DF-AED8-4CF729E36F36.jpeg",
+    sad: "3148B3B9-5C02-466D-BE7B-7E81CD9F7AE0.jpeg",
+    frustrated: "48DFDBF3-3FDD-43BD-A433-642CE2D9760E.jpeg",
+    exhausted: "ECD44CAA-325C-4A8F-8BFE-3A4A72503AB8.jpeg",
+    anxious: "EAB406D7-84C1-4762-A186-F97CDE0A3A5A.jpeg",
+    confused: "07003AFE-4FD0-479F-8E22-17A8B3E5ED83.jpeg",
+    family: "896AFE1B-6EE6-4866-9B70-AB8EE3A12DCF.jpeg",
+    friend: "13966D00-E598-4B2B-B391-C0C28C1BD9AB.jpeg",
+    partner: "86445E16-DD43-4F17-BC75-31634C699EBE.jpeg",
+    child: "83686965-EE2D-4243-85E4-AFEF0531664B.jpeg",
+    mum: "B267D2A4-7EA2-4177-B224-5ECC41922BB6.jpeg",
+    dad: "6EC42158-16BE-4BA8-8EAD-5253E7A885AE.jpeg",
+    lipstick: "F1A3FB6B-CE10-4B57-AEAE-75279FE4215D.jpeg",
+    clothes: "F4BAA167-4E0A-4970-A785-ED95C40767DD.jpeg",
+    phone: "0817DCDA-CA7B-43C9-BF8F-B034A5D37D6A.jpeg",
+    music: "4E822F6E-2057-457C-9D76-2B0DDD770EAF.jpeg",
+    glasses: "07E7EEE1-F112-4362-ACE5-CD57717D4A24.jpeg",
+    blanket: "6345F2C8-B266-4F85-A7F0-9E8F32328B75.jpeg"
+  };
 
-const DEFAULT = {
-move: [
-{id:"sit", label:"Sit", say:"I want to sit up", icon:"sit", photo:null},
-{id:"stand", label:"Stand", say:"I want to stand", icon:"stand", photo:null},
-{id:"oob", label:"Out of Bed", say:"I want to get out of bed", icon:"outofbed", photo:null},
-{id:"inbed", label:"In Bed", say:"I want to stay in bed", icon:"bed", photo:null},
-{id:"rest", label:"Rest", say:"I need a rest", icon:"rest", photo:null},
-{id:"stop", label:"Stop", say:"Stop please", icon:"stop", photo:null},
-],
-team: [
-{id:"nurse", label:"Nurse", say:"I want the nurse", icon:"nurse", photo:null},
-{id:"doctor", label:"Doctor", say:"I want the doctor", icon:"doctor", photo:null},
-{id:"ot", label:"OT", say:"I want occupational therapy", icon:"ot", photo:null},
-{id:"pt", label:"PT", say:"I want physiotherapy", icon:"pt", photo:null},
-{id:"sp", label:"SP", say:"I want speech pathology", icon:"sp", photo:null},
-{id:"call", label:"Call Bell", say:"Please use the call bell", icon:"callbell", photo:null},
-],
-equipment: [
-{id:"wheelchair", label:"Wheelchair", say:"I want my wheelchair", icon:"wheelchair", photo:null},
-{id:"bed", label:"Bed", say:"Please adjust the bed", icon:"bed", photo:null},
-{id:"callbell", label:"Call Bell", say:"Please use the call bell", icon:"callbell", photo:null},
-{id:"reposition", label:"Reposition", say:"Please help me change position", icon:"reposition", photo:null},
-{id:"toilet", label:"Toilet", say:"I need the toilet", icon:"toilet", photo:null},
-{id:"chair", label:"Chair", say:"I want the chair", icon:"sit", photo:null},
-],
-needs: [
-{id:"drink", label:"Drink", say:"I want a drink", icon:"drink", photo:null},
-{id:"food", label:"Food", say:"I am hungry", icon:"food", photo:null},
-{id:"toilet", label:"Toilet", say:"I need the toilet", icon:"toilet", photo:null},
-{id:"pain", label:"Pain", say:"I have pain", icon:"pain", photo:null},
-{id:"help", label:"HELP", say:"I need help now", icon:"help", photo:null},
-],
-};
+  const DEFAULT = {
+    move: [
+      { id:"sit", label:"Sit", say:"I want to sit up", photo:IMAGE_FILES.sit },
+      { id:"stand", label:"Stand", say:"I want to stand", photo:IMAGE_FILES.stand },
+      { id:"oob", label:"Out of Bed", say:"I want to get out of bed", photo:IMAGE_FILES.outofbed },
+      { id:"inbed", label:"In Bed", say:"I want to stay in bed", photo:IMAGE_FILES.inbed },
+      { id:"stop", label:"Stop", say:"Stop please", photo:IMAGE_FILES.stop }
+    ],
+    team: [
+      { id:"nurse", label:"Nurse", say:"I want the nurse", photo:IMAGE_FILES.nurse },
+      { id:"doctor", label:"Doctor", say:"I want the doctor", photo:IMAGE_FILES.doctor },
+      { id:"ot", label:"OT", say:"I want occupational therapy", photo:IMAGE_FILES.ot },
+      { id:"pt", label:"PT", say:"I want physiotherapy", photo:IMAGE_FILES.pt },
+      { id:"speech", label:"Speech", say:"I want speech pathology", photo:IMAGE_FILES.speech },
+      { id:"call", label:"Call Bell", say:"Please use the call bell", photo:IMAGE_FILES.callbell }
+    ],
+    equipment: [
+      { id:"wheelchair", label:"Wheelchair", say:"I want my wheelchair", photo:IMAGE_FILES.wheelchair },
+      { id:"bed", label:"Bed", say:"Please adjust the bed", photo:IMAGE_FILES.bed },
+      { id:"reposition", label:"Reposition", say:"Please help me change position", photo:IMAGE_FILES.reposition },
+      { id:"toilet", label:"Toilet", say:"I need the toilet", photo:IMAGE_FILES.toilet },
+      { id:"chair", label:"Chair", say:"I want the chair", photo:IMAGE_FILES.chair }
+    ],
+    needs: [
+      { id:"drink", label:"Drink", say:"I want a drink", photo:IMAGE_FILES.drink },
+      { id:"food", label:"Food", say:"I am hungry", photo:IMAGE_FILES.food },
+      { id:"help", label:"Help", say:"I need help now", photo:IMAGE_FILES.help },
+      { id:"dontunderstand", label:"I don't understand", say:"I don't understand", photo:IMAGE_FILES.dontunderstand },
+      { id:"repeat", label:"Repeat please", say:"Please repeat", photo:IMAGE_FILES.repeat },
+      { id:"slowdown", label:"Slow down", say:"Please slow down", photo:IMAGE_FILES.slowdown }
+    ],
+    feelings: [
+      { id:"happy", label:"Happy", say:"I feel happy", photo:IMAGE_FILES.happy },
+      { id:"sad", label:"Sad", say:"I feel sad", photo:IMAGE_FILES.sad },
+      { id:"frustrated", label:"Frustrated", say:"I feel frustrated", photo:IMAGE_FILES.frustrated },
+      { id:"exhausted", label:"Exhausted", say:"I feel exhausted", photo:IMAGE_FILES.exhausted },
+      { id:"anxious", label:"Anxious", say:"I feel anxious", photo:IMAGE_FILES.anxious },
+      { id:"confused", label:"Confused", say:"I feel confused", photo:IMAGE_FILES.confused }
+    ],
+    people: [
+      { id:"family", label:"Family", say:"I want my family", photo:IMAGE_FILES.family },
+      { id:"friend", label:"Friend", say:"I want my friend", photo:IMAGE_FILES.friend },
+      { id:"partner", label:"Partner", say:"I want my partner", photo:IMAGE_FILES.partner },
+      { id:"child", label:"Child", say:"I want my child", photo:IMAGE_FILES.child },
+      { id:"mum", label:"Mum", say:"I want my mum", photo:IMAGE_FILES.mum },
+      { id:"dad", label:"Dad", say:"I want my dad", photo:IMAGE_FILES.dad }
+    ],
+    favorites: [
+      { id:"lipstick", label:"Lipstick", say:"I want my lipstick", photo:IMAGE_FILES.lipstick },
+      { id:"clothes", label:"Clothes", say:"I want my clothes", photo:IMAGE_FILES.clothes },
+      { id:"phone", label:"Phone", say:"I want my phone", photo:IMAGE_FILES.phone },
+      { id:"music", label:"Music", say:"I want music", photo:IMAGE_FILES.music },
+      { id:"glasses", label:"Glasses", say:"I want my glasses", photo:IMAGE_FILES.glasses },
+      { id:"blanket", label:"Blanket", say:"I want my blanket", photo:IMAGE_FILES.blanket }
+    ]
+  };
 
-const YES_NO_END = [
-{id:"yes_fixed", label:"Yes", say:"Yes", icon:"yes", photo:null, _fixed:true, _yn:"yes"},
-{id:"no_fixed", label:"No", say:"No", icon:"no", photo:null, _fixed:true, _yn:"no"},
-];
+  const STORAGE_KEY = "mcuTalkboard_v1";
+  const UI_KEY = "mcuTalkboard_ui_v1";
+  const EDIT_PASSWORD = "1234";
 
-const STORAGE_KEY = "wardTalkboard_v9";
-const UI_KEY = "wardTalkboard_ui_v1";
+  let state = loadState();
+  let currentPage = "move";
+  let confirmMode = false;
+  let soundOn = true;
+  let editMode = false;
+  let confirmPendingId = null;
+  let confirmTimer = null;
+  let editingTile = null;
 
-let state = loadState();
-let currentPage = "move";
-let confirmMode = false;
-let soundOn = true;
-let editMode = false;
+  const grid = document.getElementById("grid");
+  const ynRow = document.getElementById("ynRow");
+  const toast = document.getElementById("toast");
+  const filePick = document.getElementById("filePick");
+  const painWrap = document.getElementById("painWrap");
+  const painRow = document.getElementById("painRow");
+  const painFaceBig = document.getElementById("painFaceBig");
 
-let confirmPendingId = null;
-let confirmTimer = null;
-let editingTile = null;
+  const confirmChip = document.getElementById("confirmChip");
+  const soundChip = document.getElementById("soundChip");
+  const editChip = document.getElementById("editChip");
+  const sizeChip = document.getElementById("sizeChip");
+  const resetBtn = document.getElementById("resetBtn");
+  const clearBtn = document.getElementById("clearBtn");
 
-const EDIT_PASSWORD = "1234";
+  const pageMove = document.getElementById("pageMove");
+  const pageTeam = document.getElementById("pageTeam");
+  const pageEquipment = document.getElementById("pageEquipment");
+  const pageNeeds = document.getElementById("pageNeeds");
+  const pageFeelings = document.getElementById("pageFeelings");
+  const pagePeople = document.getElementById("pagePeople");
+  const pageFavorites = document.getElementById("pageFavorites");
+  const pagePain = document.getElementById("pagePain");
 
-const grid = document.getElementById("grid");
-const toast = document.getElementById("toast");
-const filePick = document.getElementById("filePick");
+  const editModal = document.getElementById("editModal");
+  const editLabel = document.getElementById("editLabel");
+  const editSay = document.getElementById("editSay");
+  const photoBtn = document.getElementById("photoBtn");
+  const removePhotoBtn = document.getElementById("removePhotoBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const saveBtn = document.getElementById("saveBtn");
 
-const painWrap = document.getElementById("painWrap");
-const painRow = document.getElementById("painRow");
+  const sizeModal = document.getElementById("sizeModal");
+  const tileSizeRange = document.getElementById("tileSizeRange");
+  const frameSizeRange = document.getElementById("frameSizeRange");
+  const tileSizeVal = document.getElementById("tileSizeVal");
+  const frameSizeVal = document.getElementById("frameSizeVal");
+  const sizeCancelBtn = document.getElementById("sizeCancelBtn");
+  const sizeSaveBtn = document.getElementById("sizeSaveBtn");
 
-const confirmChip = document.getElementById("confirmChip");
-const soundChip = document.getElementById("soundChip");
-const editChip = document.getElementById("editChip");
-const sizeChip = document.getElementById("sizeChip");
-const resetBtn = document.getElementById("resetBtn");
-const clearBtn = document.getElementById("clearBtn");
+  function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
 
-const pageMove = document.getElementById("pageMove");
-const pageTeam = document.getElementById("pageTeam");
-const pageEquipment = document.getElementById("pageEquipment");
-const pageNeeds = document.getElementById("pageNeeds");
-const pagePain = document.getElementById("pagePain");
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("on");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>toast.classList.remove("on"),900);
+  }
 
-const editModal = document.getElementById("editModal");
-const editLabel = document.getElementById("editLabel");
-const editSay = document.getElementById("editSay");
-const photoBtn = document.getElementById("photoBtn");
-const removePhotoBtn = document.getElementById("removePhotoBtn");
-const cancelBtn = document.getElementById("cancelBtn");
-const saveBtn = document.getElementById("saveBtn");
+  function saveAll(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        state,currentPage,confirmMode,soundOn,editMode
+      }));
+    }catch(e){
+      showToast("Save blocked");
+    }
+  }
 
-const sizeModal = document.getElementById("sizeModal");
-const tileSizeRange = document.getElementById("tileSizeRange");
-const iconSizeRange = document.getElementById("iconSizeRange");
-const frameSizeRange = document.getElementById("frameSizeRange");
-const tileSizeVal = document.getElementById("tileSizeVal");
-const iconSizeVal = document.getElementById("iconSizeVal");
-const frameSizeVal = document.getElementById("frameSizeVal");
-const sizeCancelBtn = document.getElementById("sizeCancelBtn");
-const sizeSaveBtn = document.getElementById("sizeSaveBtn");
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(parsed && parsed.state && parsed.state.move) return parsed.state;
+      }
+    }catch(e){}
+    return deepCopy(DEFAULT);
+  }
 
-function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
+  function loadFlags(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      const parsed = JSON.parse(raw);
+      if(parsed){
+        if(typeof parsed.currentPage === "string") currentPage = parsed.currentPage;
+        if(typeof parsed.confirmMode === "boolean") confirmMode = parsed.confirmMode;
+        if(typeof parsed.soundOn === "boolean") soundOn = parsed.soundOn;
+        if(typeof parsed.editMode === "boolean") editMode = parsed.editMode;
+      }
+    }catch(e){}
+  }
 
-function showToast(msg){
-toast.textContent = msg;
-toast.classList.add("on");
-clearTimeout(showToast._t);
-showToast._t = setTimeout(()=>toast.classList.remove("on"), 900);
-}
+  function speak(text){
+    if(!soundOn) return;
+    try{
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.95;
+      u.pitch = 1.0;
+      u.volume = 1.0;
+      window.speechSynthesis.speak(u);
+    }catch(e){
+      showToast("Speech blocked");
+    }
+  }
 
-function saveAll(){
-try{
-localStorage.setItem(STORAGE_KEY, JSON.stringify({
-state, currentPage, confirmMode, soundOn, editMode
-}));
-}catch(e){
-showToast("Save blocked");
-}
-}
+  function setChipState(btn,on){
+    btn.classList.toggle("on",!!on);
+  }
 
-function loadState(){
-try{
-const raw = localStorage.getItem(STORAGE_KEY);
-if(raw){
-const parsed = JSON.parse(raw);
-if(parsed && parsed.state && parsed.state.move) return parsed.state;
-}
-}catch(e){}
-return JSON.parse(JSON.stringify(DEFAULT));
-}
+  function setActivePage(page){
+    currentPage = page;
+    [pageMove,pageTeam,pageEquipment,pageNeeds,pageFeelings,pagePeople,pageFavorites,pagePain].forEach(b=>b.classList.remove("active"));
+    if(page==="move") pageMove.classList.add("active");
+    if(page==="team") pageTeam.classList.add("active");
+    if(page==="equipment") pageEquipment.classList.add("active");
+    if(page==="needs") pageNeeds.classList.add("active");
+    if(page==="feelings") pageFeelings.classList.add("active");
+    if(page==="people") pagePeople.classList.add("active");
+    if(page==="favorites") pageFavorites.classList.add("active");
+    if(page==="pain") pagePain.classList.add("active");
+    render();
+    saveAll();
+  }
 
-function loadFlags(){
-try{
-const raw = localStorage.getItem(STORAGE_KEY);
-if(!raw) return;
-const parsed = JSON.parse(raw);
-if(parsed){
-if(typeof parsed.currentPage === "string") currentPage = parsed.currentPage;
-if(typeof parsed.confirmMode === "boolean") confirmMode = parsed.confirmMode;
-if(typeof parsed.soundOn === "boolean") soundOn = parsed.soundOn;
-if(typeof parsed.editMode === "boolean") editMode = parsed.editMode;
-}
-}catch(e){}
-}
+  function tilesForPage(page){
+    if(page==="pain") return [];
+    return [...(state[page] || [])];
+  }
 
-function speak(text){
-if(!soundOn) return;
-try{
-window.speechSynthesis.cancel();
-const u = new SpeechSynthesisUtterance(text);
-u.rate = 0.95;
-u.pitch = 1.0;
-u.volume = 1.0;
-window.speechSynthesis.speak(u);
-}catch(e){
-showToast("Speech blocked");
-}
-}
+  function painColor(n){
+    if(n<=2) return "rgba(47,230,179,.18)";
+    if(n<=5) return "rgba(255,212,59,.18)";
+    if(n<=7) return "rgba(255,140,0,.18)";
+    return "rgba(255,77,79,.18)";
+  }
 
-function setChipState(btn, on){
-btn.classList.toggle("on", !!on);
-}
+  function renderPainBar(){
+    const EMO = ["😊","🤨","🥺","😑","😕","☹️","😓","😣","😖","😫","😭"];
+    painRow.innerHTML = "";
+    painFaceBig.textContent = EMO[0];
 
-function setActivePage(page){
-currentPage = page;
-[pageMove,pageTeam,pageEquipment,pageNeeds,pagePain].forEach(b=>b.classList.remove("active"));
-if(page==="move") pageMove.classList.add("active");
-if(page==="team") pageTeam.classList.add("active");
-if(page==="equipment") pageEquipment.classList.add("active");
-if(page==="needs") pageNeeds.classList.add("active");
-if(page==="pain") pagePain.classList.add("active");
-render();
-saveAll();
-}
+    for(let n=0;n<=10;n++){
+      const b = document.createElement("button");
+      b.className = "painBtn";
+      b.type = "button";
+      b.style.background = painColor(n);
+      if(n===0) b.classList.add("left");
+      if(n===10) b.classList.add("right");
 
-function tilesForPage(page){
-const base = state[page] || [];
-if(page === "pain") return [];
-return [...base, ...YES_NO_END];
-}
+      const t = document.createElement("span");
+      t.textContent = String(n);
+      b.appendChild(t);
 
-function painColor(n){
-if(n <= 2) return "rgba(47,230,179,.18)";
-if(n <= 5) return "rgba(255,212,59,.18)";
-if(n <= 7) return "rgba(255,140,0,.18)";
-return "rgba(255,77,79,.18)";
-}
-function faceSVG(level){
-const S = `fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"`;
-if(level===0){
-return `<svg viewBox="0 0 256 256" width="22" height="22">
-<circle ${S} cx="128" cy="128" r="90"/>
-<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
-<path ${S} d="M92 162h72"/>
-</svg>`;
-}
-if(level===5){
-return `<svg viewBox="0 0 256 256" width="22" height="22">
-<circle ${S} cx="128" cy="128" r="90"/>
-<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
-<path ${S} d="M92 170c16-12 56-12 72 0"/>
-</svg>`;
-}
-return `<svg viewBox="0 0 256 256" width="22" height="22">
-<circle ${S} cx="128" cy="128" r="90"/>
-<circle ${S} cx="96" cy="112" r="6"/><circle ${S} cx="160" cy="112" r="6"/>
-<path ${S} d="M92 178c18-20 54-20 72 0"/>
-</svg>`;
-}
-function renderPainBar(){
-painRow.innerHTML = "";
-for(let n=0; n<=10; n++){
-const b = document.createElement("button");
-b.className = "painBtn";
-b.type = "button";
-b.style.background = painColor(n);
-if(n===0) b.classList.add("left");
-if(n===10) b.classList.add("right");
+      b.addEventListener("click", ()=>{
+        speak(`My pain is ${n}`);
+        [...painRow.children].forEach(x=>x.classList.remove("active"));
+        b.classList.add("active");
+        painFaceBig.textContent = EMO[n];
+      });
 
-if(n===0 || n===5 || n===10){
-const span = document.createElement("span");
-span.innerHTML = faceSVG(n);
-b.appendChild(span);
-}
+      painRow.appendChild(b);
+    }
+  }
 
-const t = document.createElement("span");
-t.textContent = String(n);
-b.appendChild(t);
+  function openEditor(tile){
+    editingTile = tile;
+    editLabel.value = tile.label || "";
+    editSay.value = tile.say || "";
+    editModal.classList.add("on");
+    setTimeout(()=>editLabel.focus(),80);
+  }
 
-b.addEventListener("click", ()=>{
-speak(`My pain is ${n}`);
-[...painRow.children].forEach(x=>x.classList.remove("active"));
-b.classList.add("active");
-});
+  function closeEditor(){
+    editModal.classList.remove("on");
+    editingTile = null;
+  }
 
-painRow.appendChild(b);
-}
-}
+  photoBtn.addEventListener("click", ()=>{
+    if(!editingTile) return;
+    filePick.value = "";
+    filePick.click();
+  });
 
-function openEditor(tile){
-editingTile = tile;
-editLabel.value = tile.label || "";
-editSay.value = tile.say || "";
-editModal.classList.add("on");
-setTimeout(()=>editLabel.focus(), 80);
-}
-function closeEditor(){
-editModal.classList.remove("on");
-editingTile = null;
-}
+  removePhotoBtn.addEventListener("click", ()=>{
+    if(!editingTile) return;
+    editingTile.photo = null;
+    saveAll();
+    render();
+    showToast("Photo removed");
+  });
 
-photoBtn.addEventListener("click", ()=>{
-if(!editingTile) return;
-filePick.value = "";
-filePick.click();
-});
-removePhotoBtn.addEventListener("click", ()=>{
-if(!editingTile) return;
-editingTile.photo = null;
-saveAll();
-render();
-showToast("Photo removed");
-});
-cancelBtn.addEventListener("click", closeEditor);
-saveBtn.addEventListener("click", ()=>{
-if(!editingTile) return;
-const a = editLabel.value.trim();
-const b = editSay.value.trim();
-if(a) editingTile.label = a;
-if(b) editingTile.say = b;
-saveAll();
-render();
-showToast("Saved");
-closeEditor();
-});
-editModal.addEventListener("click", (e)=>{
-if(e.target === editModal) closeEditor();
-});
+  cancelBtn.addEventListener("click", closeEditor);
 
-filePick.addEventListener("change", async (e)=>{
-const file = e.target.files && e.target.files[0];
-if(!file || !editingTile){
-filePick.value = "";
-return;
-}
-const dataUrl = await fileToDataURL(file);
-editingTile.photo = dataUrl;
-filePick.value = "";
-saveAll();
-render();
-showToast("Photo saved");
-});
-function fileToDataURL(file){
-return new Promise((resolve,reject)=>{
-const r = new FileReader();
-r.onload = ()=>resolve(r.result);
-r.onerror = reject;
-r.readAsDataURL(file);
-});
-}
+  saveBtn.addEventListener("click", ()=>{
+    if(!editingTile) return;
+    const a = editLabel.value.trim();
+    const b = editSay.value.trim();
+    if(a) editingTile.label = a;
+    if(b) editingTile.say = b;
+    saveAll();
+    render();
+    showToast("Saved");
+    closeEditor();
+  });
 
-function getCSSNum(varName){
-const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-return parseInt(v.replace("px",""), 10);
-}
-function setCSS(varName, px){
-document.documentElement.style.setProperty(varName, px + "px");
-}
-function openSizes(){
-const tile = getCSSNum("--tileSize");
-const icon = getCSSNum("--iconSize");
-const fw = getCSSNum("--frameW");
-tileSizeRange.value = tile;
-iconSizeRange.value = icon;
-frameSizeRange.value = fw;
-updateSizeLabels();
-sizeModal.classList.add("on");
-}
-function closeSizes(){
-sizeModal.classList.remove("on");
-}
-function updateSizeLabels(){
-tileSizeVal.textContent = tileSizeRange.value + "px";
-iconSizeVal.textContent = iconSizeRange.value + "px";
-frameSizeVal.textContent = frameSizeRange.value + "px";
-}
-function applySizesLive(){
-const tile = parseInt(tileSizeRange.value,10);
-const icon = parseInt(iconSizeRange.value,10);
-const fw = parseInt(frameSizeRange.value,10);
+  editModal.addEventListener("click", e=>{
+    if(e.target===editModal) closeEditor();
+  });
 
-setCSS("--tileSize", tile);
-setCSS("--iconSize", icon);
-setCSS("--frameW", fw);
-setCSS("--frameH", Math.round(fw * 0.77));
+  filePick.addEventListener("change", async e=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file || !editingTile){
+      filePick.value = "";
+      return;
+    }
+    const dataUrl = await fileToDataURL(file);
+    editingTile.photo = dataUrl;
+    filePick.value = "";
+    saveAll();
+    render();
+    showToast("Photo saved");
+  });
 
-render();
-}
+  function fileToDataURL(file){
+    return new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=>resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
 
-tileSizeRange.addEventListener("input", ()=>{ updateSizeLabels(); applySizesLive(); });
-iconSizeRange.addEventListener("input", ()=>{ updateSizeLabels(); applySizesLive(); });
-frameSizeRange.addEventListener("input", ()=>{ updateSizeLabels(); applySizesLive(); });
+  function getCSSNum(varName){
+    const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    return parseInt(v.replace("px",""),10);
+  }
 
-sizeChip.addEventListener("click", openSizes);
-sizeCancelBtn.addEventListener("click", closeSizes);
+  function setCSS(varName, px){
+    document.documentElement.style.setProperty(varName, px + "px");
+  }
 
-sizeSaveBtn.addEventListener("click", ()=>{
-const ui = {
-tileSize: parseInt(tileSizeRange.value,10),
-iconSize: parseInt(iconSizeRange.value,10),
-frameW: parseInt(frameSizeRange.value,10),
-};
-localStorage.setItem(UI_KEY, JSON.stringify(ui));
-showToast("Sizes saved");
-closeSizes();
-});
+  function openSizes(){
+    tileSizeRange.value = getCSSNum("--tileSize");
+    frameSizeRange.value = getCSSNum("--frameW");
+    updateSizeLabels();
+    sizeModal.classList.add("on");
+  }
 
-sizeModal.addEventListener("click", (e)=>{
-if(e.target === sizeModal) closeSizes();
-});
+  function closeSizes(){
+    sizeModal.classList.remove("on");
+  }
 
-function loadUISizes(){
-try{
-const raw = localStorage.getItem(UI_KEY);
-if(!raw) return;
-const ui = JSON.parse(raw);
-if(ui && ui.tileSize) setCSS("--tileSize", ui.tileSize);
-if(ui && ui.iconSize) setCSS("--iconSize", ui.iconSize);
-if(ui && ui.frameW){
-setCSS("--frameW", ui.frameW);
-setCSS("--frameH", Math.round(ui.frameW * 0.77));
-}
-}catch(e){}
-}
+  function updateSizeLabels(){
+    tileSizeVal.textContent = tileSizeRange.value + "px";
+    frameSizeVal.textContent = frameSizeRange.value + "px";
+  }
 
-function render(){
-if(currentPage === "pain"){
-painWrap.classList.add("on");
-renderPainBar();
-}else{
-painWrap.classList.remove("on");
-painRow.innerHTML = "";
-}
+  function applySizesLive(){
+    const tile = parseInt(tileSizeRange.value,10);
+    const fw = parseInt(frameSizeRange.value,10);
+    setCSS("--tileSize", tile);
+    setCSS("--frameW", fw);
+    setCSS("--frameH", Math.round(fw * 0.88));
+    render();
+  }
 
-grid.innerHTML = "";
-const tiles = tilesForPage(currentPage);
+  tileSizeRange.addEventListener("input", ()=>{
+    updateSizeLabels();
+    applySizesLive();
+  });
 
-tiles.forEach(tile=>{
-const el = document.createElement("div");
-el.className = "tile";
-if(tile._yn === "yes") el.classList.add("yesTile");
-if(tile._yn === "no") el.classList.add("noTile");
-el.setAttribute("role","button");
-el.setAttribute("tabindex","0");
+  frameSizeRange.addEventListener("input", ()=>{
+    updateSizeLabels();
+    applySizesLive();
+  });
 
-const mediaArea = document.createElement("div");
-mediaArea.className = "mediaArea";
+  sizeChip.addEventListener("click", openSizes);
+  sizeCancelBtn.addEventListener("click", closeSizes);
 
-const frame = document.createElement("div");
-frame.className = "frame";
+  sizeSaveBtn.addEventListener("click", ()=>{
+    const ui = {
+      tileSize: parseInt(tileSizeRange.value,10),
+      frameW: parseInt(frameSizeRange.value,10)
+    };
+    localStorage.setItem(UI_KEY, JSON.stringify(ui));
+    showToast("Sizes saved");
+    closeSizes();
+  });
 
-const effectivePhoto = tile._fixed ? null : tile.photo;
+  sizeModal.addEventListener("click", e=>{
+    if(e.target===sizeModal) closeSizes();
+  });
 
-if(effectivePhoto){
-const img = document.createElement("img");
-img.src = effectivePhoto;
-img.alt = "";
-frame.appendChild(img);
-}else{
-frame.innerHTML = iconSVG(tile.icon);
-}
+  function loadUISizes(){
+    try{
+      const raw = localStorage.getItem(UI_KEY);
+      if(!raw) return;
+      const ui = JSON.parse(raw);
+      if(ui && ui.tileSize) setCSS("--tileSize", ui.tileSize);
+      if(ui && ui.frameW){
+        setCSS("--frameW", ui.frameW);
+        setCSS("--frameH", Math.round(ui.frameW * 0.88));
+      }
+    }catch(e){}
+  }
 
-mediaArea.appendChild(frame);
+  function buildTile(tile){
+    const el = document.createElement("div");
+    el.className = "tile";
+    el.setAttribute("role","button");
+    el.setAttribute("tabindex","0");
 
-const labelArea = document.createElement("div");
-labelArea.className = "labelArea";
+    const mediaArea = document.createElement("div");
+    mediaArea.className = "mediaArea";
 
-const label = document.createElement("div");
-label.className = "label";
-label.textContent = tile.label;
+    const frame = document.createElement("div");
+    frame.className = "frame";
 
-labelArea.appendChild(label);
+    if(tile.photo){
+      const img = document.createElement("img");
+      img.src = tile.photo;
+      img.alt = "";
+      frame.appendChild(img);
+    }
 
-el.appendChild(mediaArea);
-el.appendChild(labelArea);
+    mediaArea.appendChild(frame);
 
-const activate = ()=>{
-if(editMode){
-if(tile._fixed){
-showToast("Yes/No are fixed");
-return;
-}
-openEditor(tile);
-return;
-}
+    const labelArea = document.createElement("div");
+    labelArea.className = "labelArea";
 
-if(confirmMode){
-if(confirmPendingId === tile.id){
-clearTimeout(confirmTimer);
-confirmPendingId = null;
-speak(tile.say);
-showToast("Spoken");
-}else{
-confirmPendingId = tile.id;
-showToast("Tap again to confirm");
-clearTimeout(confirmTimer);
-confirmTimer = setTimeout(()=>{ confirmPendingId = null; }, 2200);
-}
-return;
-}
+    const label = document.createElement("div");
+    label.className = "label";
+    label.textContent = tile.label;
 
-speak(tile.say);
-};
+    labelArea.appendChild(label);
+    el.appendChild(mediaArea);
+    el.appendChild(labelArea);
 
-el.addEventListener("click", activate);
-el.addEventListener("keydown", (ev)=>{
-if(ev.key==="Enter" || ev.key===" "){
-ev.preventDefault();
-activate();
-}
-});
+    const activate = ()=>{
+      if(editMode){
+        openEditor(tile);
+        return;
+      }
 
-grid.appendChild(el);
-});
-}
+      if(confirmMode){
+        if(confirmPendingId === tile.id){
+          clearTimeout(confirmTimer);
+          confirmPendingId = null;
+          speak(tile.say);
+          showToast("Spoken");
+        }else{
+          confirmPendingId = tile.id;
+          showToast("Tap again to confirm");
+          clearTimeout(confirmTimer);
+          confirmTimer = setTimeout(()=>{ confirmPendingId = null; },2200);
+        }
+        return;
+      }
 
-confirmChip.addEventListener("click", ()=>{
-confirmMode = !confirmMode;
-setChipState(confirmChip, confirmMode);
-saveAll();
-});
-soundChip.addEventListener("click", ()=>{
-soundOn = !soundOn;
-setChipState(soundChip, soundOn);
-showToast(soundOn ? "Sound ON" : "Sound OFF");
-saveAll();
-});
-editChip.addEventListener("click", ()=>{
-if(!editMode){
-const entered = prompt("Enter password to enable Edit mode:");
-if(entered === null) return;
-if(entered !== EDIT_PASSWORD){
-showToast("Wrong password");
-return;
-}
-editMode = true;
-setChipState(editChip, true);
-showToast("Edit ON");
-saveAll();
-}else{
-editMode = false;
-setChipState(editChip, false);
-closeEditor();
-showToast("Edit OFF");
-saveAll();
-}
-});
-resetBtn.addEventListener("click", ()=>{
-if(!confirm("Reset everything to default?")) return;
-state = JSON.parse(JSON.stringify(DEFAULT));
-confirmMode = false;
-soundOn = true;
-editMode = false;
-setChipState(confirmChip,false);
-setChipState(soundChip,true);
-setChipState(editChip,false);
-confirmPendingId = null;
-closeEditor();
-saveAll();
-render();
-showToast("Reset done");
-});
-clearBtn.addEventListener("click", ()=>{
-if(!confirm("Clear ONLY custom photos?")) return;
-["move","team","equipment","needs"].forEach(p=>{
-(state[p]||[]).forEach(t=> t.photo = null);
-});
-closeEditor();
-saveAll();
-render();
-showToast("Photos cleared");
-});
+      speak(tile.say);
+    };
 
-pageMove.addEventListener("click", ()=> setActivePage("move"));
-pageTeam.addEventListener("click", ()=> setActivePage("team"));
-pageEquipment.addEventListener("click", ()=> setActivePage("equipment"));
-pageNeeds.addEventListener("click", ()=> setActivePage("needs"));
-pagePain.addEventListener("click", ()=> setActivePage("pain"));
+    el.addEventListener("click", activate);
+    el.addEventListener("keydown", ev=>{
+      if(ev.key==="Enter" || ev.key===" "){
+        ev.preventDefault();
+        activate();
+      }
+    });
 
-loadFlags();
-loadUISizes();
+    return el;
+  }
 
-setChipState(confirmChip, confirmMode);
-setChipState(soundChip, soundOn);
-setChipState(editChip, editMode);
+  function handleConfirmSpeak(id, text){
+    if(confirmPendingId === id){
+      clearTimeout(confirmTimer);
+      confirmPendingId = null;
+      speak(text);
+      showToast("Spoken");
+    }else{
+      confirmPendingId = id;
+      showToast("Tap again to confirm");
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(()=>{ confirmPendingId = null; },2200);
+    }
+  }
 
-setActivePage(currentPage);
-render();
+  function render(){
+    if(currentPage==="pain"){
+      painWrap.classList.add("on");
+      renderPainBar();
+    }else{
+      painWrap.classList.remove("on");
+      painRow.innerHTML = "";
+      painFaceBig.textContent = "😊";
+    }
+
+    grid.innerHTML = "";
+    ynRow.innerHTML = "";
+
+    const tiles = tilesForPage(currentPage);
+    tiles.forEach(tile=> grid.appendChild(buildTile(tile)));
+
+    const yes = document.createElement("button");
+    yes.className = "ynBtn ynYes";
+    yes.textContent = "Yes";
+    yes.addEventListener("click", ()=>{
+      if(confirmMode) handleConfirmSpeak("yes_fixed","Yes");
+      else speak("Yes");
+    });
+
+    const no = document.createElement("button");
+    no.className = "ynBtn ynNo";
+    no.textContent = "No";
+    no.addEventListener("click", ()=>{
+      if(confirmMode) handleConfirmSpeak("no_fixed","No");
+      else speak("No");
+    });
+
+    ynRow.appendChild(yes);
+    ynRow.appendChild(no);
+  }
+
+  confirmChip.addEventListener("click", ()=>{
+    confirmMode = !confirmMode;
+    setChipState(confirmChip, confirmMode);
+    saveAll();
+  });
+
+  soundChip.addEventListener("click", ()=>{
+    soundOn = !soundOn;
+    setChipState(soundChip, soundOn);
+    showToast(soundOn ? "Sound ON" : "Sound OFF");
+    saveAll();
+  });
+
+  editChip.addEventListener("click", ()=>{
+    if(!editMode){
+      const entered = prompt("Enter password to enable Edit mode:");
+      if(entered===null) return;
+      if(entered!==EDIT_PASSWORD){
+        showToast("Wrong password");
+        return;
+      }
+      editMode = true;
+      setChipState(editChip,true);
+      showToast("Edit ON");
+      saveAll();
+    }else{
+      editMode = false;
+      setChipState(editChip,false);
+      closeEditor();
+      showToast("Edit OFF");
+      saveAll();
+    }
+  });
+
+  resetBtn.addEventListener("click", ()=>{
+    if(!confirm("Reset everything to default?")) return;
+    state = deepCopy(DEFAULT);
+    confirmMode = false;
+    soundOn = true;
+    editMode = false;
+    setChipState(confirmChip,false);
+    setChipState(soundChip,true);
+    setChipState(editChip,false);
+    confirmPendingId = null;
+    closeEditor();
+    saveAll();
+    render();
+    showToast("Reset done");
+  });
+
+  clearBtn.addEventListener("click", ()=>{
+    if(!confirm("Clear ONLY custom photos?")) return;
+    ["move","team","equipment","needs","feelings","people","favorites"].forEach(p=>{
+      (state[p] || []).forEach(t=>{
+        const original = DEFAULT[p].find(d=>d.id===t.id);
+        t.photo = original ? original.photo : null;
+      });
+    });
+    closeEditor();
+    saveAll();
+    render();
+    showToast("Photos reset");
+  });
+
+  pageMove.addEventListener("click", ()=> setActivePage("move"));
+  pageTeam.addEventListener("click", ()=> setActivePage("team"));
+  pageEquipment.addEventListener("click", ()=> setActivePage("equipment"));
+  pageNeeds.addEventListener("click", ()=> setActivePage("needs"));
+  pageFeelings.addEventListener("click", ()=> setActivePage("feelings"));
+  pagePeople.addEventListener("click", ()=> setActivePage("people"));
+  pageFavorites.addEventListener("click", ()=> setActivePage("favorites"));
+  pagePain.addEventListener("click", ()=> setActivePage("pain"));
+
+  loadFlags();
+  loadUISizes();
+  setChipState(confirmChip, confirmMode);
+  setChipState(soundChip, soundOn);
+  setChipState(editChip, editMode);
+  setActivePage(currentPage);
+  render();
 </script>
 </body>
 </html>
