@@ -522,57 +522,50 @@
 </div>
 
 <script>
- const IMAGE_FILES = {
-sit: "sit.png",
-stand: "stand.png",
-outofbed: "outofbed.png",
-inbed: "inbed.png",
-stop: "stop.png",
+  const IMAGE_FILES = {
+    sit: "sit.png",
+    stand: "stand.png",
+    outofbed: "outofbed.png",
+    inbed: "inbed.png",
+    stop: "stop.png",
+    nurse: "nurse.png",
+    doctor: "doctor.png",
+    ot: "ot.png",
+    pt: "pt.png",
+    speech: "speech.png",
+    callbell: "callbell.png",
+    wheelchair: "wheelchair.png",
+    bed: "bed.png",
+    reposition: "reposition.png",
+    toilet: "toilet.png",
+    chair: "chair.png",
+    drink: "drink.png",
+    food: "food.png",
+    pain: "pain.png",
+    help: "help.png",
+    dontunderstand: "dontunderstand.png",
+    repeat: "repeat.png",
+    slowdown: "slowdown.png",
+    happy: "happy.png",
+    sad: "sad.png",
+    frustrated: "frustrated.png",
+    exhausted: "exhausted.png",
+    anxious: "anxious.png",
+    confused: "confused.png",
+    family: "family.png",
+    friend: "friend.png",
+    partner: "partner.png",
+    child: "child.png",
+    mum: "mum.png",
+    dad: "dad.png",
+    lipstick: "lipstick.png",
+    clothes: "clothes.png",
+    phone: "phone.png",
+    music: "music.png",
+    glasses: "glasses.png",
+    blanket: "blanket.png"
+  };
 
-nurse: "nurse.png",
-doctor: "doctor.png",
-ot: "ot.png",
-pt: "pt.png",
-speech: "speech.png",
-callbell: "callbell.png",
-
-wheelchair: "wheelchair.png",
-bed: "bed.png",
-reposition: "reposition.png",
-toilet: "toilet.png",
-chair: "chair.png",
-
-drink: "drink.png",
-food: "food.png",
-pain: "pain.png",
-help: "help.png",
-
-dontunderstand: "dontunderstand.png",
-repeat: "repeat.png",
-slowdown: "slowdown.png",
-
-happy: "happy.png",
-sad: "sad.png",
-frustrated: "frustrated.png",
-exhausted: "exhausted.png",
-anxious: "anxious.png",
-confused: "confused.png",
-
-family: "family.png",
-friend: "friend.png",
-partner: "partner.png",
-child: "child.png",
-mum: "mum.png",
-dad: "dad.png",
-
-lipstick: "lipstick.png",
-clothes: "clothes.png",
-phone: "phone.png",
-music: "music.png",
-glasses: "glasses.png",
-blanket: "blanket.png"
-};
-  
   const DEFAULT = {
     move: [
       { id:"sit", label:"Sit", say:"I want to sit up", photo:IMAGE_FILES.sit },
@@ -630,8 +623,8 @@ blanket: "blanket.png"
     ]
   };
 
-  const STORAGE_KEY = "mcuTalkboard_v1";
-  const UI_KEY = "mcuTalkboard_ui_v1";
+  const STORAGE_KEY = "mcuTalkboard_v2";
+  const UI_KEY = "mcuTalkboard_ui_v2";
   const EDIT_PASSWORD = "1234";
 
   let state = loadState();
