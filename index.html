@@ -150,7 +150,6 @@
       box-shadow:0 10px 26px rgba(0,0,0,.22);
     }
 
-    /* deliberately different shapes + colours for visual separation */
     .grid .tile:nth-child(1){
       background:linear-gradient(180deg,#2b7cff,#1f66db);
       border-radius:18px;
@@ -464,7 +463,7 @@
     <button class="chip" id="pagePain" type="button">Pain</button>
   </div>
 
-  <div class="hint">Designed for low visual and cognitive demand: 2 columns, wide spacing, max 4 choices.</div>
+  <div class="hint">Low-demand layout. You can change button size, photo size, and distance between all buttons in Sizes.</div>
 </header>
 
 <main>
@@ -521,6 +520,14 @@
       <div class="rangeRow">
         <input id="frameSizeRange" type="range" min="150" max="200" step="2" />
         <div class="rangeValue" id="frameSizeVal"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Distance between buttons</label>
+      <div class="rangeRow">
+        <input id="gapSizeRange" type="range" min="10" max="80" step="2" />
+        <div class="rangeValue" id="gapSizeVal"></div>
       </div>
     </div>
 
@@ -621,8 +628,8 @@
     ]
   };
 
-  const STORAGE_KEY = "mcuTalkboard_lowdemand_v1";
-  const UI_KEY = "mcuTalkboard_lowdemand_ui_v1";
+  const STORAGE_KEY = "mcuTalkboard_lowdemand_v2";
+  const UI_KEY = "mcuTalkboard_lowdemand_ui_v2";
   const EDIT_PASSWORD = "1234";
 
   let state = loadState();
@@ -669,8 +676,10 @@
   const sizeModal = document.getElementById("sizeModal");
   const tileSizeRange = document.getElementById("tileSizeRange");
   const frameSizeRange = document.getElementById("frameSizeRange");
+  const gapSizeRange = document.getElementById("gapSizeRange");
   const tileSizeVal = document.getElementById("tileSizeVal");
   const frameSizeVal = document.getElementById("frameSizeVal");
+  const gapSizeVal = document.getElementById("gapSizeVal");
   const sizeCancelBtn = document.getElementById("sizeCancelBtn");
   const sizeSaveBtn = document.getElementById("sizeSaveBtn");
 
@@ -871,6 +880,7 @@
   function openSizes(){
     tileSizeRange.value = getCSSNum("--tileW");
     frameSizeRange.value = getCSSNum("--frameW");
+    gapSizeRange.value = getCSSNum("--gap");
     updateSizeLabels();
     sizeModal.classList.add("on");
   }
@@ -882,15 +892,19 @@
   function updateSizeLabels(){
     tileSizeVal.textContent = tileSizeRange.value + "px";
     frameSizeVal.textContent = frameSizeRange.value + "px";
+    gapSizeVal.textContent = gapSizeRange.value + "px";
   }
 
   function applySizesLive(){
     const tile = parseInt(tileSizeRange.value,10);
     const fw = parseInt(frameSizeRange.value,10);
+    const gap = parseInt(gapSizeRange.value,10);
+
     setCSS("--tileW", tile);
     setCSS("--tileH", tile);
     setCSS("--frameW", fw);
     setCSS("--frameH", Math.round(fw * 0.84));
+    setCSS("--gap", gap);
     render();
   }
 
@@ -904,13 +918,19 @@
     applySizesLive();
   });
 
+  gapSizeRange.addEventListener("input", ()=>{
+    updateSizeLabels();
+    applySizesLive();
+  });
+
   sizeChip.addEventListener("click", openSizes);
   sizeCancelBtn.addEventListener("click", closeSizes);
 
   sizeSaveBtn.addEventListener("click", ()=>{
     const ui = {
       tileW: parseInt(tileSizeRange.value,10),
-      frameW: parseInt(frameSizeRange.value,10)
+      frameW: parseInt(frameSizeRange.value,10),
+      gap: parseInt(gapSizeRange.value,10)
     };
     localStorage.setItem(UI_KEY, JSON.stringify(ui));
     showToast("Sizes saved");
@@ -933,6 +953,9 @@
       if(ui && ui.frameW){
         setCSS("--frameW", ui.frameW);
         setCSS("--frameH", Math.round(ui.frameW * 0.84));
+      }
+      if(ui && ui.gap){
+        setCSS("--gap", ui.gap);
       }
     }catch(e){}
   }
