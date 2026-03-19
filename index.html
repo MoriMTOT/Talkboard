@@ -41,6 +41,9 @@
       font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;
       background:var(--bg);
       color:var(--text);
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
     }
 
     header{
@@ -77,8 +80,6 @@
       color:var(--text);
       font-weight:800;
       touch-action:manipulation;
-      user-select:none;
-      -webkit-user-select:none;
     }
 
     .controls .chip.on{
@@ -103,8 +104,6 @@
       font-weight:950;
       letter-spacing:.2px;
       touch-action:manipulation;
-      user-select:none;
-      -webkit-user-select:none;
     }
 
     .pages .chip.active{
@@ -148,6 +147,7 @@
       touch-action:manipulation;
       border:2px solid rgba(255,255,255,.18);
       box-shadow:0 10px 26px rgba(0,0,0,.22);
+      -webkit-touch-callout:none;
     }
 
     .grid .tile:nth-child(1){
@@ -186,19 +186,7 @@
       align-items:center;
       justify-content:center;
       box-shadow:0 4px 14px rgba(0,0,0,.12);
-    }
-
-    .grid .tile:nth-child(2) .frame{
-      border-radius:28px;
-    }
-    .grid .tile:nth-child(3) .frame{
-      border-radius:50%;
-      width:150px;
-      height:150px;
-    }
-    .grid .tile:nth-child(4) .frame{
-      border-radius:12px;
-      transform:rotate(-2deg);
+      -webkit-touch-callout:none;
     }
 
     .frame img{
@@ -207,6 +195,12 @@
       object-fit:contain;
       object-position:center;
       background:#fff;
+      -webkit-user-drag:none;
+      user-drag:none;
+      -webkit-touch-callout:none;
+      -webkit-user-select:none;
+      user-select:none;
+      pointer-events:none;
     }
 
     .labelArea{
@@ -234,6 +228,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      -webkit-touch-callout:none;
     }
 
     .ynRow{
@@ -256,9 +251,8 @@
       border:none;
       color:#fff;
       touch-action:manipulation;
-      user-select:none;
-      -webkit-user-select:none;
       box-shadow:0 10px 22px rgba(0,0,0,.24);
+      -webkit-touch-callout:none;
     }
 
     .ynYes{background:#22b63f}
@@ -292,12 +286,11 @@
       font-weight:950;
       font-size:var(--painFont);
       touch-action:manipulation;
-      user-select:none;
-      -webkit-user-select:none;
       display:flex;
       align-items:center;
       justify-content:center;
       padding:0;
+      -webkit-touch-callout:none;
     }
 
     .painBtn.left{border-radius:14px 0 0 14px}
@@ -316,8 +309,7 @@
       justify-content:center;
       font-size:130px;
       line-height:1;
-      user-select:none;
-      -webkit-user-select:none;
+      -webkit-touch-callout:none;
     }
 
     .toast{
@@ -628,8 +620,8 @@
     ]
   };
 
-  const STORAGE_KEY = "mcuTalkboard_lowdemand_v2";
-  const UI_KEY = "mcuTalkboard_lowdemand_ui_v2";
+  const STORAGE_KEY = "mcuTalkboard_lowdemand_v3";
+  const UI_KEY = "mcuTalkboard_lowdemand_ui_v3";
   const EDIT_PASSWORD = "1234";
 
   let state = loadState();
@@ -976,6 +968,7 @@
       const img = document.createElement("img");
       img.src = tile.photo;
       img.alt = "";
+      img.draggable = false;
       frame.appendChild(img);
     }
 
@@ -1149,6 +1142,9 @@
   pagePeople.addEventListener("click", ()=> setActivePage("people"));
   pageFavorites.addEventListener("click", ()=> setActivePage("favorites"));
   pagePain.addEventListener("click", ()=> setActivePage("pain"));
+
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("dragstart", e => e.preventDefault());
 
   loadFlags();
   loadUISizes();
