@@ -2,1091 +2,1252 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>MCU Rehab Game</title>
-<style>
-:root{
---bgA:#09111f;
---bgB:#17243a;
---panel:rgba(12,19,34,.82);
---text:#f8fbff;
---muted:#c8d4e6;
---line:rgba(255,255,255,.12);
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>MCU Rehab Game</title>
+  <style>
+    :root{
+      --bg1:#07111f;
+      --bg2:#14243d;
+      --panel:rgba(10,18,34,.82);
+      --text:#f8fbff;
+      --muted:#c7d3e6;
+      --line:rgba(255,255,255,.12);
+      --blue:#3b82f6;
+      --orange:#f59e0b;
+      --green:#10b981;
+      --pink:#ec4899;
+      --violet:#8b5cf6;
+      --red:#ef4444;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --shadow:0 14px 30px rgba(0,0,0,.28);
+      --cardW:220px;
+      --cardH:220px;
+      --gap:24px;
+    }
 
---blue:#3b82f6;
---orange:#f59e0b;
---green:#10b981;
---pink:#ec4899;
---violet:#8b5cf6;
---red:#ef4444;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(59,130,246,.25), transparent 22%),
+        radial-gradient(circle at 90% 10%, rgba(236,72,153,.18), transparent 18%),
+        linear-gradient(180deg,var(--bg2),var(--bg1));
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
+    }
 
---good:#22c55e;
---bad:#ef4444;
+    .app{
+      max-width:1180px;
+      margin:0 auto;
+      padding:16px 14px 28px;
+    }
 
---shadow:0 14px 30px rgba(0,0,0,.28);
---cardW:220px;
---cardH:220px;
---gap:24px;
-}
+    .top{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-color:var(--text);
-background:
-radial-gradient(circle at 10% 10%, rgba(59,130,246,.25), transparent 22%),
-radial-gradient(circle at 90% 10%, rgba(236,72,153,.18), transparent 18%),
-linear-gradient(180deg,var(--bgB),var(--bgA));
--webkit-user-select:none;
-user-select:none;
--webkit-touch-callout:none;
-}
+    .titleWrap{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
 
-.app{
-max-width:1180px;
-margin:0 auto;
-padding:16px 14px 28px;
-}
+    .title{
+      font-size:28px;
+      font-weight:950;
+      letter-spacing:.2px;
+    }
 
-.top{
-display:flex;
-flex-wrap:wrap;
-gap:12px;
-align-items:center;
-justify-content:space-between;
-margin-bottom:14px;
-}
+    .subtitle{
+      font-size:14px;
+      color:var(--muted);
+    }
 
-.titleWrap{
-display:flex;
-flex-direction:column;
-gap:4px;
-}
+    .stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
 
-.title{
-font-size:28px;
-font-weight:950;
-letter-spacing:.2px;
-}
+    .stat{
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
 
-.subtitle{
-font-size:14px;
-color:var(--muted);
-}
+    .tabs{
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:16px;
+    }
 
-.stats{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-}
+    .tab{
+      border:none;
+      border-radius:18px;
+      padding:14px 10px;
+      color:#fff;
+      font-size:15px;
+      font-weight:950;
+      box-shadow:var(--shadow);
+      touch-action:manipulation;
+    }
 
-.stat{
-background:rgba(255,255,255,.08);
-border:1px solid var(--line);
-border-radius:999px;
-padding:10px 14px;
-font-size:14px;
-font-weight:900;
-box-shadow:var(--shadow);
-}
+    .tab.active{
+      outline:4px solid rgba(255,255,255,.20);
+      transform:translateY(-1px);
+    }
 
-.tabs{
-display:grid;
-grid-template-columns:repeat(6,minmax(0,1fr));
-gap:10px;
-margin-bottom:16px;
-}
+    .t-match{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+    .t-orient{background:linear-gradient(135deg,#f59e0b,#ea580c)}
+    .t-process{background:linear-gradient(135deg,#10b981,#059669)}
+    .t-build{background:linear-gradient(135deg,#ec4899,#db2777)}
+    .t-results{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+    .t-edit{background:linear-gradient(135deg,#64748b,#334155)}
 
-.tab{
-border:none;
-border-radius:18px;
-padding:14px 10px;
-color:#fff;
-font-size:15px;
-font-weight:950;
-box-shadow:var(--shadow);
-touch-action:manipulation;
-}
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
 
-.tab.active{
-outline:4px solid rgba(255,255,255,.20);
-transform:translateY(-1px);
-}
+    .stage{display:none}
+    .stage.active{display:block}
 
-.t-match{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
-.t-orient{background:linear-gradient(135deg,#f59e0b,#ea580c)}
-.t-process{background:linear-gradient(135deg,#10b981,#059669)}
-.t-build{background:linear-gradient(135deg,#ec4899,#db2777)}
-.t-results{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
-.t-edit{background:linear-gradient(135deg,#64748b,#334155)}
+    .prompt{
+      text-align:center;
+      font-size:30px;
+      font-weight:950;
+      min-height:38px;
+      margin-bottom:8px;
+    }
 
-.panel{
-background:var(--panel);
-border:1px solid var(--line);
-border-radius:28px;
-padding:18px;
-box-shadow:var(--shadow);
-backdrop-filter:blur(10px);
-}
+    .helper{
+      text-align:center;
+      color:var(--muted);
+      font-size:15px;
+      min-height:22px;
+      margin-bottom:18px;
+    }
 
-.stage{display:none}
-.stage.active{display:block}
+    .previewWrap{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin-bottom:18px;
+      min-height:160px;
+    }
 
-.prompt{
-text-align:center;
-font-size:30px;
-font-weight:950;
-min-height:38px;
-margin-bottom:8px;
-}
+    .previewCard{
+      width:220px;
+      height:170px;
+      border-radius:28px;
+      background:#fff;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#111827;
+      font-size:32px;
+      font-weight:950;
+      text-align:center;
+      padding:12px;
+    }
 
-.helper{
-text-align:center;
-color:var(--muted);
-font-size:15px;
-min-height:22px;
-margin-bottom:18px;
-}
+    .previewCard img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      pointer-events:none;
+      -webkit-user-drag:none;
+      user-drag:none;
+    }
 
-.previewWrap{
-display:flex;
-justify-content:center;
-align-items:center;
-margin-bottom:18px;
-min-height:160px;
-}
+    .board{
+      display:grid;
+      gap:var(--gap);
+      justify-content:center;
+    }
 
-.previewCard{
-width:220px;
-height:170px;
-border-radius:28px;
-background:#fff;
-overflow:hidden;
-box-shadow:var(--shadow);
-display:flex;
-align-items:center;
-justify-content:center;
-color:#111827;
-font-size:32px;
-font-weight:950;
-text-align:center;
-padding:12px;
-}
+    .board.two{grid-template-columns:repeat(2,minmax(180px,var(--cardW)))}
+    .board.four{grid-template-columns:repeat(2,minmax(180px,var(--cardW)))}
 
-.previewCard img{
-width:100%;
-height:100%;
-object-fit:contain;
-background:#fff;
-pointer-events:none;
--webkit-user-drag:none;
-user-drag:none;
-}
+    .gameCard{
+      min-height:var(--cardH);
+      border:none;
+      border-radius:28px;
+      padding:14px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      align-items:center;
+      touch-action:manipulation;
+      box-shadow:var(--shadow);
+      position:relative;
+    }
 
-.board{
-display:grid;
-gap:var(--gap);
-justify-content:center;
-}
+    .c1{background:linear-gradient(180deg,#60a5fa,#2563eb)}
+    .c2{background:linear-gradient(180deg,#fbbf24,#f97316)}
+    .c3{background:linear-gradient(180deg,#34d399,#059669)}
+    .c4{background:linear-gradient(180deg,#f9a8d4,#db2777)}
 
-.board.two{grid-template-columns:repeat(2,minmax(180px,var(--cardW)))}
-.board.three{grid-template-columns:repeat(3,minmax(160px,200px))}
-.board.four{grid-template-columns:repeat(2,minmax(180px,var(--cardW)))}
+    .media{
+      flex:1;
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
+    }
 
-.gameCard{
-min-height:var(--cardH);
-border:none;
-border-radius:28px;
-padding:14px;
-overflow:hidden;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-align-items:center;
-touch-action:manipulation;
-box-shadow:var(--shadow);
-position:relative;
-}
+    .imgBox{
+      width:150px;
+      height:130px;
+      border-radius:22px;
+      background:#fff;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
+    }
 
-.c1{background:linear-gradient(180deg,#60a5fa,#2563eb)}
-.c2{background:linear-gradient(180deg,#fbbf24,#f97316)}
-.c3{background:linear-gradient(180deg,#34d399,#059669)}
-.c4{background:linear-gradient(180deg,#f9a8d4,#db2777)}
+    .imgBox img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      background:#fff;
+      pointer-events:none;
+      -webkit-user-drag:none;
+      user-drag:none;
+    }
 
-.media{
-flex:1;
-width:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:8px;
-}
+    .label{
+      width:100%;
+      min-height:56px;
+      border-radius:18px;
+      background:rgba(255,255,255,.95);
+      color:#111827;
+      font-size:22px;
+      font-weight:950;
+      text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+      line-height:1.08;
+    }
 
-.imgBox{
-width:150px;
-height:130px;
-border-radius:22px;
-background:#fff;
-overflow:hidden;
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:0 8px 18px rgba(0,0,0,.18);
-}
+    .wordTarget{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      min-height:76px;
+      margin-bottom:18px;
+    }
 
-.imgBox img{
-width:100%;
-height:100%;
-object-fit:contain;
-background:#fff;
-pointer-events:none;
--webkit-user-drag:none;
-user-drag:none;
-}
+    .slot{
+      width:64px;
+      height:64px;
+      border-radius:18px;
+      border:2px dashed rgba(255,255,255,.24);
+      background:rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:30px;
+      font-weight:950;
+    }
 
-.label{
-width:100%;
-min-height:56px;
-border-radius:18px;
-background:rgba(255,255,255,.95);
-color:#111827;
-font-size:22px;
-font-weight:950;
-text-align:center;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:10px;
-line-height:1.08;
-}
+    .letterBank{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
 
-.wordTarget{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-min-height:76px;
-margin-bottom:18px;
-}
+    .letterBtn{
+      width:72px;
+      height:72px;
+      border:none;
+      border-radius:20px;
+      background:#fff;
+      color:#111827;
+      font-size:34px;
+      font-weight:950;
+      box-shadow:var(--shadow);
+      touch-action:manipulation;
+    }
 
-.slot{
-width:64px;
-height:64px;
-border-radius:18px;
-border:2px dashed rgba(255,255,255,.24);
-background:rgba(255,255,255,.06);
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:30px;
-font-weight:950;
-}
+    .processArea{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      align-items:center;
+    }
 
-.letterBank{
-display:flex;
-justify-content:center;
-gap:12px;
-flex-wrap:wrap;
-}
+    .processGrid{
+      display:grid;
+      grid-template-columns:repeat(3,92px);
+      gap:16px;
+      justify-content:center;
+    }
 
-.letterBtn{
-width:72px;
-height:72px;
-border:none;
-border-radius:20px;
-background:#fff;
-color:#111827;
-font-size:34px;
-font-weight:950;
-box-shadow:var(--shadow);
-touch-action:manipulation;
-}
+    .processBtn{
+      width:92px;
+      height:92px;
+      border:none;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      touch-action:manipulation;
+      color:#fff;
+      font-weight:950;
+      font-size:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:6px;
+    }
 
-.processArea{
-display:flex;
-flex-direction:column;
-gap:18px;
-align-items:center;
-}
+    .p1{background:#3b82f6}
+    .p2{background:#f59e0b}
+    .p3{background:#10b981}
+    .p4{background:#ec4899}
 
-.processGrid{
-display:grid;
-grid-template-columns:repeat(3,92px);
-gap:16px;
-justify-content:center;
-}
+    .feedback{
+      margin-top:18px;
+      min-height:34px;
+      text-align:center;
+      font-size:28px;
+      font-weight:950;
+    }
 
-.processBtn{
-width:92px;
-height:92px;
-border:none;
-border-radius:24px;
-box-shadow:var(--shadow);
-touch-action:manipulation;
-}
+    .good{color:var(--good)}
+    .bad{color:var(--bad)}
 
-.p1{background:#3b82f6}
-.p2{background:#f59e0b}
-.p3{background:#10b981}
-.p4{background:#ec4899}
+    .controls{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
 
-.feedback{
-margin-top:18px;
-min-height:34px;
-text-align:center;
-font-size:28px;
-font-weight:950;
-}
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:14px 18px;
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      font-size:15px;
+      font-weight:950;
+      box-shadow:var(--shadow);
+      touch-action:manipulation;
+    }
 
-.good{color:var(--good)}
-.bad{color:var(--bad)}
+    .btn.on{
+      outline:3px solid rgba(255,255,255,.22);
+    }
 
-.controls{
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-gap:12px;
-margin-top:18px;
-}
+    .resultsGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
 
-.btn{
-border:none;
-border-radius:999px;
-padding:14px 18px;
-background:rgba(255,255,255,.10);
-color:#fff;
-font-size:15px;
-font-weight:950;
-box-shadow:var(--shadow);
-touch-action:manipulation;
-}
+    .resultCard{
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:14px;
+    }
 
-.btn.on{
-outline:3px solid rgba(255,255,255,.22);
-}
+    .resultCard strong{
+      display:block;
+      font-size:18px;
+      margin-bottom:6px;
+    }
 
-.resultsGrid{
-display:grid;
-grid-template-columns:repeat(2,minmax(0,1fr));
-gap:14px;
-}
+    .noteBox{
+      margin-top:16px;
+      width:100%;
+      min-height:150px;
+      border:none;
+      border-radius:18px;
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      padding:14px;
+      font:inherit;
+      resize:none;
+    }
 
-.resultCard{
-background:rgba(255,255,255,.08);
-border:1px solid var(--line);
-border-radius:20px;
-padding:14px;
-}
+    .editGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
 
-.resultCard strong{
-display:block;
-font-size:18px;
-margin-bottom:6px;
-}
+    .editCard{
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+    }
 
-.noteBox{
-margin-top:16px;
-width:100%;
-min-height:150px;
-border:none;
-border-radius:18px;
-background:rgba(255,255,255,.08);
-color:#fff;
-padding:14px;
-font:inherit;
-resize:none;
-}
+    .editCard h4{
+      margin:0 0 10px 0;
+      font-size:18px;
+    }
 
-.editGrid{
-display:grid;
-grid-template-columns:repeat(2,minmax(0,1fr));
-gap:14px;
-}
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom:10px;
+    }
 
-.editCard{
-background:rgba(255,255,255,.08);
-border:1px solid var(--line);
-border-radius:18px;
-padding:14px;
-}
+    .field label{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+    }
 
-.editCard h4{
-margin:0 0 10px 0;
-font-size:18px;
-}
+    .field input, .field select{
+      width:100%;
+      height:44px;
+      border:none;
+      border-radius:12px;
+      padding:0 12px;
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      font:inherit;
+    }
 
-.field{
-display:flex;
-flex-direction:column;
-gap:6px;
-margin-bottom:10px;
-}
+    .field input[type="file"]{
+      height:auto;
+      padding:10px 12px;
+    }
 
-.field label{
-color:var(--muted);
-font-size:13px;
-font-weight:800;
-}
-
-.field input, .field select{
-width:100%;
-height:44px;
-border:none;
-border-radius:12px;
-padding:0 12px;
-background:rgba(255,255,255,.10);
-color:#fff;
-font:inherit;
-}
-
-.field input[type="file"]{
-height:auto;
-padding:10px 12px;
-}
-
-@media (max-width:800px){
-.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
-.board.two,.board.three,.board.four{grid-template-columns:1fr}
-.resultsGrid,.editGrid{grid-template-columns:1fr}
-.prompt{font-size:25px}
-}
-</style>
+    @media (max-width:800px){
+      .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .board.two,.board.four{grid-template-columns:1fr}
+      .resultsGrid,.editGrid{grid-template-columns:1fr}
+      .prompt{font-size:25px}
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-<div class="top">
-<div class="titleWrap">
-<div class="title">MCU Rehab Game</div>
-<div class="subtitle">Different app: processing, matching, orientation and word building</div>
-</div>
-
-<div class="stats">
-<div class="stat">Mode: <span id="modeLabel">Matching</span></div>
-<div class="stat">Rounds: <span id="rounds">0</span></div>
-<div class="stat">Correct: <span id="correct">0</span></div>
-</div>
-</div>
-
-<div class="tabs">
-<button class="tab t-match active" id="tabMatch" type="button">Matching</button>
-<button class="tab t-orient" id="tabOrient" type="button">Orientation</button>
-<button class="tab t-process" id="tabProcess" type="button">Processing</button>
-<button class="tab t-build" id="tabBuild" type="button">Word Build</button>
-<button class="tab t-results" id="tabResults" type="button">Results</button>
-<button class="tab t-edit" id="tabEdit" type="button">Edit</button>
-</div>
-
-<div class="panel">
-<div id="stageMatch" class="stage active">
-<div class="prompt" id="matchPrompt">Tap the same picture</div>
-<div class="helper">Picture matching and visual recognition</div>
-<div class="previewWrap" id="matchPreview"></div>
-<div class="board four" id="matchBoard"></div>
-</div>
-
-<div id="stageOrient" class="stage">
-<div class="prompt" id="orientPrompt">Tap the correct orientation</div>
-<div class="helper">Uses pictures, not words, to test top / bottom / sleeve / neck / object direction</div>
-<div class="previewWrap" id="orientPreview"></div>
-<div class="board four" id="orientBoard"></div>
-</div>
-
-<div id="stageProcess" class="stage">
-<div class="prompt" id="processPrompt">Tap the colour I say</div>
-<div class="helper">Simple processing speed and attention training</div>
-<div class="processArea">
-<div class="previewCard" id="processCue">BLUE</div>
-<div class="processGrid" id="processGrid"></div>
-</div>
-</div>
-
-<div id="stageBuild" class="stage">
-<div class="prompt" id="buildPrompt">Build the word</div>
-<div class="helper">Checks letter selection and word making</div>
-<div class="previewWrap" id="buildPreview"></div>
-<div class="wordTarget" id="buildSlots"></div>
-<div class="letterBank" id="letterBank"></div>
-</div>
-
-<div id="stageResults" class="stage">
-<div class="prompt">Results</div>
-<div class="helper">Quick bedside summary</div>
-<div class="resultsGrid">
-<div class="resultCard"><strong>Matching</strong><div id="resMatch"></div></div>
-<div class="resultCard"><strong>Orientation</strong><div id="resOrient"></div></div>
-<div class="resultCard"><strong>Processing</strong><div id="resProcess"></div></div>
-<div class="resultCard"><strong>Word Build</strong><div id="resBuild"></div></div>
-</div>
-<textarea class="noteBox" id="clinicalSummary" readonly></textarea>
-</div>
-
-<div id="stageEdit" class="stage">
-<div class="prompt">Edit</div>
-<div class="helper">Change prompts, labels and photos for this patient</div>
-<div class="editGrid">
-<div class="editCard">
-<h4>Edit item</h4>
-<div class="field">
-<label>Item</label>
-<select id="editItem"></select>
-</div>
-<div class="field">
-<label>Label</label>
-<input id="editLabel" />
-</div>
-<div class="field">
-<label>Photo</label>
-<input id="editPhoto" type="file" accept="image/*" />
-</div>
-<button class="btn" id="saveItemBtn" type="button">Save item</button>
-</div>
-
-<div class="editCard">
-<h4>Edit prompts</h4>
-<div class="field">
-<label>Matching prompt</label>
-<input id="editMatchPrompt" />
-</div>
-<div class="field">
-<label>Orientation prompt</label>
-<input id="editOrientPrompt" />
-</div>
-<div class="field">
-<label>Processing prompt</label>
-<input id="editProcessPrompt" />
-</div>
-<div class="field">
-<label>Word build prompt</label>
-<input id="editBuildPrompt" />
-</div>
-<button class="btn" id="savePromptsBtn" type="button">Save prompts</button>
-</div>
-</div>
-</div>
-
-<div class="feedback" id="feedback"></div>
-
-<div class="controls">
-<button class="btn" id="speakBtn" type="button">Speak prompt</button>
-<button class="btn" id="nextBtn" type="button">Next</button>
-<button class="btn" id="twoChoiceBtn" type="button">2 choices</button>
-<button class="btn" id="fourChoiceBtn" type="button">4 choices</button>
-<button class="btn" id="resetBtn" type="button">Reset scores</button>
-</div>
-</div>
-</div>
-
-<script>
-const STORAGE_KEY = "mcu_rehab_game_v1";
-
-const defaultData = {
-prompts:{
-match:"Tap the same picture",
-orient:"Tap the correct orientation",
-process:"Tap the colour I say",
-build:"Build the word"
-},
-items:{
-drink:{label:"Drink", img:"drink.png"},
-toilet:{label:"Toilet", img:"toilet.png"},
-food:{label:"Food", img:"food.png"},
-help:{label:"Help", img:"help.png"},
-nurse:{label:"Nurse", img:"nurse.png"},
-doctor:{label:"Doctor", img:"doctor.png"},
-sit:{label:"Sit", img:"sit.png"},
-stop:{label:"Stop", img:"stop.png"},
-shirt_top:{label:"Top side", img:"clothes.png"},
-shirt_bottom:{label:"Bottom side", img:"clothes.png"},
-shirt_sleeve:{label:"Sleeve", img:"clothes.png"},
-shirt_neck:{label:"Neck hole", img:"clothes.png"},
-arrow_up:{label:"Up", img:"outofbed.png"},
-arrow_down:{label:"Down", img:"inbed.png"},
-arrow_left:{label:"Left", img:"repeat.png"},
-arrow_right:{label:"Right", img:"slowdown.png"}
-}
-};
-
-let appData = loadData();
-
-const stats = {
-match:{correct:0,total:0},
-orient:{correct:0,total:0},
-process:{correct:0,total:0},
-build:{correct:0,total:0}
-};
-
-const MATCH_TASKS = [
-{answer:"drink", options:["drink","toilet","food","help"]},
-{answer:"toilet", options:["toilet","drink","food","help"]},
-{answer:"nurse", options:["nurse","doctor","help","drink"]},
-{answer:"sit", options:["sit","stop","drink","help"]}
-];
-
-const ORIENT_TASKS = [
-{answer:"shirt_top", options:["shirt_top","shirt_bottom","shirt_sleeve","shirt_neck"]},
-{answer:"shirt_bottom", options:["shirt_bottom","shirt_top","shirt_sleeve","shirt_neck"]},
-{answer:"shirt_sleeve", options:["shirt_sleeve","shirt_neck","shirt_top","shirt_bottom"]},
-{answer:"shirt_neck", options:["shirt_neck","shirt_sleeve","shirt_top","shirt_bottom"]},
-{answer:"arrow_up", options:["arrow_up","arrow_down","arrow_left","arrow_right"]},
-{answer:"arrow_left", options:["arrow_left","arrow_right","arrow_up","arrow_down"]}
-];
-
-const BUILD_TASKS = [
-{answer:"drink"},
-{answer:"food"},
-{answer:"help"},
-{answer:"sit"}
-];
-
-const PROCESS_TASKS = [
-{answer:"BLUE", choices:["BLUE","ORANGE","GREEN","PINK"]},
-{answer:"GREEN", choices:["BLUE","ORANGE","GREEN","PINK"]},
-{answer:"PINK", choices:["BLUE","ORANGE","GREEN","PINK"]},
-{answer:"ORANGE", choices:["BLUE","ORANGE","GREEN","PINK"]}
-];
-
-let mode = "match";
-let rounds = 0;
-let correct = 0;
-let choiceCount = 4;
-let currentTask = null;
-let buildProgress = [];
-
-const modeLabel = document.getElementById("modeLabel");
-const roundsEl = document.getElementById("rounds");
-const correctEl = document.getElementById("correct");
-const feedback = document.getElementById("feedback");
-
-function loadData(){
-try{
-const raw = localStorage.getItem(STORAGE_KEY);
-if(raw) return JSON.parse(raw);
-}catch(e){}
-return JSON.parse(JSON.stringify(defaultData));
-}
-
-function saveData(){
-localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-}
-
-function shuffle(arr){
-return [...arr].sort(()=>Math.random()-0.5);
-}
-
-function speak(text){
-try{
-speechSynthesis.cancel();
-const u = new SpeechSynthesisUtterance(text);
-u.rate = 0.9;
-u.pitch = 1.0;
-speechSynthesis.speak(u);
-}catch(e){}
-}
-
-function setActiveTab(id){
-document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-}
-
-function setStage(id){
-document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-feedback.textContent = "";
-feedback.className = "feedback";
-}
-
-function updateTop(){
-roundsEl.textContent = rounds;
-correctEl.textContent = correct;
-}
-
-function setFeedback(text, good=true){
-feedback.textContent = text;
-feedback.className = "feedback " + (good ? "good" : "bad");
-}
-
-function markResult(bucket, ok){
-stats[bucket].total += 1;
-rounds += 1;
-if(ok){
-stats[bucket].correct += 1;
-correct += 1;
-}
-updateTop();
-}
-
-function preview(containerId, itemKey){
-const wrap = document.getElementById(containerId);
-wrap.innerHTML = "";
-const card = document.createElement("div");
-card.className = "previewCard";
-const img = document.createElement("img");
-img.src = appData.items[itemKey].img;
-img.alt = "";
-card.appendChild(img);
-wrap.appendChild(card);
-}
-
-function makeCard(key, cls, onTap){
-const item = appData.items[key];
-const btn = document.createElement("button");
-btn.className = `gameCard ${cls}`;
-btn.type = "button";
-
-const media = document.createElement("div");
-media.className = "media";
-
-const box = document.createElement("div");
-box.className = "imgBox";
-
-const img = document.createElement("img");
-img.src = item.img;
-img.alt = "";
-box.appendChild(img);
-media.appendChild(box);
-
-const label = document.createElement("div");
-label.className = "label";
-label.textContent = item.label;
-
-btn.appendChild(media);
-btn.appendChild(label);
-btn.addEventListener("click", onTap);
-return btn;
-}
-
-function startMatch(){
-mode = "match";
-modeLabel.textContent = "Matching";
-setActiveTab("tabMatch");
-setStage("stageMatch");
-
-document.getElementById("matchPrompt").textContent = appData.prompts.match;
-currentTask = MATCH_TASKS[Math.floor(Math.random()*MATCH_TASKS.length)];
-preview("matchPreview", currentTask.answer);
-
-const board = document.getElementById("matchBoard");
-board.className = choiceCount === 2 ? "board two" : "board four";
-board.innerHTML = "";
-
-let opts = shuffle(currentTask.options).slice(0, choiceCount);
-if(!opts.includes(currentTask.answer)){
-opts[Math.floor(Math.random()*opts.length)] = currentTask.answer;
-}
-opts = shuffle(opts);
-
-opts.forEach((key, i)=>{
-board.appendChild(makeCard(key, ["c1","c2","c3","c4"][i], ()=>{
-const ok = key === currentTask.answer;
-markResult("match", ok);
-setFeedback(ok ? "Correct" : "Try again", ok);
-}));
-});
-}
-
-function startOrient(){
-mode = "orient";
-modeLabel.textContent = "Orientation";
-setActiveTab("tabOrient");
-setStage("stageOrient");
-
-document.getElementById("orientPrompt").textContent = appData.prompts.orient;
-currentTask = ORIENT_TASKS[Math.floor(Math.random()*ORIENT_TASKS.length)];
-preview("orientPreview", currentTask.answer);
-
-const board = document.getElementById("orientBoard");
-board.innerHTML = "";
-board.className = "board four";
-
-shuffle(currentTask.options).forEach((key, i)=>{
-board.appendChild(makeCard(key, ["c1","c2","c3","c4"][i], ()=>{
-const ok = key === currentTask.answer;
-markResult("orient", ok);
-setFeedback(ok ? "Correct" : "Try again", ok);
-}));
-});
-}
-
-function startProcess(){
-mode = "process";
-modeLabel.textContent = "Processing";
-setActiveTab("tabProcess");
-setStage("stageProcess");
-
-document.getElementById("processPrompt").textContent = appData.prompts.process;
-currentTask = PROCESS_TASKS[Math.floor(Math.random()*PROCESS_TASKS.length)];
-
-const cue = document.getElementById("processCue");
-cue.textContent = currentTask.answer;
-cue.style.background = "#fff";
-
-const grid = document.getElementById("processGrid");
-grid.innerHTML = "";
-
-const map = {
-BLUE:"p1",
-ORANGE:"p2",
-GREEN:"p3",
-PINK:"p4"
-};
-
-shuffle(currentTask.choices).forEach(name=>{
-const btn = document.createElement("button");
-btn.className = `processBtn ${map[name]}`;
-btn.type = "button";
-btn.setAttribute("aria-label", name);
-btn.addEventListener("click", ()=>{
-const ok = name === currentTask.answer;
-markResult("process", ok);
-setFeedback(ok ? "Correct" : "Try again", ok);
-});
-grid.appendChild(btn);
-});
-
-speak(currentTask.answer);
-}
-
-function startBuild(){
-mode = "build";
-modeLabel.textContent = "Word Build";
-setActiveTab("tabBuild");
-setStage("stageBuild");
-
-document.getElementById("buildPrompt").textContent = appData.prompts.build;
-currentTask = BUILD_TASKS[Math.floor(Math.random()*BUILD_TASKS.length)];
-buildProgress = [];
-
-preview("buildPreview", currentTask.answer);
-
-const targetWord = appData.items[currentTask.answer].label.toUpperCase();
-const slots = document.getElementById("buildSlots");
-const bank = document.getElementById("letterBank");
-slots.innerHTML = "";
-bank.innerHTML = "";
-
-for(let i=0;i<targetWord.length;i++){
-const s = document.createElement("div");
-s.className = "slot";
-slots.appendChild(s);
-}
-
-let letters = targetWord.split("");
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-while(letters.length < Math.max(6, targetWord.length + 2)){
-letters.push(alphabet[Math.floor(Math.random()*alphabet.length)]);
-}
-letters = shuffle(letters);
-
-letters.forEach(ch=>{
-const b = document.createElement("button");
-b.className = "letterBtn";
-b.type = "button";
-b.textContent = ch;
-b.addEventListener("click", ()=>{
-if(buildProgress.length >= targetWord.length) return;
-buildProgress.push(ch);
-renderSlots(targetWord);
-b.disabled = true;
-b.style.opacity = ".45";
-
-if(buildProgress.length === targetWord.length){
-const made = buildProgress.join("");
-const ok = made === targetWord;
-markResult("build", ok);
-setFeedback(ok ? "Correct" : "Not quite", ok);
-}
-});
-bank.appendChild(b);
-});
-}
-
-function renderSlots(targetWord){
-const slots = [...document.querySelectorAll("#buildSlots .slot")];
-slots.forEach((s,i)=> s.textContent = buildProgress[i] || "");
-}
-
-function showResults(){
-mode = "results";
-modeLabel.textContent = "Results";
-setActiveTab("tabResults");
-setStage("stageResults");
-
-document.getElementById("resMatch").textContent = `${stats.match.correct} / ${stats.match.total} correct`;
-document.getElementById("resOrient").textContent = `${stats.orient.correct} / ${stats.orient.total} correct`;
-document.getElementById("resProcess").textContent = `${stats.process.correct} / ${stats.process.total} correct`;
-document.getElementById("resBuild").textContent = `${stats.build.correct} / ${stats.build.total} correct`;
-
-const matchRate = stats.match.total ? stats.match.correct / stats.match.total : 0;
-const orientRate = stats.orient.total ? stats.orient.correct / stats.orient.total : 0;
-const processRate = stats.process.total ? stats.process.correct / stats.process.total : 0;
-const buildRate = stats.build.total ? stats.build.correct / stats.build.total : 0;
-
-let txt = "Quick summary:\n";
-
-if(stats.match.total){
-txt += matchRate < .5
-? "- Matching is reduced, suggesting visual recognition / discrimination difficulty.\n"
-: "- Matching is relatively preserved.\n";
-}
-
-if(stats.orient.total){
-txt += orientRate < .5
-? "- Orientation tasks are reduced, suggesting perceptual and/or praxis difficulty with object direction and clothing parts.\n"
-: "- Orientation tasks are relatively better.\n";
-}
-
-if(stats.process.total){
-txt += processRate < .5
-? "- Processing task is reduced, suggesting slower attention and response speed.\n"
-: "- Processing speed task is relatively better.\n";
-}
-
-if(stats.build.total){
-txt += buildRate < .5
-? "- Word building is reduced, suggesting difficulty with letter sequencing or word assembly.\n"
-: "- Word building is relatively better.\n";
-}
-
-txt += "\nStrategy ideas:\n";
-txt += "- Keep tasks to 2 choices when accuracy drops.\n";
-txt += "- Use picture-based orientation tasks rather than verbal-only instruction.\n";
-txt += "- For dressing, highlight neck and sleeves on real clothing.\n";
-txt += "- For processing, use one cue at a time and reduce background distraction.\n";
-txt += "- If word building is poor, use recognition rather than spelling demands.\n";
-
-document.getElementById("clinicalSummary").value = txt;
-}
-
-function showEdit(){
-mode = "edit";
-modeLabel.textContent = "Edit";
-setActiveTab("tabEdit");
-setStage("stageEdit");
-populateEdit();
-}
-
-function populateEdit(){
-const sel = document.getElementById("editItem");
-sel.innerHTML = "";
-Object.keys(appData.items).forEach(key=>{
-const opt = document.createElement("option");
-opt.value = key;
-opt.textContent = key;
-sel.appendChild(opt);
-});
-loadEditItem();
-
-document.getElementById("editMatchPrompt").value = appData.prompts.match;
-document.getElementById("editOrientPrompt").value = appData.prompts.orient;
-document.getElementById("editProcessPrompt").value = appData.prompts.process;
-document.getElementById("editBuildPrompt").value = appData.prompts.build;
-}
-
-function loadEditItem(){
-const key = document.getElementById("editItem").value;
-document.getElementById("editLabel").value = appData.items[key].label;
-document.getElementById("editPhoto").value = "";
-}
-
-document.getElementById("editItem").addEventListener("change", loadEditItem);
-
-document.getElementById("saveItemBtn").addEventListener("click", ()=>{
-const key = document.getElementById("editItem").value;
-const label = document.getElementById("editLabel").value.trim();
-if(label) appData.items[key].label = label;
-
-const file = document.getElementById("editPhoto").files[0];
-if(file){
-const r = new FileReader();
-r.onload = ()=>{
-appData.items[key].img = r.result;
-saveData();
-setFeedback("Item saved", true);
-};
-r.readAsDataURL(file);
-}else{
-saveData();
-setFeedback("Item saved", true);
-}
-});
-
-document.getElementById("savePromptsBtn").addEventListener("click", ()=>{
-appData.prompts.match = document.getElementById("editMatchPrompt").value.trim() || appData.prompts.match;
-appData.prompts.orient = document.getElementById("editOrientPrompt").value.trim() || appData.prompts.orient;
-appData.prompts.process = document.getElementById("editProcessPrompt").value.trim() || appData.prompts.process;
-appData.prompts.build = document.getElementById("editBuildPrompt").value.trim() || appData.prompts.build;
-saveData();
-setFeedback("Prompts saved", true);
-});
-
-document.getElementById("tabMatch").addEventListener("click", startMatch);
-document.getElementById("tabOrient").addEventListener("click", startOrient);
-document.getElementById("tabProcess").addEventListener("click", startProcess);
-document.getElementById("tabBuild").addEventListener("click", startBuild);
-document.getElementById("tabResults").addEventListener("click", showResults);
-document.getElementById("tabEdit").addEventListener("click", showEdit);
-
-document.getElementById("speakBtn").addEventListener("click", ()=>{
-if(mode === "match") speak(appData.prompts.match);
-if(mode === "orient") speak(appData.prompts.orient);
-if(mode === "process") speak(currentTask?.answer || appData.prompts.process);
-if(mode === "build") speak(appData.prompts.build);
-});
-
-document.getElementById("nextBtn").addEventListener("click", ()=>{
-if(mode === "match") startMatch();
-if(mode === "orient") startOrient();
-if(mode === "process") startProcess();
-if(mode === "build") startBuild();
-if(mode === "results") showResults();
-if(mode === "edit") showEdit();
-});
-
-document.getElementById("twoChoiceBtn").addEventListener("click", function(){
-choiceCount = 2;
-this.classList.add("on");
-document.getElementById("fourChoiceBtn").classList.remove("on");
-if(mode === "match") startMatch();
-});
-
-document.getElementById("fourChoiceBtn").addEventListener("click", function(){
-choiceCount = 4;
-this.classList.add("on");
-document.getElementById("twoChoiceBtn").classList.remove("on");
-if(mode === "match") startMatch();
-});
-
-document.getElementById("resetBtn").addEventListener("click", ()=>{
-Object.keys(stats).forEach(k=>{
-stats[k].correct = 0;
-stats[k].total = 0;
-});
-rounds = 0;
-correct = 0;
-updateTop();
-setFeedback("", true);
-if(mode === "match") startMatch();
-if(mode === "orient") startOrient();
-if(mode === "process") startProcess();
-if(mode === "build") startBuild();
-if(mode === "results") showResults();
-});
-
-function updateTop(){
-roundsEl.textContent = rounds;
-correctEl.textContent = correct;
-}
-
-document.addEventListener("contextmenu", e=>e.preventDefault());
-document.addEventListener("dragstart", e=>e.preventDefault());
-
-document.getElementById("fourChoiceBtn").classList.add("on");
-updateTop();
-startMatch();
-</script>
+  <div class="app">
+    <div class="top">
+      <div class="titleWrap">
+        <div class="title">MCU Rehab Game</div>
+        <div class="subtitle">Different app: processing, matching, orientation and word building</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Mode: <span id="modeLabel">Matching</span></div>
+        <div class="stat">Rounds: <span id="rounds">0</span></div>
+        <div class="stat">Correct: <span id="correct">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab t-match active" id="tabMatch" type="button">Matching</button>
+      <button class="tab t-orient" id="tabOrient" type="button">Orientation</button>
+      <button class="tab t-process" id="tabProcess" type="button">Processing</button>
+      <button class="tab t-build" id="tabBuild" type="button">Word Build</button>
+      <button class="tab t-results" id="tabResults" type="button">Results</button>
+      <button class="tab t-edit" id="tabEdit" type="button">Edit</button>
+    </div>
+
+    <div class="panel">
+      <div id="stageMatch" class="stage active">
+        <div class="prompt" id="matchPrompt">Tap the same picture</div>
+        <div class="helper">Picture matching and visual recognition</div>
+        <div class="previewWrap" id="matchPreview"></div>
+        <div class="board four" id="matchBoard"></div>
+      </div>
+
+      <div id="stageOrient" class="stage">
+        <div class="prompt" id="orientPrompt">Tap the correct orientation</div>
+        <div class="helper">Uses true orientation pictures, not random images</div>
+        <div class="previewWrap" id="orientPreview"></div>
+        <div class="board four" id="orientBoard"></div>
+      </div>
+
+      <div id="stageProcess" class="stage">
+        <div class="prompt" id="processPrompt">Tap the target</div>
+        <div class="helper">Processing speed, discrimination and attention</div>
+        <div class="processArea">
+          <div class="previewCard" id="processCue">BLUE</div>
+          <div class="processGrid" id="processGrid"></div>
+        </div>
+      </div>
+
+      <div id="stageBuild" class="stage">
+        <div class="prompt" id="buildPrompt">Build the word</div>
+        <div class="helper">Checks letter selection and word making</div>
+        <div class="previewWrap" id="buildPreview"></div>
+        <div class="wordTarget" id="buildSlots"></div>
+        <div class="letterBank" id="letterBank"></div>
+      </div>
+
+      <div id="stageResults" class="stage">
+        <div class="prompt">Results</div>
+        <div class="helper">Quick bedside summary</div>
+        <div class="resultsGrid">
+          <div class="resultCard"><strong>Matching</strong><div id="resMatch"></div></div>
+          <div class="resultCard"><strong>Orientation</strong><div id="resOrient"></div></div>
+          <div class="resultCard"><strong>Processing</strong><div id="resProcess"></div></div>
+          <div class="resultCard"><strong>Word Build</strong><div id="resBuild"></div></div>
+        </div>
+        <textarea class="noteBox" id="clinicalSummary" readonly></textarea>
+      </div>
+
+      <div id="stageEdit" class="stage">
+        <div class="prompt">Edit</div>
+        <div class="helper">Change labels, photos and prompts for this patient</div>
+        <div class="editGrid">
+          <div class="editCard">
+            <h4>Edit item</h4>
+            <div class="field">
+              <label>Item</label>
+              <select id="editItem"></select>
+            </div>
+            <div class="field">
+              <label>Label</label>
+              <input id="editLabel" />
+            </div>
+            <div class="field">
+              <label>Photo</label>
+              <input id="editPhoto" type="file" accept="image/*" />
+            </div>
+            <button class="btn" id="saveItemBtn" type="button">Save item</button>
+          </div>
+
+          <div class="editCard">
+            <h4>Edit prompts</h4>
+            <div class="field">
+              <label>Matching prompt</label>
+              <input id="editMatchPrompt" />
+            </div>
+            <div class="field">
+              <label>Orientation prompt</label>
+              <input id="editOrientPrompt" />
+            </div>
+            <div class="field">
+              <label>Processing prompt</label>
+              <input id="editProcessPrompt" />
+            </div>
+            <div class="field">
+              <label>Word build prompt</label>
+              <input id="editBuildPrompt" />
+            </div>
+            <button class="btn" id="savePromptsBtn" type="button">Save prompts</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="controls">
+        <button class="btn" id="speakBtn" type="button">Speak prompt</button>
+        <button class="btn" id="nextBtn" type="button">Next</button>
+        <button class="btn" id="twoChoiceBtn" type="button">2 choices</button>
+        <button class="btn" id="fourChoiceBtn" type="button">4 choices</button>
+        <button class="btn" id="resetBtn" type="button">Reset scores</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "mcu_rehab_game_v2";
+
+    const defaultData = {
+      prompts:{
+        match:"Tap the same picture",
+        orient:"Tap the correct orientation",
+        process:"Tap the target",
+        build:"Build the word"
+      },
+      items:{
+        drink:{label:"Drink", img:"drink.png"},
+        toilet:{label:"Toilet", img:"toilet.png"},
+        food:{label:"Food", img:"food.png"},
+        help:{label:"Help", img:"help.png"},
+        nurse:{label:"Nurse", img:"nurse.png"},
+        doctor:{label:"Doctor", img:"doctor.png"},
+        sit:{label:"Sit", img:"sit.png"},
+        stop:{label:"Stop", img:"stop.png"},
+        phone:{label:"Phone", img:"phone.png"},
+        glasses:{label:"Glasses", img:"glasses.png"},
+        blanket:{label:"Blanket", img:"blanket.png"},
+        music:{label:"Music", img:"music.png"},
+        callbell:{label:"Call Bell", img:"callbell.png"},
+        wheelchair:{label:"Wheelchair", img:"wheelchair.png"},
+        bed:{label:"Bed", img:"bed.png"},
+        chair:{label:"Chair", img:"chair.png"},
+        repeat:{label:"Repeat", img:"repeat.png"},
+        slowdown:{label:"Slow down", img:"slowdown.png"},
+        dontunderstand:{label:"Don't understand", img:"dontunderstand.png"},
+        pain:{label:"Pain", img:"pain.png"}
+      }
+    };
+
+    let appData = loadData();
+
+    const ORIENT_KEYS = new Set([
+      "shirt_top","shirt_bottom","shirt_sleeve","shirt_neck",
+      "arrow_up","arrow_down","arrow_left","arrow_right",
+      "cup_up","cup_down","sock_left","sock_right"
+    ]);
+
+    function loadData(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) return JSON.parse(raw);
+      }catch(e){}
+      return JSON.parse(JSON.stringify(defaultData));
+    }
+
+    function saveData(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    }
+
+    function svgData(svg){
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    function makeOrientationSVG(kind){
+      const baseShirt = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 170">
+          <rect width="220" height="170" fill="white"/>
+          <path d="M64 34 L90 18 L100 34 L120 34 L130 18 L156 34 L178 56 L162 74 L148 62 L148 140 L72 140 L72 62 L58 74 L42 56 Z"
+                fill="#dbeafe" stroke="#1e3a8a" stroke-width="4"/>
+          {{MARK}}
+        </svg>
+      `;
+      if(kind === "shirt_top"){
+        return svgData(baseShirt.replace("{{MARK}}", `<rect x="70" y="22" width="80" height="18" rx="6" fill="#22c55e"/>`));
+      }
+      if(kind === "shirt_bottom"){
+        return svgData(baseShirt.replace("{{MARK}}", `<rect x="72" y="128" width="76" height="10" rx="5" fill="#22c55e"/>`));
+      }
+      if(kind === "shirt_sleeve"){
+        return svgData(baseShirt.replace("{{MARK}}", `<rect x="40" y="48" width="28" height="22" rx="6" fill="#f59e0b"/><rect x="152" y="48" width="28" height="22" rx="6" fill="#f59e0b"/>`));
+      }
+      if(kind === "shirt_neck"){
+        return svgData(baseShirt.replace("{{MARK}}", `<circle cx="110" cy="36" r="13" fill="#ef4444"/>`));
+      }
+
+      const arrow = (path) => svgData(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 170">
+          <rect width="220" height="170" fill="white"/>
+          <path d="${path}" fill="none" stroke="#7c3aed" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `);
+      if(kind === "arrow_up") return arrow("M110 132 L110 42 M110 42 L78 74 M110 42 L142 74");
+      if(kind === "arrow_down") return arrow("M110 38 L110 128 M110 128 L78 96 M110 128 L142 96");
+      if(kind === "arrow_left") return arrow("M170 85 L50 85 M50 85 L82 53 M50 85 L82 117");
+      if(kind === "arrow_right") return arrow("M50 85 L170 85 M170 85 L138 53 M170 85 L138 117");
+
+      if(kind === "cup_up"){
+        return svgData(`
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 170">
+            <rect width="220" height="170" fill="white"/>
+            <path d="M78 44 H142 L134 118 H86 Z" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="5"/>
+            <path d="M142 60 Q170 60 166 88 Q163 112 138 104" fill="none" stroke="#1d4ed8" stroke-width="5"/>
+          </svg>
+        `);
+      }
+      if(kind === "cup_down"){
+        return svgData(`
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 170">
+            <rect width="220" height="170" fill="white"/>
+            <path d="M86 52 H134 L142 126 H78 Z" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="5"/>
+            <path d="M78 66 Q50 66 54 94 Q57 118 82 110" fill="none" stroke="#1d4ed8" stroke-width="5"/>
+          </svg>
+        `);
+      }
+      if(kind === "sock_left"){
+        return svgData(`
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 170">
+            <rect width="220" height="170" fill="white"/>
+            <path d="M132 40 V92 Q132 118 108 118 H68 V84 H96 V40 Z" fill="#fecdd3" stroke="#be185d" stroke-width="5"/>
+          </svg>
+        `);
+      }
+      if(kind === "sock_right"){
+        return svgData(`
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 170">
+            <rect width="220" height="170" fill="white"/>
+            <path d="M88 40 V92 Q88 118 112 118 H152 V84 H124 V40 Z" fill="#fecdd3" stroke="#be185d" stroke-width="5"/>
+          </svg>
+        `);
+      }
+      return "";
+    }
+
+    function getImage(key){
+      if(ORIENT_KEYS.has(key)) return makeOrientationSVG(key);
+      return appData.items[key]?.img || "";
+    }
+
+    const stats = {
+      match:{correct:0,total:0},
+      orient:{correct:0,total:0},
+      process:{correct:0,total:0},
+      build:{correct:0,total:0}
+    };
+
+    const MATCH_TASKS = [
+      {answer:"drink", options:["drink","toilet","food","help"]},
+      {answer:"toilet", options:["toilet","drink","food","help"]},
+      {answer:"food", options:["food","drink","toilet","help"]},
+      {answer:"help", options:["help","drink","food","toilet"]},
+      {answer:"nurse", options:["nurse","doctor","help","drink"]},
+      {answer:"doctor", options:["doctor","nurse","help","food"]},
+      {answer:"sit", options:["sit","stop","drink","help"]},
+      {answer:"stop", options:["stop","sit","drink","help"]},
+      {answer:"phone", options:["phone","glasses","blanket","music"]},
+      {answer:"glasses", options:["glasses","phone","blanket","music"]},
+      {answer:"blanket", options:["blanket","phone","glasses","music"]},
+      {answer:"music", options:["music","phone","glasses","blanket"]},
+      {answer:"callbell", options:["callbell","pain","help","drink"]},
+      {answer:"wheelchair", options:["wheelchair","chair","bed","drink"]},
+      {answer:"bed", options:["bed","chair","wheelchair","blanket"]},
+      {answer:"chair", options:["chair","bed","wheelchair","blanket"]},
+      {answer:"repeat", options:["repeat","slowdown","dontunderstand","help"]},
+      {answer:"slowdown", options:["slowdown","repeat","dontunderstand","help"]},
+      {answer:"dontunderstand", options:["dontunderstand","repeat","slowdown","help"]},
+      {answer:"pain", options:["pain","help","drink","toilet"]}
+    ];
+
+    const ORIENT_TASKS = [
+      {answer:"shirt_top", options:["shirt_top","shirt_bottom","shirt_sleeve","shirt_neck"]},
+      {answer:"shirt_bottom", options:["shirt_bottom","shirt_top","shirt_sleeve","shirt_neck"]},
+      {answer:"shirt_sleeve", options:["shirt_sleeve","shirt_neck","shirt_top","shirt_bottom"]},
+      {answer:"shirt_neck", options:["shirt_neck","shirt_sleeve","shirt_top","shirt_bottom"]},
+      {answer:"arrow_up", options:["arrow_up","arrow_down","arrow_left","arrow_right"]},
+      {answer:"arrow_down", options:["arrow_down","arrow_up","arrow_left","arrow_right"]},
+      {answer:"arrow_left", options:["arrow_left","arrow_right","arrow_up","arrow_down"]},
+      {answer:"arrow_right", options:["arrow_right","arrow_left","arrow_up","arrow_down"]},
+      {answer:"cup_up", options:["cup_up","cup_down","sock_left","sock_right"]},
+      {answer:"cup_down", options:["cup_down","cup_up","sock_left","sock_right"]},
+      {answer:"sock_left", options:["sock_left","sock_right","arrow_left","arrow_right"]},
+      {answer:"sock_right", options:["sock_right","sock_left","arrow_left","arrow_right"]},
+      {answer:"shirt_top", options:["shirt_top","shirt_bottom"]},
+      {answer:"shirt_bottom", options:["shirt_bottom","shirt_top"]},
+      {answer:"shirt_sleeve", options:["shirt_sleeve","shirt_neck"]},
+      {answer:"shirt_neck", options:["shirt_neck","shirt_sleeve"]},
+      {answer:"arrow_up", options:["arrow_up","arrow_down"]},
+      {answer:"arrow_down", options:["arrow_down","arrow_up"]},
+      {answer:"arrow_left", options:["arrow_left","arrow_right"]},
+      {answer:"arrow_right", options:["arrow_right","arrow_left"]}
+    ];
+
+    const PROCESS_TASKS = [
+      {type:"colour", prompt:"Tap BLUE", answer:"BLUE", choices:["BLUE","ORANGE","GREEN","PINK"]},
+      {type:"colour", prompt:"Tap GREEN", answer:"GREEN", choices:["BLUE","ORANGE","GREEN","PINK"]},
+      {type:"colour", prompt:"Tap PINK", answer:"PINK", choices:["BLUE","ORANGE","GREEN","PINK"]},
+      {type:"colour", prompt:"Tap ORANGE", answer:"ORANGE", choices:["BLUE","ORANGE","GREEN","PINK"]},
+
+      {type:"findPicture", prompt:"Find DRINK", answer:"drink", choices:["drink","toilet","food","help"]},
+      {type:"findPicture", prompt:"Find TOILET", answer:"toilet", choices:["drink","toilet","food","help"]},
+      {type:"findPicture", prompt:"Find NURSE", answer:"nurse", choices:["nurse","doctor","help","drink"]},
+      {type:"findPicture", prompt:"Find STOP", answer:"stop", choices:["sit","stop","drink","help"]},
+
+      {type:"findPicture", prompt:"Find PHONE", answer:"phone", choices:["phone","glasses","blanket","music"]},
+      {type:"findPicture", prompt:"Find GLASSES", answer:"glasses", choices:["phone","glasses","blanket","music"]},
+      {type:"findPicture", prompt:"Find BED", answer:"bed", choices:["bed","chair","wheelchair","blanket"]},
+      {type:"findPicture", prompt:"Find CHAIR", answer:"chair", choices:["bed","chair","wheelchair","blanket"]},
+
+      {type:"orient", prompt:"Tap UP", answer:"arrow_up", choices:["arrow_up","arrow_down","arrow_left","arrow_right"]},
+      {type:"orient", prompt:"Tap DOWN", answer:"arrow_down", choices:["arrow_up","arrow_down","arrow_left","arrow_right"]},
+      {type:"orient", prompt:"Tap LEFT", answer:"arrow_left", choices:["arrow_up","arrow_down","arrow_left","arrow_right"]},
+      {type:"orient", prompt:"Tap RIGHT", answer:"arrow_right", choices:["arrow_up","arrow_down","arrow_left","arrow_right"]},
+
+      {type:"clothing", prompt:"Tap SLEEVE", answer:"shirt_sleeve", choices:["shirt_sleeve","shirt_neck","shirt_top","shirt_bottom"]},
+      {type:"clothing", prompt:"Tap NECK", answer:"shirt_neck", choices:["shirt_sleeve","shirt_neck","shirt_top","shirt_bottom"]},
+      {type:"clothing", prompt:"Tap TOP", answer:"shirt_top", choices:["shirt_sleeve","shirt_neck","shirt_top","shirt_bottom"]},
+      {type:"clothing", prompt:"Tap BOTTOM", answer:"shirt_bottom", choices:["shirt_sleeve","shirt_neck","shirt_top","shirt_bottom"]}
+    ];
+
+    const BUILD_TASKS = [
+      {answer:"sit"},
+      {answer:"stop"},
+      {answer:"help"},
+      {answer:"food"},
+      {answer:"drink"},
+      {answer:"nurse"},
+      {answer:"doctor"},
+      {answer:"phone"},
+      {answer:"music"},
+      {answer:"glasses"},
+      {answer:"blanket"},
+      {answer:"repeat"},
+      {answer:"slow"},
+      {answer:"toilet"},
+      {answer:"neck"},
+      {answer:"sleeve"},
+      {answer:"top"},
+      {answer:"bottom"},
+      {answer:"left"},
+      {answer:"right"}
+    ];
+
+    let mode = "match";
+    let rounds = 0;
+    let correct = 0;
+    let choiceCount = 4;
+    let currentTask = null;
+    let buildProgress = [];
+
+    const modeLabel = document.getElementById("modeLabel");
+    const roundsEl = document.getElementById("rounds");
+    const correctEl = document.getElementById("correct");
+    const feedback = document.getElementById("feedback");
+
+    function shuffle(arr){
+      return [...arr].sort(()=>Math.random()-0.5);
+    }
+
+    function speak(text){
+      try{
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.9;
+        u.pitch = 1.0;
+        speechSynthesis.speak(u);
+      }catch(e){}
+    }
+
+    function setActiveTab(id){
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    function setStage(id){
+      document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      feedback.textContent = "";
+      feedback.className = "feedback";
+    }
+
+    function updateTop(){
+      roundsEl.textContent = rounds;
+      correctEl.textContent = correct;
+    }
+
+    function setFeedback(text, good=true){
+      feedback.textContent = text;
+      feedback.className = "feedback " + (good ? "good" : "bad");
+    }
+
+    function markResult(bucket, ok){
+      stats[bucket].total += 1;
+      rounds += 1;
+      if(ok){
+        stats[bucket].correct += 1;
+        correct += 1;
+      }
+      updateTop();
+    }
+
+    function preview(containerId, key){
+      const wrap = document.getElementById(containerId);
+      wrap.innerHTML = "";
+      const card = document.createElement("div");
+      card.className = "previewCard";
+      const img = document.createElement("img");
+      img.src = getImage(key);
+      img.alt = "";
+      card.appendChild(img);
+      wrap.appendChild(card);
+    }
+
+    function makeCard(key, cls, onTap){
+      const labelText = appData.items[key]?.label || key;
+      const btn = document.createElement("button");
+      btn.className = `gameCard ${cls}`;
+      btn.type = "button";
+
+      const media = document.createElement("div");
+      media.className = "media";
+
+      const box = document.createElement("div");
+      box.className = "imgBox";
+
+      const img = document.createElement("img");
+      img.src = getImage(key);
+      img.alt = "";
+      box.appendChild(img);
+      media.appendChild(box);
+
+      const label = document.createElement("div");
+      label.className = "label";
+      label.textContent = labelText;
+
+      btn.appendChild(media);
+      btn.appendChild(label);
+      btn.addEventListener("click", onTap);
+      return btn;
+    }
+
+    function startMatch(){
+      mode = "match";
+      modeLabel.textContent = "Matching";
+      setActiveTab("tabMatch");
+      setStage("stageMatch");
+
+      document.getElementById("matchPrompt").textContent = appData.prompts.match;
+      currentTask = MATCH_TASKS[Math.floor(Math.random()*MATCH_TASKS.length)];
+      preview("matchPreview", currentTask.answer);
+
+      const board = document.getElementById("matchBoard");
+      board.className = choiceCount === 2 ? "board two" : "board four";
+      board.innerHTML = "";
+
+      let opts = shuffle(currentTask.options).slice(0, choiceCount);
+      if(!opts.includes(currentTask.answer)){
+        opts[Math.floor(Math.random()*opts.length)] = currentTask.answer;
+      }
+      opts = shuffle(opts);
+
+      opts.forEach((key, i)=>{
+        board.appendChild(makeCard(key, ["c1","c2","c3","c4"][i], ()=>{
+          const ok = key === currentTask.answer;
+          markResult("match", ok);
+          setFeedback(ok ? "Correct" : "Try again", ok);
+        }));
+      });
+    }
+
+    function startOrient(){
+      mode = "orient";
+      modeLabel.textContent = "Orientation";
+      setActiveTab("tabOrient");
+      setStage("stageOrient");
+
+      document.getElementById("orientPrompt").textContent = appData.prompts.orient;
+      currentTask = ORIENT_TASKS[Math.floor(Math.random()*ORIENT_TASKS.length)];
+      preview("orientPreview", currentTask.answer);
+
+      const board = document.getElementById("orientBoard");
+      board.innerHTML = "";
+      board.className = currentTask.options.length <= 2 ? "board two" : "board four";
+
+      shuffle(currentTask.options).forEach((key, i)=>{
+        board.appendChild(makeCard(key, ["c1","c2","c3","c4"][i], ()=>{
+          const ok = key === currentTask.answer;
+          markResult("orient", ok);
+          setFeedback(ok ? "Correct" : "Try again", ok);
+        }));
+      });
+    }
+
+    function startProcess(){
+      mode = "process";
+      modeLabel.textContent = "Processing";
+      setActiveTab("tabProcess");
+      setStage("stageProcess");
+
+      currentTask = PROCESS_TASKS[Math.floor(Math.random()*PROCESS_TASKS.length)];
+      document.getElementById("processPrompt").textContent = currentTask.prompt;
+
+      const cue = document.getElementById("processCue");
+      cue.innerHTML = "";
+
+      if(currentTask.type === "colour"){
+        cue.textContent = currentTask.answer;
+      } else if(currentTask.type === "findPicture" || currentTask.type === "orient" || currentTask.type === "clothing"){
+        const img = document.createElement("img");
+        img.src = getImage(currentTask.answer);
+        img.alt = "";
+        cue.appendChild(img);
+      }
+
+      const grid = document.getElementById("processGrid");
+      grid.innerHTML = "";
+
+      const colourMap = { BLUE:"p1", ORANGE:"p2", GREEN:"p3", PINK:"p4" };
+
+      shuffle(currentTask.choices).forEach((name, i)=>{
+        const btn = document.createElement("button");
+        btn.className = `processBtn ${currentTask.type === "colour" ? colourMap[name] : ["p1","p2","p3","p4"][i % 4]}`;
+        btn.type = "button";
+
+        if(currentTask.type === "colour"){
+          btn.textContent = name;
+        } else {
+          const img = document.createElement("img");
+          img.src = getImage(name);
+          img.alt = "";
+          img.style.width = "78px";
+          img.style.height = "78px";
+          img.style.objectFit = "contain";
+          img.style.pointerEvents = "none";
+          btn.appendChild(img);
+        }
+
+        btn.addEventListener("click", ()=>{
+          const ok = name === currentTask.answer;
+          markResult("process", ok);
+          setFeedback(ok ? "Correct" : "Try again", ok);
+        });
+        grid.appendChild(btn);
+      });
+
+      speak(currentTask.prompt);
+    }
+
+    function startBuild(){
+      mode = "build";
+      modeLabel.textContent = "Word Build";
+      setActiveTab("tabBuild");
+      setStage("stageBuild");
+
+      document.getElementById("buildPrompt").textContent = appData.prompts.build;
+      currentTask = BUILD_TASKS[Math.floor(Math.random()*BUILD_TASKS.length)];
+      buildProgress = [];
+
+      const previewWrap = document.getElementById("buildPreview");
+      previewWrap.innerHTML = "";
+      const previewCard = document.createElement("div");
+      previewCard.className = "previewCard";
+      previewCard.textContent = currentTask.answer.toUpperCase();
+      previewWrap.appendChild(previewCard);
+
+      const targetWord = currentTask.answer.toUpperCase();
+      const slots = document.getElementById("buildSlots");
+      const bank = document.getElementById("letterBank");
+      slots.innerHTML = "";
+      bank.innerHTML = "";
+
+      for(let i=0;i<targetWord.length;i++){
+        const s = document.createElement("div");
+        s.className = "slot";
+        slots.appendChild(s);
+      }
+
+      let letters = targetWord.split("");
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      while(letters.length < Math.max(6, targetWord.length + 2)){
+        letters.push(alphabet[Math.floor(Math.random()*alphabet.length)]);
+      }
+      letters = shuffle(letters);
+
+      letters.forEach(ch=>{
+        const b = document.createElement("button");
+        b.className = "letterBtn";
+        b.type = "button";
+        b.textContent = ch;
+        b.addEventListener("click", ()=>{
+          if(buildProgress.length >= targetWord.length) return;
+          buildProgress.push(ch);
+          renderSlots(targetWord);
+          b.disabled = true;
+          b.style.opacity = ".45";
+
+          if(buildProgress.length === targetWord.length){
+            const made = buildProgress.join("");
+            const ok = made === targetWord;
+            markResult("build", ok);
+            setFeedback(ok ? "Correct" : "Not quite", ok);
+          }
+        });
+        bank.appendChild(b);
+      });
+
+      speak("Build " + targetWord);
+    }
+
+    function renderSlots(targetWord){
+      const slots = [...document.querySelectorAll("#buildSlots .slot")];
+      slots.forEach((s,i)=> s.textContent = buildProgress[i] || "");
+    }
+
+    function showResults(){
+      mode = "results";
+      modeLabel.textContent = "Results";
+      setActiveTab("tabResults");
+      setStage("stageResults");
+
+      document.getElementById("resMatch").textContent = `${stats.match.correct} / ${stats.match.total} correct`;
+      document.getElementById("resOrient").textContent = `${stats.orient.correct} / ${stats.orient.total} correct`;
+      document.getElementById("resProcess").textContent = `${stats.process.correct} / ${stats.process.total} correct`;
+      document.getElementById("resBuild").textContent = `${stats.build.correct} / ${stats.build.total} correct`;
+
+      const matchRate = stats.match.total ? stats.match.correct / stats.match.total : 0;
+      const orientRate = stats.orient.total ? stats.orient.correct / stats.orient.total : 0;
+      const processRate = stats.process.total ? stats.process.correct / stats.process.total : 0;
+      const buildRate = stats.build.total ? stats.build.correct / stats.build.total : 0;
+
+      let txt = "Quick summary:\n";
+      txt += matchRate < .5 && stats.match.total ? "- Matching is reduced, suggesting visual recognition / discrimination difficulty.\n" : (stats.match.total ? "- Matching is relatively preserved.\n" : "");
+      txt += orientRate < .5 && stats.orient.total ? "- Orientation tasks are reduced, suggesting perceptual and/or praxis difficulty with object direction and clothing parts.\n" : (stats.orient.total ? "- Orientation tasks are relatively better.\n" : "");
+      txt += processRate < .5 && stats.process.total ? "- Processing task is reduced, suggesting slower attention and response speed.\n" : (stats.process.total ? "- Processing speed task is relatively better.\n" : "");
+      txt += buildRate < .5 && stats.build.total ? "- Word building is reduced, suggesting difficulty with letter sequencing or word assembly.\n" : (stats.build.total ? "- Word building is relatively better.\n" : "");
+
+      txt += "\nStrategy ideas:\n";
+      txt += "- Keep tasks to 2 choices when accuracy drops.\n";
+      txt += "- Use picture-based orientation tasks rather than verbal-only instruction.\n";
+      txt += "- For dressing, highlight neck and sleeves on real clothing.\n";
+      txt += "- For processing, use one cue at a time and reduce background distraction.\n";
+      txt += "- If word building is poor, use recognition rather than spelling demands.\n";
+
+      document.getElementById("clinicalSummary").value = txt;
+    }
+
+    function showEdit(){
+      mode = "edit";
+      modeLabel.textContent = "Edit";
+      setActiveTab("tabEdit");
+      setStage("stageEdit");
+      populateEdit();
+    }
+
+    function populateEdit(){
+      const sel = document.getElementById("editItem");
+      sel.innerHTML = "";
+      Object.keys(appData.items).forEach(key=>{
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = key;
+        sel.appendChild(opt);
+      });
+      loadEditItem();
+
+      document.getElementById("editMatchPrompt").value = appData.prompts.match;
+      document.getElementById("editOrientPrompt").value = appData.prompts.orient;
+      document.getElementById("editProcessPrompt").value = appData.prompts.process;
+      document.getElementById("editBuildPrompt").value = appData.prompts.build;
+    }
+
+    function loadEditItem(){
+      const key = document.getElementById("editItem").value;
+      document.getElementById("editLabel").value = appData.items[key].label;
+      document.getElementById("editPhoto").value = "";
+    }
+
+    document.getElementById("editItem").addEventListener("change", loadEditItem);
+
+    document.getElementById("saveItemBtn").addEventListener("click", ()=>{
+      const key = document.getElementById("editItem").value;
+      const label = document.getElementById("editLabel").value.trim();
+      if(label) appData.items[key].label = label;
+
+      const file = document.getElementById("editPhoto").files[0];
+      if(file){
+        const r = new FileReader();
+        r.onload = ()=>{
+          appData.items[key].img = r.result;
+          saveData();
+          setFeedback("Item saved", true);
+        };
+        r.readAsDataURL(file);
+      }else{
+        saveData();
+        setFeedback("Item saved", true);
+      }
+    });
+
+    document.getElementById("savePromptsBtn").addEventListener("click", ()=>{
+      appData.prompts.match = document.getElementById("editMatchPrompt").value.trim() || appData.prompts.match;
+      appData.prompts.orient = document.getElementById("editOrientPrompt").value.trim() || appData.prompts.orient;
+      appData.prompts.process = document.getElementById("editProcessPrompt").value.trim() || appData.prompts.process;
+      appData.prompts.build = document.getElementById("editBuildPrompt").value.trim() || appData.prompts.build;
+      saveData();
+      setFeedback("Prompts saved", true);
+    });
+
+    document.getElementById("tabMatch").addEventListener("click", startMatch);
+    document.getElementById("tabOrient").addEventListener("click", startOrient);
+    document.getElementById("tabProcess").addEventListener("click", startProcess);
+    document.getElementById("tabBuild").addEventListener("click", startBuild);
+    document.getElementById("tabResults").addEventListener("click", showResults);
+    document.getElementById("tabEdit").addEventListener("click", showEdit);
+
+    document.getElementById("speakBtn").addEventListener("click", ()=>{
+      if(mode === "match") speak(appData.prompts.match);
+      if(mode === "orient") speak(appData.prompts.orient);
+      if(mode === "process") speak(currentTask?.prompt || appData.prompts.process);
+      if(mode === "build") speak("Build " + (currentTask?.answer || ""));
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", ()=>{
+      if(mode === "match") startMatch();
+      if(mode === "orient") startOrient();
+      if(mode === "process") startProcess();
+      if(mode === "build") startBuild();
+      if(mode === "results") showResults();
+      if(mode === "edit") showEdit();
+    });
+
+    document.getElementById("twoChoiceBtn").addEventListener("click", function(){
+      choiceCount = 2;
+      this.classList.add("on");
+      document.getElementById("fourChoiceBtn").classList.remove("on");
+      if(mode === "match") startMatch();
+    });
+
+    document.getElementById("fourChoiceBtn").addEventListener("click", function(){
+      choiceCount = 4;
+      this.classList.add("on");
+      document.getElementById("twoChoiceBtn").classList.remove("on");
+      if(mode === "match") startMatch();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", ()=>{
+      Object.keys(stats).forEach(k=>{
+        stats[k].correct = 0;
+        stats[k].total = 0;
+      });
+      rounds = 0;
+      correct = 0;
+      updateTop();
+      setFeedback("", true);
+      if(mode === "match") startMatch();
+      if(mode === "orient") startOrient();
+      if(mode === "process") startProcess();
+      if(mode === "build") startBuild();
+      if(mode === "results") showResults();
+    });
+
+    function updateTop(){
+      roundsEl.textContent = rounds;
+      correctEl.textContent = correct;
+    }
+
+    document.addEventListener("contextmenu", e=>e.preventDefault());
+    document.addEventListener("dragstart", e=>e.preventDefault());
+
+    document.getElementById("fourChoiceBtn").classList.add("on");
+    updateTop();
+    startMatch();
+  </script>
 </body>
 </html>
