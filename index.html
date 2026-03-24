@@ -1,344 +1,372 @@
+
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>MCU Reading & Dressing Check</title>
-
+<title>MCU Cognitive Game</title>
 <style>
 :root{
---bg:#0b1020;
---panel:#121a33;
---card1:#2b7cff;
---card2:#ff9f1c;
---card3:#20c997;
---card4:#b26bff;
---text:#f4f7ff;
---muted:rgba(244,247,255,.78);
---border:rgba(255,255,255,.16);
-
---tileW:230px;
---tileH:235px;
---frameW:165px;
---frameH:135px;
---gap:34px;
---labelFont:26px;
+--bg1:#0f172a;
+--bg2:#1e293b;
+--panel:#111827;
+--card:#1f2937;
+--text:#f8fafc;
+--muted:#cbd5e1;
+--accent1:#38bdf8;
+--accent2:#f59e0b;
+--accent3:#34d399;
+--accent4:#f472b6;
+--good:#22c55e;
+--bad:#ef4444;
+--shadow:0 14px 30px rgba(0,0,0,.28);
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
 margin:0;
-font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-background:var(--bg);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 color:var(--text);
+background:
+radial-gradient(circle at top left, #1d4ed8 0%, transparent 24%),
+radial-gradient(circle at top right, #7c3aed 0%, transparent 18%),
+linear-gradient(180deg,var(--bg2),var(--bg1));
 -webkit-user-select:none;
 user-select:none;
 -webkit-touch-callout:none;
 }
 
-header{
-position:sticky;
-top:0;
-z-index:20;
-background:linear-gradient(180deg,var(--panel),rgba(18,26,51,.95));
-border-bottom:1px solid rgba(255,255,255,.10);
-padding:14px 14px calc(12px + env(safe-area-inset-top));
+.app{
+max-width:1100px;
+margin:0 auto;
+padding:18px 16px 28px;
 }
 
-.row{
+.top{
 display:flex;
-gap:10px;
 flex-wrap:wrap;
+gap:12px;
 align-items:center;
+justify-content:space-between;
+margin-bottom:14px;
+}
+
+.titleWrap{
+display:flex;
+flex-direction:column;
+gap:4px;
 }
 
 .title{
-margin-right:auto;
+font-size:28px;
 font-weight:900;
-color:var(--muted);
-font-size:18px;
 letter-spacing:.2px;
 }
 
-.pill{
-border:none;
-border-radius:999px;
-padding:10px 14px;
-font-size:15px;
-font-weight:900;
-background:rgba(255,255,255,.08);
-color:var(--text);
+.subtitle{
+color:var(--muted);
+font-size:14px;
 }
 
-.tabs{
-margin-top:12px;
+.stats{
 display:flex;
 gap:10px;
 flex-wrap:wrap;
+}
+
+.stat{
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.12);
+border-radius:999px;
+padding:10px 14px;
+font-weight:800;
+font-size:14px;
+box-shadow:var(--shadow);
+}
+
+.tabs{
+display:grid;
+grid-template-columns:repeat(5,minmax(0,1fr));
+gap:10px;
+margin-bottom:18px;
 }
 
 .tab{
 border:none;
-border-radius:999px;
-padding:14px 18px;
-font-size:18px;
-font-weight:900;
+border-radius:18px;
+padding:14px 12px;
 color:#fff;
+font-size:16px;
+font-weight:900;
+box-shadow:var(--shadow);
 touch-action:manipulation;
 }
 
 .tab.active{
-box-shadow:0 0 0 5px rgba(255,255,255,.18) inset;
+outline:4px solid rgba(255,255,255,.22);
 transform:translateY(-1px);
 }
 
-#tabWord{background:#2b7cff}
-#tabListen{background:#20c997}
-#tabScan{background:#ff9f1c}
-#tabDress{background:#b26bff}
-#tabResults{background:#ff4d4f}
+.tab.read{background:linear-gradient(135deg,#0ea5e9,#2563eb)}
+.tab.build{background:linear-gradient(135deg,#f59e0b,#f97316)}
+.tab.match{background:linear-gradient(135deg,#10b981,#059669)}
+.tab.orient{background:linear-gradient(135deg,#ec4899,#db2777)}
+.tab.results{background:linear-gradient(135deg,#64748b,#334155)}
 
-main{
-padding:18px 16px calc(22px + env(safe-area-inset-bottom));
-}
-
-.promptBox{
-background:rgba(255,255,255,.06);
+.panel{
+background:rgba(17,24,39,.72);
 border:1px solid rgba(255,255,255,.10);
-border-radius:22px;
+border-radius:28px;
 padding:18px;
-margin-bottom:18px;
-text-align:center;
-}
-
-.modeTitle{
-font-size:18px;
-font-weight:900;
-color:var(--muted);
-margin-bottom:6px;
+box-shadow:var(--shadow);
+backdrop-filter:blur(10px);
 }
 
 .prompt{
-font-size:34px;
-font-weight:950;
-min-height:44px;
-line-height:1.1;
-}
-
-.subPrompt{
-margin-top:8px;
-font-size:16px;
-color:var(--muted);
-min-height:22px;
-}
-
-.targetWrap{
-margin-top:16px;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:170px;
-}
-
-.targetCard{
-width:220px;
-height:170px;
-border-radius:24px;
-background:#fff;
-border:2px solid rgba(255,255,255,.15);
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-box-shadow:0 8px 22px rgba(0,0,0,.18);
-color:#000;
-font-size:34px;
-font-weight:950;
 text-align:center;
-padding:10px;
+font-size:30px;
+font-weight:950;
+min-height:38px;
+margin-bottom:8px;
 }
 
-.targetCard img{
-width:100%;
-height:100%;
-object-fit:contain;
-object-position:center;
-background:#fff;
-pointer-events:none;
--webkit-user-drag:none;
-user-drag:none;
+.helper{
+text-align:center;
+color:var(--muted);
+font-size:15px;
+min-height:24px;
+margin-bottom:18px;
 }
 
-.board{
+.stage{
+display:none;
+}
+
+.stage.active{
+display:block;
+}
+
+.cards2, .cards4{
 display:grid;
-gap:var(--gap);
 justify-content:center;
-align-content:start;
-margin-top:14px;
+gap:22px;
 }
 
-.board.two{
-grid-template-columns:repeat(2,minmax(0,var(--tileW)));
+.cards2{
+grid-template-columns:repeat(2,minmax(180px,240px));
 }
 
-.board.four{
-grid-template-columns:repeat(2,minmax(0,var(--tileW)));
+.cards4{
+grid-template-columns:repeat(2,minmax(170px,220px));
 }
 
-.choice{
-width:var(--tileW);
-height:var(--tileH);
+.gameCard{
+min-height:220px;
 border:none;
-overflow:hidden;
+border-radius:28px;
+padding:14px;
+box-shadow:var(--shadow);
 display:flex;
 flex-direction:column;
-box-shadow:0 10px 24px rgba(0,0,0,.22);
+justify-content:space-between;
+align-items:center;
 touch-action:manipulation;
-}
-
-.choice:nth-child(1){ background:linear-gradient(180deg,var(--card1),#1f66db); border-radius:18px; }
-.choice:nth-child(2){ background:linear-gradient(180deg,var(--card2),#f18805); border-radius:34px 18px 34px 18px; }
-.choice:nth-child(3){ background:linear-gradient(180deg,var(--card3),#0f9f75); border-radius:18px 34px 18px 34px; }
-.choice:nth-child(4){ background:linear-gradient(180deg,var(--card4),#8b3dff); border-radius:28px; }
-
-.choice.correctCue{
-outline:7px solid #fff;
-outline-offset:4px;
-}
-
-.choice.dim{
-opacity:.45;
-}
-
-.media{
-flex:1 1 auto;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:14px 12px 10px;
-}
-
-.frame{
-width:var(--frameW);
-height:var(--frameH);
-border-radius:18px;
-border:2px solid rgba(255,255,255,.18);
-background:#fff;
+position:relative;
 overflow:hidden;
+}
+
+.gameCard.c1{background:linear-gradient(180deg,#38bdf8,#2563eb)}
+.gameCard.c2{background:linear-gradient(180deg,#fbbf24,#f97316)}
+.gameCard.c3{background:linear-gradient(180deg,#34d399,#059669)}
+.gameCard.c4{background:linear-gradient(180deg,#f9a8d4,#db2777)}
+
+.cardMedia{
+width:100%;
+flex:1;
 display:flex;
 align-items:center;
 justify-content:center;
+padding:8px;
 }
 
-.frame img{
+.imgBox{
+width:150px;
+height:130px;
+background:#fff;
+border-radius:24px;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+box-shadow:0 8px 18px rgba(0,0,0,.18);
+}
+
+.imgBox img{
 width:100%;
 height:100%;
 object-fit:contain;
-object-position:center;
 background:#fff;
 pointer-events:none;
 -webkit-user-drag:none;
 user-drag:none;
 }
 
-.wordOnly{
+.wordBox{
 width:100%;
-height:100%;
+min-height:82px;
+background:#fff;
+color:#111827;
+border-radius:20px;
 display:flex;
 align-items:center;
 justify-content:center;
 text-align:center;
-font-size:42px;
+font-size:30px;
 font-weight:950;
-color:#000;
-background:#fff;
-padding:16px;
-line-height:1.05;
-}
-
-.labelWrap{
 padding:10px;
-display:flex;
-justify-content:center;
-align-items:center;
+line-height:1.05;
+box-shadow:0 8px 18px rgba(0,0,0,.16);
 }
 
-.label{
+.miniLabel{
+margin-top:10px;
 width:100%;
-min-height:64px;
+min-height:54px;
+background:rgba(255,255,255,.92);
+color:#111827;
+border-radius:16px;
 display:flex;
 align-items:center;
 justify-content:center;
 text-align:center;
-background:#fff;
-color:#000;
-border-radius:16px;
-border:2px solid rgba(0,0,0,.14);
-padding:10px 12px;
-font-size:var(--labelFont);
-font-weight:950;
-line-height:1.08;
+font-size:22px;
+font-weight:900;
+padding:8px 10px;
 }
 
 .feedback{
 margin-top:18px;
 min-height:34px;
 text-align:center;
-font-size:28px;
+font-size:30px;
 font-weight:950;
 }
 
-.good{color:#2fe6b3}
-.bad{color:#ff8c8a}
+.good{color:var(--good)}
+.bad{color:var(--bad)}
 
-.tools{
-margin-top:20px;
+.controls{
 display:flex;
 justify-content:center;
-gap:12px;
 flex-wrap:wrap;
+gap:12px;
+margin-top:18px;
 }
 
 .btn{
 border:none;
 border-radius:999px;
 padding:14px 18px;
-font-size:16px;
-font-weight:900;
-background:rgba(255,255,255,.1);
+background:rgba(255,255,255,.10);
 color:#fff;
+font-size:15px;
+font-weight:900;
+box-shadow:var(--shadow);
 touch-action:manipulation;
 }
 
 .btn.on{
-box-shadow:0 0 0 4px rgba(255,255,255,.16) inset;
+outline:3px solid rgba(255,255,255,.22);
 }
 
-.results{
-max-width:950px;
-margin:0 auto;
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.10);
+.buildTarget{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:18px;
+min-height:74px;
+}
+
+.slot{
+width:64px;
+height:64px;
+border-radius:18px;
+background:rgba(255,255,255,.08);
+border:2px dashed rgba(255,255,255,.22);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+font-weight:950;
+color:#fff;
+}
+
+.letters{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+}
+
+.letterBtn{
+width:72px;
+height:72px;
+border:none;
 border-radius:22px;
-padding:18px;
+font-size:34px;
+font-weight:950;
+color:#111827;
+background:#fff;
+box-shadow:var(--shadow);
+touch-action:manipulation;
 }
 
-.results h3{
-margin:0 0 14px 0;
-font-size:22px;
+.targetPreview{
+display:flex;
+justify-content:center;
+margin-bottom:18px;
 }
 
-.resultGrid{
+.previewCard{
+width:220px;
+height:170px;
+border-radius:28px;
+background:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:var(--shadow);
+overflow:hidden;
+color:#111827;
+font-size:34px;
+font-weight:950;
+padding:12px;
+text-align:center;
+}
+
+.previewCard img{
+width:100%;
+height:100%;
+object-fit:contain;
+pointer-events:none;
+-webkit-user-drag:none;
+user-drag:none;
+}
+
+.resultsGrid{
 display:grid;
 grid-template-columns:repeat(2,minmax(0,1fr));
 gap:14px;
+margin-top:12px;
 }
 
 .resultCard{
-background:rgba(255,255,255,.07);
+background:rgba(255,255,255,.08);
 border:1px solid rgba(255,255,255,.10);
-border-radius:18px;
+border-radius:20px;
 padding:14px;
 }
 
@@ -351,165 +379,166 @@ margin-bottom:6px;
 .noteBox{
 margin-top:16px;
 width:100%;
-min-height:120px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,.14);
-background:rgba(255,255,255,.06);
+min-height:140px;
+border:none;
+border-radius:18px;
+background:rgba(255,255,255,.08);
 color:#fff;
-padding:12px;
+padding:14px;
 font:inherit;
+resize:none;
 }
 
-@media (max-width:650px){
-.prompt{font-size:28px}
-.resultGrid{grid-template-columns:1fr}
+@media (max-width:700px){
+.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cards2,.cards4{grid-template-columns:1fr}
+.resultsGrid{grid-template-columns:1fr}
+.prompt{font-size:25px}
 }
 </style>
 </head>
 <body>
-<header>
-<div class="row">
-<div class="title">MCU Reading & Dressing Check</div>
-<div class="pill">Mode: <span id="modeName">Word → Picture</span></div>
-<div class="pill">Rounds: <span id="rounds">0</span></div>
-<div class="pill">Correct: <span id="correct">0</span></div>
+<div class="app">
+<div class="top">
+<div class="titleWrap">
+<div class="title">MCU Cognitive Game</div>
+<div class="subtitle">Reading, word building, matching and orientation check</div>
+</div>
+
+<div class="stats">
+<div class="stat">Mode: <span id="modeLabel">Reading</span></div>
+<div class="stat">Rounds: <span id="rounds">0</span></div>
+<div class="stat">Correct: <span id="correct">0</span></div>
+</div>
 </div>
 
 <div class="tabs">
-<button class="tab active" id="tabWord" type="button">Word</button>
-<button class="tab" id="tabListen" type="button">Listen</button>
-<button class="tab" id="tabScan" type="button">Scan</button>
-<button class="tab" id="tabDress" type="button">Dressing</button>
-<button class="tab" id="tabResults" type="button">Results</button>
-</div>
-</header>
-
-<main>
-<div id="taskView">
-<div class="promptBox">
-<div class="modeTitle" id="modeTitle">Word → Picture</div>
-<div class="prompt" id="prompt">Show me DRINK</div>
-<div class="subPrompt" id="subPrompt">Use this to see whether reading is the main problem</div>
-<div class="targetWrap" id="targetWrap"></div>
+<button class="tab read active" id="tabRead" type="button">Reading</button>
+<button class="tab build" id="tabBuild" type="button">Word Build</button>
+<button class="tab match" id="tabMatch" type="button">Matching</button>
+<button class="tab orient" id="tabOrient" type="button">Orientation</button>
+<button class="tab results" id="tabResults" type="button">Results</button>
 </div>
 
-<div class="board two" id="board"></div>
+<div class="panel">
+<div id="stageRead" class="stage active">
+<div class="prompt" id="readPrompt">Tap the picture that matches the word</div>
+<div class="helper" id="readHelper">Use this to see if written word recognition is present</div>
+<div class="targetPreview" id="readTargetPreview"></div>
+<div class="cards2" id="readBoard"></div>
+</div>
+
+<div id="stageBuild" class="stage">
+<div class="prompt" id="buildPrompt">Build the word</div>
+<div class="helper">Tap letters in order to make the word</div>
+<div class="targetPreview" id="buildTargetPreview"></div>
+<div class="buildTarget" id="buildSlots"></div>
+<div class="letters" id="letterBank"></div>
+</div>
+
+<div id="stageMatch" class="stage">
+<div class="prompt" id="matchPrompt">Tap the picture that is the same</div>
+<div class="helper">Checks picture recognition and matching</div>
+<div class="targetPreview" id="matchTargetPreview"></div>
+<div class="cards4" id="matchBoard"></div>
+</div>
+
+<div id="stageOrient" class="stage">
+<div class="prompt" id="orientPrompt">Tap the correct orientation</div>
+<div class="helper">Checks top / bottom / sleeve / neck understanding and object orientation</div>
+<div class="targetPreview" id="orientTargetPreview"></div>
+<div class="cards4" id="orientBoard"></div>
+</div>
+
+<div id="stageResults" class="stage">
+<div class="prompt">Results</div>
+<div class="helper">Quick interpretation for bedside use</div>
+<div class="resultsGrid">
+<div class="resultCard"><strong>Reading</strong><div id="resRead"></div></div>
+<div class="resultCard"><strong>Word Build</strong><div id="resBuild"></div></div>
+<div class="resultCard"><strong>Matching</strong><div id="resMatch"></div></div>
+<div class="resultCard"><strong>Orientation</strong><div id="resOrient"></div></div>
+</div>
+<textarea id="clinicalSummary" class="noteBox" readonly></textarea>
+</div>
 
 <div class="feedback" id="feedback"></div>
 
-<div class="tools">
+<div class="controls">
 <button class="btn" id="speakBtn" type="button">Speak prompt</button>
-<button class="btn" id="nextBtn" type="button">Next item</button>
-<button class="btn" id="twoBtn" type="button">2 choices</button>
-<button class="btn" id="fourBtn" type="button">4 choices</button>
-<button class="btn" id="cueBtn" type="button">Cue after error</button>
+<button class="btn" id="nextBtn" type="button">Next</button>
+<button class="btn" id="twoChoiceBtn" type="button">2 choices</button>
+<button class="btn" id="fourChoiceBtn" type="button">4 choices</button>
 <button class="btn" id="resetBtn" type="button">Reset scores</button>
 </div>
 </div>
-
-<div id="resultsView" style="display:none">
-<div class="results">
-<h3>Results summary</h3>
-<div class="resultGrid">
-<div class="resultCard">
-<strong>Word → Picture</strong>
-<div id="resWord">0 / 0 correct</div>
 </div>
-<div class="resultCard">
-<strong>Listen → Picture</strong>
-<div id="resListen">0 / 0 correct</div>
-</div>
-<div class="resultCard">
-<strong>Left / Right Scan</strong>
-<div id="resScan">0 / 0 correct</div>
-</div>
-<div class="resultCard">
-<strong>Dressing Perception</strong>
-<div id="resDress">0 / 0 correct</div>
-</div>
-</div>
-
-<textarea class="noteBox" id="clinicalNote" readonly></textarea>
-</div>
-</div>
-</main>
 
 <script>
 const ITEMS = {
-drink:{label:"DRINK", photo:"drink.png"},
-toilet:{label:"TOILET", photo:"toilet.png"},
-food:{label:"FOOD", photo:"food.png"},
-help:{label:"HELP", photo:"help.png"},
-nurse:{label:"NURSE", photo:"nurse.png"},
-doctor:{label:"DOCTOR", photo:"doctor.png"},
-sit:{label:"SIT", photo:"sit.png"},
-stop:{label:"STOP", photo:"stop.png"},
-sleeve:{label:"SLEEVE", photo:"clothes.png"},
-neck:{label:"NECK", photo:"clothes.png"},
-top:{label:"TOP", photo:"clothes.png"},
-bottom:{label:"BOTTOM", photo:"clothes.png"},
-repeat:{label:"REPEAT", photo:"repeat.png"},
-slowdown:{label:"SLOW DOWN", photo:"slowdown.png"},
-dontunderstand:{label:"DON'T UNDERSTAND", photo:"dontunderstand.png"}
+drink:{word:"DRINK", img:"drink.png"},
+toilet:{word:"TOILET", img:"toilet.png"},
+food:{word:"FOOD", img:"food.png"},
+help:{word:"HELP", img:"help.png"},
+nurse:{word:"NURSE", img:"nurse.png"},
+doctor:{word:"DOCTOR", img:"doctor.png"},
+sit:{word:"SIT", img:"sit.png"},
+stop:{word:"STOP", img:"stop.png"},
+sleeve:{word:"SLEEVE", img:"clothes.png"},
+neck:{word:"NECK", img:"clothes.png"},
+top:{word:"TOP", img:"clothes.png"},
+bottom:{word:"BOTTOM", img:"clothes.png"}
 };
 
-const TASKS = {
-word: [
-{prompt:"Show me DRINK", answer:"drink", options:["drink","toilet","food","help"], targetType:"word"},
-{prompt:"Show me TOILET", answer:"toilet", options:["toilet","drink","food","help"], targetType:"word"},
-{prompt:"Show me NURSE", answer:"nurse", options:["nurse","doctor","help","food"], targetType:"word"},
-{prompt:"Show me STOP", answer:"stop", options:["stop","sit","help","drink"], targetType:"word"}
-],
-listen: [
-{prompt:"Listen and choose", answer:"drink", options:["drink","toilet","food","help"], speak:"Show me drink", targetType:"none"},
-{prompt:"Listen and choose", answer:"doctor", options:["doctor","nurse","food","help"], speak:"Show me doctor", targetType:"none"},
-{prompt:"Listen and choose", answer:"sit", options:["sit","stop","drink","help"], speak:"Show me sit", targetType:"none"},
-{prompt:"Listen and choose", answer:"repeat", options:["repeat","slowdown","dontunderstand","help"], speak:"Show me repeat", targetType:"none"}
-],
-scan: [
-{prompt:"Find DRINK", answer:"drink", options:["drink","toilet"], forcedPositions:["left","right"], targetType:"word"},
-{prompt:"Find TOILET", answer:"toilet", options:["drink","toilet"], forcedPositions:["right","left"], targetType:"word"},
-{prompt:"Find NURSE", answer:"nurse", options:["nurse","doctor"], forcedPositions:["left","right"], targetType:"word"},
-{prompt:"Find DOCTOR", answer:"doctor", options:["nurse","doctor"], forcedPositions:["right","left"], targetType:"word"}
-],
-dress: [
-{prompt:"Show me SLEEVE", answer:"sleeve", options:["sleeve","neck","top","bottom"], targetType:"word"},
-{prompt:"Show me NECK", answer:"neck", options:["neck","sleeve","top","bottom"], targetType:"word"},
-{prompt:"Show me TOP", answer:"top", options:["top","bottom","sleeve","neck"], targetType:"word"},
-{prompt:"Show me BOTTOM", answer:"bottom", options:["bottom","top","sleeve","neck"], targetType:"word"}
-]
+const READ_TASKS = [
+{answer:"drink", options:["drink","toilet","food","help"]},
+{answer:"toilet", options:["drink","toilet","food","help"]},
+{answer:"nurse", options:["nurse","doctor","help","food"]},
+{answer:"stop", options:["stop","sit","help","drink"]}
+];
+
+const BUILD_TASKS = [
+{answer:"drink"},
+{answer:"food"},
+{answer:"help"},
+{answer:"sit"}
+];
+
+const MATCH_TASKS = [
+{answer:"drink", options:["drink","toilet","food","help"]},
+{answer:"toilet", options:["toilet","drink","food","help"]},
+{answer:"nurse", options:["nurse","doctor","help","drink"]},
+{answer:"sit", options:["sit","stop","help","drink"]}
+];
+
+const ORIENT_TASKS = [
+{answer:"top", options:["top","bottom","sleeve","neck"], prompt:"Tap TOP"},
+{answer:"bottom", options:["bottom","top","sleeve","neck"], prompt:"Tap BOTTOM"},
+{answer:"sleeve", options:["sleeve","neck","top","bottom"], prompt:"Tap SLEEVE"},
+{answer:"neck", options:["neck","sleeve","top","bottom"], prompt:"Tap NECK"}
+];
+
+const stats = {
+read:{correct:0,total:0},
+build:{correct:0,total:0},
+match:{correct:0,total:0},
+orient:{correct:0,total:0}
 };
 
-const STATS = {
-word:{correct:0,total:0},
-listen:{correct:0,total:0},
-scan:{correct:0,total:0,leftMiss:0,rightMiss:0},
-dress:{correct:0,total:0}
-};
-
-let mode = "word";
+let mode = "read";
 let currentTask = null;
-let choiceCount = 2;
-let cueAfterError = true;
 let rounds = 0;
-let correctTotal = 0;
+let correct = 0;
+let choiceCount = 2;
+let buildProgress = [];
 
-const board = document.getElementById("board");
-const promptEl = document.getElementById("prompt");
-const subPrompt = document.getElementById("subPrompt");
-const targetWrap = document.getElementById("targetWrap");
 const feedback = document.getElementById("feedback");
+const modeLabel = document.getElementById("modeLabel");
 const roundsEl = document.getElementById("rounds");
 const correctEl = document.getElementById("correct");
-const modeName = document.getElementById("modeName");
-const modeTitle = document.getElementById("modeTitle");
-const taskView = document.getElementById("taskView");
-const resultsView = document.getElementById("resultsView");
-const noteBox = document.getElementById("clinicalNote");
 
-function setActiveTab(id){
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-document.getElementById(id).classList.add("active");
+function shuffle(arr){
+return [...arr].sort(()=>Math.random()-0.5);
 }
 
 function speak(text){
@@ -522,299 +551,358 @@ speechSynthesis.speak(u);
 }catch(e){}
 }
 
-function shuffle(arr){
-return [...arr].sort(()=>Math.random()-0.5);
+function setActiveTab(id){
+document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+
+function setActiveStage(id){
+document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+feedback.textContent = "";
+feedback.className = "feedback";
 }
 
 function updateTop(){
 roundsEl.textContent = rounds;
-correctEl.textContent = correctTotal;
+correctEl.textContent = correct;
 }
 
-function changeMode(newMode){
-mode = newMode;
-feedback.textContent = "";
-feedback.className = "feedback";
-
-if(mode === "results"){
-setActiveTab("tabResults");
-taskView.style.display = "none";
-resultsView.style.display = "block";
-renderResults();
-return;
-}
-
-resultsView.style.display = "none";
-taskView.style.display = "block";
-
-if(mode === "word"){
-setActiveTab("tabWord");
-modeName.textContent = "Word → Picture";
-modeTitle.textContent = "Word → Picture";
-subPrompt.textContent = "If this is poor but Listen is better, think reading problem";
-}
-if(mode === "listen"){
-setActiveTab("tabListen");
-modeName.textContent = "Listen → Picture";
-modeTitle.textContent = "Listen → Picture";
-subPrompt.textContent = "If this is better than Word, reading may be the main difficulty";
-}
-if(mode === "scan"){
-setActiveTab("tabScan");
-modeName.textContent = "Left / Right Scan";
-modeTitle.textContent = "Left / Right Scan";
-subPrompt.textContent = "Watch for repeated misses on one side";
-}
-if(mode === "dress"){
-setActiveTab("tabDress");
-modeName.textContent = "Dressing Perception";
-modeTitle.textContent = "Dressing Perception";
-subPrompt.textContent = "Checks sleeve / neck / top / bottom recognition";
-}
-
-nextTask();
-}
-
-function buildTarget(task){
-targetWrap.innerHTML = "";
-if(task.targetType === "none") return;
-
+function makePreview(containerId, itemKey, showWord=false){
+const container = document.getElementById(containerId);
+container.innerHTML = "";
 const card = document.createElement("div");
-card.className = "targetCard";
-
-if(task.targetType === "word"){
-card.textContent = ITEMS[task.answer].label;
-} else if(task.targetType === "picture"){
+card.className = "previewCard";
+if(showWord){
+card.textContent = ITEMS[itemKey].word;
+}else{
 const img = document.createElement("img");
-img.src = ITEMS[task.answer].photo;
+img.src = ITEMS[itemKey].img;
 img.alt = "";
-img.draggable = false;
 card.appendChild(img);
 }
-
-targetWrap.appendChild(card);
+container.appendChild(card);
 }
 
-function getTaskOptions(task){
-let opts = [...task.options];
-if(choiceCount === 2) opts = opts.slice(0,2);
-if(choiceCount === 4) opts = opts.slice(0,4);
-
-if(mode === "scan" && task.forcedPositions && opts.length === 2){
-const answerKey = task.answer;
-const otherKey = opts.find(x=>x!==answerKey);
-if(task.forcedPositions[0] === "left"){
-return [answerKey, otherKey];
-} else {
-return [otherKey, answerKey];
-}
-}
-return shuffle(opts);
-}
-
-function buildChoice(key, wordOnly=false){
-const item = ITEMS[key];
+function makeCard(itemKey, colorClass, showWord=false, labelText=null, onTap=null){
 const btn = document.createElement("button");
-btn.className = "choice";
+btn.className = `gameCard ${colorClass}`;
 btn.type = "button";
-btn.dataset.key = key;
 
 const media = document.createElement("div");
-media.className = "media";
+media.className = "cardMedia";
 
-const frame = document.createElement("div");
-frame.className = "frame";
-
-if(wordOnly){
+if(showWord){
 const word = document.createElement("div");
-word.className = "wordOnly";
-word.textContent = item.label;
-frame.appendChild(word);
-} else {
+word.className = "wordBox";
+word.textContent = ITEMS[itemKey].word;
+media.appendChild(word);
+}else{
+const box = document.createElement("div");
+box.className = "imgBox";
 const img = document.createElement("img");
-img.src = item.photo;
+img.src = ITEMS[itemKey].img;
 img.alt = "";
-img.draggable = false;
-frame.appendChild(img);
+box.appendChild(img);
+media.appendChild(box);
 }
 
-media.appendChild(frame);
-
-const labelWrap = document.createElement("div");
-labelWrap.className = "labelWrap";
-
 const label = document.createElement("div");
-label.className = "label";
-label.textContent = item.label;
+label.className = "miniLabel";
+label.textContent = labelText || ITEMS[itemKey].word;
 
-labelWrap.appendChild(label);
 btn.appendChild(media);
-btn.appendChild(labelWrap);
+btn.appendChild(label);
 
-btn.addEventListener("click", ()=>selectChoice(btn, key));
+if(onTap) btn.addEventListener("click", onTap);
 return btn;
 }
 
-function nextTask(){
-feedback.textContent = "";
-feedback.className = "feedback";
-board.innerHTML = "";
-
-const pool = TASKS[mode];
-currentTask = pool[Math.floor(Math.random()*pool.length)];
-
-promptEl.textContent = currentTask.prompt;
-buildTarget(currentTask);
-
-const opts = getTaskOptions(currentTask);
-board.className = "board " + (opts.length === 2 ? "two" : "four");
-
-const useWordOnlyChoices = (mode === "dress" || mode === "word");
-opts.forEach(key=>{
-board.appendChild(buildChoice(key, useWordOnlyChoices));
-});
-
-if(currentTask.speak){
-speak(currentTask.speak);
-}
+function setFeedback(text, good=true){
+feedback.textContent = text;
+feedback.className = "feedback " + (good ? "good" : "bad");
 }
 
-function selectChoice(btn, key){
+function markResult(bucket, wasCorrect){
+stats[bucket].total += 1;
 rounds += 1;
-STATS[mode].total += 1;
-
-if(key === currentTask.answer){
-correctTotal += 1;
-STATS[mode].correct += 1;
-feedback.textContent = "Correct";
-feedback.className = "feedback good";
-speak("Correct");
-} else {
-feedback.textContent = "Try again";
-feedback.className = "feedback bad";
-speak("Try again");
-
-if(mode === "scan"){
-const all = [...board.children];
-const index = all.indexOf(btn);
-if(index === 0) STATS.scan.leftMiss += 1;
-if(index === 1) STATS.scan.rightMiss += 1;
+if(wasCorrect){
+stats[bucket].correct += 1;
+correct += 1;
 }
-
-if(cueAfterError){
-[...board.children].forEach(choice=>{
-if(choice.dataset.key === currentTask.answer){
-choice.classList.add("correctCue");
-} else {
-choice.classList.add("dim");
-}
-});
-}
-}
-
 updateTop();
 }
 
-function renderResults(){
-document.getElementById("resWord").textContent = `${STATS.word.correct} / ${STATS.word.total} correct`;
-document.getElementById("resListen").textContent = `${STATS.listen.correct} / ${STATS.listen.total} correct`;
-document.getElementById("resScan").textContent = `${STATS.scan.correct} / ${STATS.scan.total} correct | Left misses: ${STATS.scan.leftMiss} | Right misses: ${STATS.scan.rightMiss}`;
-document.getElementById("resDress").textContent = `${STATS.dress.correct} / ${STATS.dress.total} correct`;
+function startRead(){
+mode = "read";
+modeLabel.textContent = "Reading";
+setActiveTab("tabRead");
+setActiveStage("stageRead");
 
-let note = "";
-note += "Clinical impression:\n";
+currentTask = READ_TASKS[Math.floor(Math.random()*READ_TASKS.length)];
+document.getElementById("readPrompt").textContent = "Tap the picture for " + ITEMS[currentTask.answer].word;
+document.getElementById("readHelper").textContent = "Word is the target. Pictures are the choices.";
+makePreview("readTargetPreview", currentTask.answer, true);
 
-if(STATS.word.total > 0 && STATS.listen.total > 0){
-const wordRate = STATS.word.correct / STATS.word.total;
-const listenRate = STATS.listen.correct / STATS.listen.total;
+const board = document.getElementById("readBoard");
+board.className = choiceCount === 2 ? "cards2" : "cards4";
+board.innerHTML = "";
+const opts = shuffle(currentTask.options).slice(0, choiceCount);
 
-if(listenRate > wordRate + 0.2){
-note += "- Listen performance is better than Word performance, which may suggest reading impairment contributes more than basic picture recognition.\n";
-} else if(wordRate < 0.5 && listenRate < 0.5){
-note += "- Both Word and Listen are reduced, suggesting broader comprehension / attention / cognitive difficulty rather than reading alone.\n";
+while(!opts.includes(currentTask.answer)){
+opts[Math.floor(Math.random()*opts.length)] = currentTask.answer;
+}
+
+shuffle(opts).forEach((key, i)=>{
+board.appendChild(
+makeCard(key, ["c1","c2","c3","c4"][i], false, ITEMS[key].word, ()=>{
+const ok = key === currentTask.answer;
+markResult("read", ok);
+setFeedback(ok ? "Correct" : "Try again", ok);
+})
+);
+});
+}
+
+function startBuild(){
+mode = "build";
+modeLabel.textContent = "Word Build";
+setActiveTab("tabBuild");
+setActiveStage("stageBuild");
+
+currentTask = BUILD_TASKS[Math.floor(Math.random()*BUILD_TASKS.length)];
+buildProgress = [];
+
+document.getElementById("buildPrompt").textContent = "Build " + ITEMS[currentTask.answer].word;
+document.getElementById("buildHelper")?.remove;
+makePreview("buildTargetPreview", currentTask.answer, false);
+
+const targetWord = ITEMS[currentTask.answer].word;
+const slots = document.getElementById("buildSlots");
+const bank = document.getElementById("letterBank");
+slots.innerHTML = "";
+bank.innerHTML = "";
+
+for(let i=0;i<targetWord.length;i++){
+const s = document.createElement("div");
+s.className = "slot";
+slots.appendChild(s);
+}
+
+let letters = targetWord.split("");
+while(letters.length < Math.max(6, targetWord.length + 2)){
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+letters.push(alphabet[Math.floor(Math.random()*alphabet.length)]);
+}
+letters = shuffle(letters);
+
+letters.forEach(ch=>{
+const b = document.createElement("button");
+b.className = "letterBtn";
+b.type = "button";
+b.textContent = ch;
+b.addEventListener("click", ()=>{
+if(buildProgress.length >= targetWord.length) return;
+buildProgress.push(ch);
+renderSlots(targetWord);
+b.disabled = true;
+b.style.opacity = ".45";
+
+if(buildProgress.length === targetWord.length){
+const made = buildProgress.join("");
+const ok = made === targetWord;
+markResult("build", ok);
+setFeedback(ok ? "Correct" : "Not quite", ok);
+}
+});
+bank.appendChild(b);
+});
+}
+
+function renderSlots(targetWord){
+const slots = [...document.querySelectorAll("#buildSlots .slot")];
+slots.forEach((s,i)=> s.textContent = buildProgress[i] || "");
+}
+
+function startMatch(){
+mode = "match";
+modeLabel.textContent = "Matching";
+setActiveTab("tabMatch");
+setActiveStage("stageMatch");
+
+currentTask = MATCH_TASKS[Math.floor(Math.random()*MATCH_TASKS.length)];
+document.getElementById("matchPrompt").textContent = "Tap the same picture";
+document.getElementById("matchHelper")?.remove;
+makePreview("matchTargetPreview", currentTask.answer, false);
+
+const board = document.getElementById("matchBoard");
+board.className = choiceCount === 2 ? "cards2" : "cards4";
+board.innerHTML = "";
+
+const opts = shuffle(currentTask.options).slice(0, choiceCount);
+while(!opts.includes(currentTask.answer)){
+opts[Math.floor(Math.random()*opts.length)] = currentTask.answer;
+}
+
+shuffle(opts).forEach((key, i)=>{
+board.appendChild(
+makeCard(key, ["c1","c2","c3","c4"][i], false, ITEMS[key].word, ()=>{
+const ok = key === currentTask.answer;
+markResult("match", ok);
+setFeedback(ok ? "Correct" : "Try again", ok);
+})
+);
+});
+}
+
+function startOrient(){
+mode = "orient";
+modeLabel.textContent = "Orientation";
+setActiveTab("tabOrient");
+setActiveStage("stageOrient");
+
+currentTask = ORIENT_TASKS[Math.floor(Math.random()*ORIENT_TASKS.length)];
+document.getElementById("orientPrompt").textContent = currentTask.prompt;
+document.getElementById("orientHelper")?.remove;
+makePreview("orientTargetPreview", currentTask.answer, true);
+
+const board = document.getElementById("orientBoard");
+board.className = "cards4";
+board.innerHTML = "";
+
+shuffle(currentTask.options).forEach((key, i)=>{
+board.appendChild(
+makeCard(key, ["c1","c2","c3","c4"][i], true, ITEMS[key].word, ()=>{
+const ok = key === currentTask.answer;
+markResult("orient", ok);
+setFeedback(ok ? "Correct" : "Try again", ok);
+})
+);
+});
+}
+
+function showResults(){
+mode = "results";
+modeLabel.textContent = "Results";
+setActiveTab("tabResults");
+setActiveStage("stageResults");
+
+document.getElementById("resRead").textContent = `${stats.read.correct} / ${stats.read.total} correct`;
+document.getElementById("resBuild").textContent = `${stats.build.correct} / ${stats.build.total} correct`;
+document.getElementById("resMatch").textContent = `${stats.match.correct} / ${stats.match.total} correct`;
+document.getElementById("resOrient").textContent = `${stats.orient.correct} / ${stats.orient.total} correct`;
+
+const readRate = stats.read.total ? stats.read.correct / stats.read.total : 0;
+const buildRate = stats.build.total ? stats.build.correct / stats.build.total : 0;
+const matchRate = stats.match.total ? stats.match.correct / stats.match.total : 0;
+const orientRate = stats.orient.total ? stats.orient.correct / stats.orient.total : 0;
+
+let summary = "Quick interpretation:\n";
+
+if(stats.read.total > 0){
+if(readRate < .5){
+summary += "- Reading task is reduced.\n";
 } else {
-note += "- Word and Listen performance are relatively similar.\n";
+summary += "- Reading task shows some preserved word recognition.\n";
 }
 }
 
-if(STATS.scan.leftMiss > STATS.scan.rightMiss + 1){
-note += "- More left-sided misses than right-sided misses, which may support visual inattention / scanning difficulty to the left.\n";
-} else if(STATS.scan.rightMiss > STATS.scan.leftMiss + 1){
-note += "- More right-sided misses than left-sided misses.\n";
-} else if(STATS.scan.total > 0){
-note += "- Scan errors do not show a clear side pattern.\n";
-}
-
-if(STATS.dress.total > 0){
-const dressRate = STATS.dress.correct / STATS.dress.total;
-if(dressRate < 0.5){
-note += "- Poor performance on sleeve / neck / top / bottom tasks suggests dressing difficulty is likely influenced by perceptual and/or praxis impairment, not only language.\n";
+if(stats.build.total > 0){
+if(buildRate < .5){
+summary += "- Word building is reduced, suggesting difficulty with letter sequencing / word assembly.\n";
 } else {
-note += "- Dressing-part identification is relatively better than expected.\n";
+summary += "- Word building is relatively better than expected.\n";
 }
 }
 
-note += "\nStrategy ideas:\n";
-note += "- Keep only 2 choices when performance drops.\n";
-note += "- Use spoken cue + picture before written word if reading is weak.\n";
-note += "- For dressing, use a plain top, fixed orientation, and visually highlight neck and sleeves.\n";
-note += "- If scanning errors are side-specific, place targets with deliberate cueing toward the missed side.\n";
-
-noteBox.value = note;
+if(stats.match.total > 0){
+if(matchRate < .5){
+summary += "- Matching is reduced, suggesting picture recognition / visual discrimination difficulty.\n";
+} else {
+summary += "- Matching is relatively preserved.\n";
+}
 }
 
-document.getElementById("tabWord").addEventListener("click", ()=>changeMode("word"));
-document.getElementById("tabListen").addEventListener("click", ()=>changeMode("listen"));
-document.getElementById("tabScan").addEventListener("click", ()=>changeMode("scan"));
-document.getElementById("tabDress").addEventListener("click", ()=>changeMode("dress"));
-document.getElementById("tabResults").addEventListener("click", ()=>changeMode("results"));
+if(stats.orient.total > 0){
+if(orientRate < .5){
+summary += "- Orientation task is reduced, suggesting perceptual / praxis difficulty with top-bottom / sleeve-neck concepts.\n";
+} else {
+summary += "- Orientation task is relatively preserved.\n";
+}
+}
+
+summary += "\nUseful strategy ideas:\n";
+summary += "- Keep only 2 choices when accuracy drops.\n";
+summary += "- Use picture target before word target if reading is weak.\n";
+summary += "- If word building is poor, use whole-word recognition rather than asking her to construct words.\n";
+summary += "- If orientation is poor, use real clothing with visual markers on neck and sleeves.\n";
+
+document.getElementById("clinicalSummary").value = summary;
+}
+
+document.getElementById("tabRead").addEventListener("click", startRead);
+document.getElementById("tabBuild").addEventListener("click", startBuild);
+document.getElementById("tabMatch").addEventListener("click", startMatch);
+document.getElementById("tabOrient").addEventListener("click", startOrient);
+document.getElementById("tabResults").addEventListener("click", showResults);
 
 document.getElementById("speakBtn").addEventListener("click", ()=>{
-if(currentTask?.speak) speak(currentTask.speak);
-else if(currentTask?.prompt) speak(currentTask.prompt);
+if(mode === "read"){
+speak(document.getElementById("readPrompt").textContent);
+} else if(mode === "build"){
+speak(document.getElementById("buildPrompt").textContent);
+} else if(mode === "match"){
+speak(document.getElementById("matchPrompt").textContent);
+} else if(mode === "orient"){
+speak(document.getElementById("orientPrompt").textContent);
+}
 });
 
-document.getElementById("nextBtn").addEventListener("click", nextTask);
+document.getElementById("nextBtn").addEventListener("click", ()=>{
+if(mode === "read") startRead();
+if(mode === "build") startBuild();
+if(mode === "match") startMatch();
+if(mode === "orient") startOrient();
+});
 
-document.getElementById("twoBtn").addEventListener("click", function(){
+document.getElementById("twoChoiceBtn").addEventListener("click", function(){
 choiceCount = 2;
-document.getElementById("twoBtn").classList.add("on");
-document.getElementById("fourBtn").classList.remove("on");
-nextTask();
+this.classList.add("on");
+document.getElementById("fourChoiceBtn").classList.remove("on");
+if(mode === "read") startRead();
+if(mode === "match") startMatch();
 });
 
-document.getElementById("fourBtn").addEventListener("click", function(){
+document.getElementById("fourChoiceBtn").addEventListener("click", function(){
 choiceCount = 4;
-document.getElementById("fourBtn").classList.add("on");
-document.getElementById("twoBtn").classList.remove("on");
-nextTask();
-});
-
-document.getElementById("cueBtn").addEventListener("click", function(){
-cueAfterError = !cueAfterError;
-this.classList.toggle("on", cueAfterError);
+this.classList.add("on");
+document.getElementById("twoChoiceBtn").classList.remove("on");
+if(mode === "read") startRead();
+if(mode === "match") startMatch();
 });
 
 document.getElementById("resetBtn").addEventListener("click", ()=>{
-Object.keys(STATS).forEach(k=>{
-Object.keys(STATS[k]).forEach(x=>STATS[k][x] = 0);
+Object.keys(stats).forEach(k=>{
+stats[k].correct = 0;
+stats[k].total = 0;
 });
 rounds = 0;
-correctTotal = 0;
+correct = 0;
 updateTop();
-feedback.textContent = "";
-feedback.className = "feedback";
-nextTask();
+setFeedback("", true);
+if(mode === "read") startRead();
+if(mode === "build") startBuild();
+if(mode === "match") startMatch();
+if(mode === "orient") startOrient();
+if(mode === "results") showResults();
 });
 
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.addEventListener("dragstart", e => e.preventDefault());
-
-document.getElementById("twoBtn").classList.add("on");
-document.getElementById("cueBtn").classList.add("on");
+document.addEventListener("contextmenu", e=>e.preventDefault());
+document.addEventListener("dragstart", e=>e.preventDefault());
 
 updateTop();
-changeMode("word");
+document.getElementById("twoChoiceBtn").classList.add("on");
+startRead();
 </script>
 </body>
 </html>
