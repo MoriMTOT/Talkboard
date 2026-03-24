@@ -1,1158 +1,820 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>MCU Talkboard</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MCU Reading & Dressing Check</title>
 
-  <style>
-    :root{
-      --bg:#0b1020;
-      --panel:#121a33;
-      --text:#f3f6ff;
-      --muted:rgba(243,246,255,.78);
-      --border:rgba(255,255,255,.16);
+<style>
+:root{
+--bg:#0b1020;
+--panel:#121a33;
+--card1:#2b7cff;
+--card2:#ff9f1c;
+--card3:#20c997;
+--card4:#b26bff;
+--text:#f4f7ff;
+--muted:rgba(244,247,255,.78);
+--border:rgba(255,255,255,.16);
 
-      --chipFont:22px;
-      --chipPadY:14px;
-      --chipPadX:20px;
-      --chipMinH:58px;
+--tileW:230px;
+--tileH:235px;
+--frameW:165px;
+--frameH:135px;
+--gap:34px;
+--labelFont:26px;
+}
 
-      --ctrlFont:16px;
-      --ctrlPadY:10px;
-      --ctrlPadX:14px;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+margin:0;
+font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+background:var(--bg);
+color:var(--text);
+-webkit-user-select:none;
+user-select:none;
+-webkit-touch-callout:none;
+}
 
-      --tileW:250px;
-      --tileH:250px;
-      --frameW:178px;
-      --frameH:150px;
-      --gap:30px;
-      --labelFont:26px;
-      --labelMinH:82px;
-      --labelPad:10px;
+header{
+position:sticky;
+top:0;
+z-index:20;
+background:linear-gradient(180deg,var(--panel),rgba(18,26,51,.95));
+border-bottom:1px solid rgba(255,255,255,.10);
+padding:14px 14px calc(12px + env(safe-area-inset-top));
+}
 
-      --painFont:22px;
-      --painMinH:62px;
-    }
+.row{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+align-items:center;
+}
 
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      -webkit-user-select:none;
-      user-select:none;
-      -webkit-touch-callout:none;
-    }
+.title{
+margin-right:auto;
+font-weight:900;
+color:var(--muted);
+font-size:18px;
+letter-spacing:.2px;
+}
 
-    header{
-      position:sticky;
-      top:0;
-      z-index:20;
-      background:linear-gradient(180deg,var(--panel),rgba(18,26,51,.94));
-      border-bottom:1px solid rgba(255,255,255,.10);
-      padding:14px 14px calc(12px + env(safe-area-inset-top));
-    }
+.pill{
+border:none;
+border-radius:999px;
+padding:10px 14px;
+font-size:15px;
+font-weight:900;
+background:rgba(255,255,255,.08);
+color:var(--text);
+}
 
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+.tabs{
+margin-top:12px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
 
-    .title{
-      margin-right:auto;
-      font-weight:800;
-      color:var(--muted);
-      font-size:16px;
-      letter-spacing:.2px;
-    }
+.tab{
+border:none;
+border-radius:999px;
+padding:14px 18px;
+font-size:18px;
+font-weight:900;
+color:#fff;
+touch-action:manipulation;
+}
 
-    .controls .chip{
-      font-size:var(--ctrlFont);
-      padding:var(--ctrlPadY) var(--ctrlPadX);
-      min-height:44px;
-      border-radius:999px;
-      background:rgba(255,255,255,.06);
-      border:1px solid var(--border);
-      color:var(--text);
-      font-weight:800;
-      touch-action:manipulation;
-    }
+.tab.active{
+box-shadow:0 0 0 5px rgba(255,255,255,.18) inset;
+transform:translateY(-1px);
+}
 
-    .controls .chip.on{
-      border-color:rgba(118,167,255,.65);
-      box-shadow:0 0 0 3px rgba(118,167,255,.20) inset;
-      background:rgba(118,167,255,.10);
-    }
+#tabWord{background:#2b7cff}
+#tabListen{background:#20c997}
+#tabScan{background:#ff9f1c}
+#tabDress{background:#b26bff}
+#tabResults{background:#ff4d4f}
 
-    .controls .danger{
-      background:rgba(255,77,79,.14);
-      border-color:rgba(255,77,79,.35);
-    }
+main{
+padding:18px 16px calc(22px + env(safe-area-inset-bottom));
+}
 
-    .pages{margin-top:12px}
+.promptBox{
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.10);
+border-radius:22px;
+padding:18px;
+margin-bottom:18px;
+text-align:center;
+}
 
-    .pages .chip{
-      font-size:var(--chipFont);
-      padding:var(--chipPadY) var(--chipPadX);
-      min-height:var(--chipMinH);
-      border-radius:999px;
-      border:none;
-      font-weight:950;
-      letter-spacing:.2px;
-      touch-action:manipulation;
-    }
+.modeTitle{
+font-size:18px;
+font-weight:900;
+color:var(--muted);
+margin-bottom:6px;
+}
 
-    .pages .chip.active{
-      box-shadow:0 0 0 5px rgba(255,255,255,.18) inset;
-      transform:translateY(-1px);
-    }
+.prompt{
+font-size:34px;
+font-weight:950;
+min-height:44px;
+line-height:1.1;
+}
 
-    #pageNeeds{ background:#ff4d4f; color:#fff; }
-    #pageMove{ background:#2b7cff; color:#fff; }
-    #pageCommunication{ background:#ffd43b; color:#2a2100; }
-    #pageTeam{ background:#2fe6b3; color:#062218; }
-    #pageFeelings{ background:#ff8ad6; color:#330022; }
-    #pagePeople{ background:#4dd2ff; color:#002333; }
-    #pageFavorites{ background:#8cff66; color:#133300; }
-    #pagePain{ background:#b26bff; color:#fff; }
+.subPrompt{
+margin-top:8px;
+font-size:16px;
+color:var(--muted);
+min-height:22px;
+}
 
-    main{
-      padding:18px 16px calc(18px + env(safe-area-inset-bottom));
-    }
+.targetWrap{
+margin-top:16px;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:170px;
+}
 
-    .hint{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:13px;
-    }
+.targetCard{
+width:220px;
+height:170px;
+border-radius:24px;
+background:#fff;
+border:2px solid rgba(255,255,255,.15);
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+box-shadow:0 8px 22px rgba(0,0,0,.18);
+color:#000;
+font-size:34px;
+font-weight:950;
+text-align:center;
+padding:10px;
+}
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,var(--tileW)));
-      gap:var(--gap);
-      justify-content:center;
-      align-content:start;
-    }
+.targetCard img{
+width:100%;
+height:100%;
+object-fit:contain;
+object-position:center;
+background:#fff;
+pointer-events:none;
+-webkit-user-drag:none;
+user-drag:none;
+}
 
-    .tile{
-      width:var(--tileW);
-      height:var(--tileH);
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      touch-action:manipulation;
-      border:2px solid rgba(255,255,255,.18);
-      box-shadow:0 10px 26px rgba(0,0,0,.22);
-      -webkit-touch-callout:none;
-    }
+.board{
+display:grid;
+gap:var(--gap);
+justify-content:center;
+align-content:start;
+margin-top:14px;
+}
 
-    .grid .tile:nth-child(1){
-      background:linear-gradient(180deg,#2b7cff,#1f66db);
-      border-radius:18px;
-    }
-    .grid .tile:nth-child(2){
-      background:linear-gradient(180deg,#ffb347,#ff8c00);
-      border-radius:34px 18px 34px 18px;
-    }
-    .grid .tile:nth-child(3){
-      background:linear-gradient(180deg,#2fe6b3,#0aa574);
-      border-radius:18px 34px 18px 34px;
-    }
-    .grid .tile:nth-child(4){
-      background:linear-gradient(180deg,#b26bff,#8b3dff);
-      border-radius:28px;
-    }
+.board.two{
+grid-template-columns:repeat(2,minmax(0,var(--tileW)));
+}
 
-    .mediaArea{
-      flex:1 1 auto;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:14px 12px 10px;
-    }
+.board.four{
+grid-template-columns:repeat(2,minmax(0,var(--tileW)));
+}
 
-    .frame{
-      width:var(--frameW);
-      height:var(--frameH);
-      border-radius:18px;
-      border:2px solid rgba(255,255,255,.18);
-      background:#fff;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 4px 14px rgba(0,0,0,.12);
-      -webkit-touch-callout:none;
-    }
+.choice{
+width:var(--tileW);
+height:var(--tileH);
+border:none;
+overflow:hidden;
+display:flex;
+flex-direction:column;
+box-shadow:0 10px 24px rgba(0,0,0,.22);
+touch-action:manipulation;
+}
 
-    .frame img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      object-position:center;
-      background:#fff;
-      -webkit-user-drag:none;
-      user-drag:none;
-      -webkit-touch-callout:none;
-      -webkit-user-select:none;
-      user-select:none;
-      pointer-events:none;
-    }
+.choice:nth-child(1){ background:linear-gradient(180deg,var(--card1),#1f66db); border-radius:18px; }
+.choice:nth-child(2){ background:linear-gradient(180deg,var(--card2),#f18805); border-radius:34px 18px 34px 18px; }
+.choice:nth-child(3){ background:linear-gradient(180deg,var(--card3),#0f9f75); border-radius:18px 34px 18px 34px; }
+.choice:nth-child(4){ background:linear-gradient(180deg,var(--card4),#8b3dff); border-radius:28px; }
 
-    .labelArea{
-      flex:0 0 auto;
-      min-height:var(--labelMinH);
-      padding:var(--labelPad);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
+.choice.correctCue{
+outline:7px solid #fff;
+outline-offset:4px;
+}
 
-    .label{
-      width:100%;
-      text-align:center;
-      font-weight:950;
-      font-size:var(--labelFont);
-      line-height:1.08;
-      padding:12px 14px;
-      border-radius:16px;
-      background:#fff;
-      color:#000;
-      box-sizing:border-box;
-      border:2px solid rgba(0,0,0,.14);
-      min-height:64px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      -webkit-touch-callout:none;
-    }
+.choice.dim{
+opacity:.45;
+}
 
-    .ynRow{
-      margin-top:22px;
-      display:flex;
-      justify-content:center;
-      gap:46px;
-      flex-wrap:nowrap;
-    }
+.media{
+flex:1 1 auto;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:14px 12px 10px;
+}
 
-    .ynBtn{
-      width:128px;
-      height:128px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:38px;
-      font-weight:900;
-      border:none;
-      color:#fff;
-      touch-action:manipulation;
-      box-shadow:0 10px 22px rgba(0,0,0,.24);
-      -webkit-touch-callout:none;
-    }
+.frame{
+width:var(--frameW);
+height:var(--frameH);
+border-radius:18px;
+border:2px solid rgba(255,255,255,.18);
+background:#fff;
+overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+}
 
-    .ynYes{background:#22b63f}
-    .ynNo{background:#e53935}
+.frame img{
+width:100%;
+height:100%;
+object-fit:contain;
+object-position:center;
+background:#fff;
+pointer-events:none;
+-webkit-user-drag:none;
+user-drag:none;
+}
 
-    .painWrap{display:none;margin-bottom:14px}
-    .painWrap.on{display:block}
+.wordOnly{
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+font-size:42px;
+font-weight:950;
+color:#000;
+background:#fff;
+padding:16px;
+line-height:1.05;
+}
 
-    .painTop{
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:8px;
-      color:rgba(243,246,255,.85);
-      font-weight:900;
-      font-size:14px;
-    }
+.labelWrap{
+padding:10px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
 
-    .painRow{
-      display:flex;
-      gap:8px;
-      width:100%;
-    }
+.label{
+width:100%;
+min-height:64px;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+background:#fff;
+color:#000;
+border-radius:16px;
+border:2px solid rgba(0,0,0,.14);
+padding:10px 12px;
+font-size:var(--labelFont);
+font-weight:950;
+line-height:1.08;
+}
 
-    .painBtn{
-      flex:1 1 0;
-      min-height:var(--painMinH);
-      border-radius:0;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      font-weight:950;
-      font-size:var(--painFont);
-      touch-action:manipulation;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:0;
-      -webkit-touch-callout:none;
-    }
+.feedback{
+margin-top:18px;
+min-height:34px;
+text-align:center;
+font-size:28px;
+font-weight:950;
+}
 
-    .painBtn.left{border-radius:14px 0 0 14px}
-    .painBtn.right{border-radius:0 14px 14px 0}
+.good{color:#2fe6b3}
+.bad{color:#ff8c8a}
 
-    .painBtn.active{
-      box-shadow:0 0 0 4px rgba(255,255,255,.14) inset;
-      border-color:rgba(255,255,255,.28);
-    }
+.tools{
+margin-top:20px;
+display:flex;
+justify-content:center;
+gap:12px;
+flex-wrap:wrap;
+}
 
-    .painFaceBig{
-      margin-top:16px;
-      height:170px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:130px;
-      line-height:1;
-      -webkit-touch-callout:none;
-    }
+.btn{
+border:none;
+border-radius:999px;
+padding:14px 18px;
+font-size:16px;
+font-weight:900;
+background:rgba(255,255,255,.1);
+color:#fff;
+touch-action:manipulation;
+}
 
-    .toast{
-      position:fixed;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:16px;
-      background:rgba(0,0,0,.75);
-      border:1px solid rgba(255,255,255,.18);
-      color:#fff;
-      padding:10px 14px;
-      border-radius:999px;
-      font-weight:800;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .18s ease;
-      z-index:50;
-    }
+.btn.on{
+box-shadow:0 0 0 4px rgba(255,255,255,.16) inset;
+}
 
-    .toast.on{opacity:1}
-    #filePick{display:none}
+.results{
+max-width:950px;
+margin:0 auto;
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.10);
+border-radius:22px;
+padding:18px;
+}
 
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.55);
-      display:none;
-      align-items:flex-end;
-      justify-content:center;
-      z-index:100;
-      padding:12px 12px calc(12px + env(safe-area-inset-bottom));
-    }
+.results h3{
+margin:0 0 14px 0;
+font-size:22px;
+}
 
-    .modal.on{display:flex}
+.resultGrid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:14px;
+}
 
-    .sheet{
-      width:min(720px,100%);
-      background:rgba(18,26,51,.98);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:20px;
-      padding:14px;
-    }
+.resultCard{
+background:rgba(255,255,255,.07);
+border:1px solid rgba(255,255,255,.10);
+border-radius:18px;
+padding:14px;
+}
 
-    .sheet h3{
-      margin:0 0 10px 0;
-      font-size:16px;
-      color:rgba(243,246,255,.85);
-      letter-spacing:.2px;
-    }
+.resultCard strong{
+display:block;
+font-size:18px;
+margin-bottom:6px;
+}
 
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      margin-bottom:10px;
-    }
+.noteBox{
+margin-top:16px;
+width:100%;
+min-height:120px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,.14);
+background:rgba(255,255,255,.06);
+color:#fff;
+padding:12px;
+font:inherit;
+}
 
-    .field label{
-      font-size:13px;
-      color:rgba(243,246,255,.75);
-      font-weight:800;
-    }
-
-    .field input,.field input[type="range"]{
-      height:44px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      padding:0 12px;
-      font-size:16px;
-      font-weight:700;
-      outline:none;
-      box-sizing:border-box;
-      width:100%;
-    }
-
-    .rangeRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-
-    .rangeValue{
-      min-width:54px;
-      text-align:right;
-      font-weight:900;
-      color:rgba(243,246,255,.85);
-    }
-
-    .sheetActions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      margin-top:10px;
-    }
-
-    .btn{
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.08);
-      color:var(--text);
-      height:44px;
-      padding:0 14px;
-      font-weight:900;
-      font-size:14px;
-      touch-action:manipulation;
-    }
-
-    .btn.primary{
-      border-color:rgba(118,167,255,.55);
-      background:rgba(118,167,255,.14);
-    }
-
-    .btn.danger{
-      border-color:rgba(255,77,79,.45);
-      background:rgba(255,77,79,.14);
-    }
-  </style>
+@media (max-width:650px){
+.prompt{font-size:28px}
+.resultGrid{grid-template-columns:1fr}
+}
+</style>
 </head>
-
 <body>
 <header>
-  <div class="row controls">
-    <div class="title">MCU Talkboard</div>
-    <button class="chip" id="confirmChip" type="button">Confirm</button>
-    <button class="chip on" id="soundChip" type="button">Sound</button>
-    <button class="chip" id="editChip" type="button">Edit</button>
-    <button class="chip" id="sizeChip" type="button">Sizes</button>
-    <button class="chip danger" id="resetBtn" type="button">Reset</button>
-    <button class="chip danger" id="clearBtn" type="button">Clear Photos</button>
-  </div>
+<div class="row">
+<div class="title">MCU Reading & Dressing Check</div>
+<div class="pill">Mode: <span id="modeName">Word → Picture</span></div>
+<div class="pill">Rounds: <span id="rounds">0</span></div>
+<div class="pill">Correct: <span id="correct">0</span></div>
+</div>
 
-  <div class="row pages" id="pageRow">
-    <button class="chip active" id="pageNeeds" type="button">Needs</button>
-    <button class="chip" id="pageMove" type="button">Move</button>
-    <button class="chip" id="pageCommunication" type="button">Communication</button>
-    <button class="chip" id="pageTeam" type="button">Team</button>
-    <button class="chip" id="pageFeelings" type="button">Feelings</button>
-    <button class="chip" id="pagePeople" type="button">People</button>
-    <button class="chip" id="pageFavorites" type="button">Favorites</button>
-    <button class="chip" id="pagePain" type="button">Pain</button>
-  </div>
-
-  <div class="hint">Low-demand layout. You can change button size, photo size, and distance between all buttons in Sizes.</div>
+<div class="tabs">
+<button class="tab active" id="tabWord" type="button">Word</button>
+<button class="tab" id="tabListen" type="button">Listen</button>
+<button class="tab" id="tabScan" type="button">Scan</button>
+<button class="tab" id="tabDress" type="button">Dressing</button>
+<button class="tab" id="tabResults" type="button">Results</button>
+</div>
 </header>
 
 <main>
-  <div class="painWrap" id="painWrap">
-    <div class="painTop"><span>No pain</span><span>Worst pain</span></div>
-    <div class="painRow" id="painRow"></div>
-    <div class="painFaceBig" id="painFaceBig">😊</div>
-  </div>
+<div id="taskView">
+<div class="promptBox">
+<div class="modeTitle" id="modeTitle">Word → Picture</div>
+<div class="prompt" id="prompt">Show me DRINK</div>
+<div class="subPrompt" id="subPrompt">Use this to see whether reading is the main problem</div>
+<div class="targetWrap" id="targetWrap"></div>
+</div>
 
-  <div class="grid" id="grid"></div>
-  <div class="ynRow" id="ynRow"></div>
+<div class="board two" id="board"></div>
+
+<div class="feedback" id="feedback"></div>
+
+<div class="tools">
+<button class="btn" id="speakBtn" type="button">Speak prompt</button>
+<button class="btn" id="nextBtn" type="button">Next item</button>
+<button class="btn" id="twoBtn" type="button">2 choices</button>
+<button class="btn" id="fourBtn" type="button">4 choices</button>
+<button class="btn" id="cueBtn" type="button">Cue after error</button>
+<button class="btn" id="resetBtn" type="button">Reset scores</button>
+</div>
+</div>
+
+<div id="resultsView" style="display:none">
+<div class="results">
+<h3>Results summary</h3>
+<div class="resultGrid">
+<div class="resultCard">
+<strong>Word → Picture</strong>
+<div id="resWord">0 / 0 correct</div>
+</div>
+<div class="resultCard">
+<strong>Listen → Picture</strong>
+<div id="resListen">0 / 0 correct</div>
+</div>
+<div class="resultCard">
+<strong>Left / Right Scan</strong>
+<div id="resScan">0 / 0 correct</div>
+</div>
+<div class="resultCard">
+<strong>Dressing Perception</strong>
+<div id="resDress">0 / 0 correct</div>
+</div>
+</div>
+
+<textarea class="noteBox" id="clinicalNote" readonly></textarea>
+</div>
+</div>
 </main>
 
-<div class="toast" id="toast">Saved</div>
-<input id="filePick" type="file" accept="image/*" />
-
-<div class="modal" id="editModal">
-  <div class="sheet">
-    <h3>Edit button</h3>
-
-    <div class="field">
-      <label for="editLabel">Button name</label>
-      <input id="editLabel" autocomplete="off" />
-    </div>
-
-    <div class="field">
-      <label for="editSay">What it should say</label>
-      <input id="editSay" autocomplete="off" />
-    </div>
-
-    <div class="sheetActions">
-      <button class="btn" id="photoBtn" type="button">Choose photo</button>
-      <button class="btn danger" id="removePhotoBtn" type="button">Remove photo</button>
-      <button class="btn" id="cancelBtn" type="button">Cancel</button>
-      <button class="btn primary" id="saveBtn" type="button">Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="sizeModal">
-  <div class="sheet">
-    <h3>Sizes</h3>
-
-    <div class="field">
-      <label>Button size</label>
-      <div class="rangeRow">
-        <input id="tileSizeRange" type="range" min="220" max="290" step="2" />
-        <div class="rangeValue" id="tileSizeVal"></div>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Photo frame size</label>
-      <div class="rangeRow">
-        <input id="frameSizeRange" type="range" min="150" max="200" step="2" />
-        <div class="rangeValue" id="frameSizeVal"></div>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Distance between buttons</label>
-      <div class="rangeRow">
-        <input id="gapSizeRange" type="range" min="10" max="80" step="2" />
-        <div class="rangeValue" id="gapSizeVal"></div>
-      </div>
-    </div>
-
-    <div class="sheetActions">
-      <button class="btn" id="sizeCancelBtn" type="button">Close</button>
-      <button class="btn primary" id="sizeSaveBtn" type="button">Save</button>
-    </div>
-  </div>
-</div>
-
 <script>
-  const IMAGE_FILES = {
-    sit: "sit.png",
-    stand: "stand.png",
-    outofbed: "outofbed.png",
-    inbed: "inbed.png",
-    stop: "stop.png",
-    nurse: "nurse.png",
-    doctor: "doctor.png",
-    ot: "ot.png",
-    pt: "pt.png",
-    speech: "speech.png",
-    callbell: "callbell.png",
-    wheelchair: "wheelchair.png",
-    bed: "bed.png",
-    reposition: "reposition.png",
-    toilet: "toilet.png",
-    chair: "chair.png",
-    drink: "drink.png",
-    food: "food.png",
-    pain: "pain.png",
-    help: "help.png",
-    dontunderstand: "dontunderstand.png",
-    repeat: "repeat.png",
-    slowdown: "slowdown.png",
-    happy: "happy.png",
-    sad: "sad.png",
-    frustrated: "frustrated.png",
-    exhausted: "exhausted.png",
-    anxious: "anxious.png",
-    confused: "confused.png",
-    family: "family.png",
-    friend: "friend.png",
-    partner: "partner.png",
-    child: "child.png",
-    mum: "mum.png",
-    dad: "dad.png",
-    lipstick: "lipstick.png",
-    clothes: "clothes.png",
-    phone: "phone.png",
-    music: "music.png",
-    glasses: "glasses.png",
-    blanket: "blanket.png"
-  };
-
-  const DEFAULT = {
-    needs: [
-      { id:"help", label:"Help", say:"I need help now", photo:IMAGE_FILES.help },
-      { id:"pain", label:"Pain", say:"I have pain", photo:IMAGE_FILES.pain },
-      { id:"drink", label:"Drink", say:"I want a drink", photo:IMAGE_FILES.drink },
-      { id:"toilet", label:"Toilet", say:"I need the toilet", photo:IMAGE_FILES.toilet }
-    ],
-    move: [
-      { id:"sit", label:"Sit", say:"I want to sit up", photo:IMAGE_FILES.sit },
-      { id:"inbed", label:"In Bed", say:"I want to stay in bed", photo:IMAGE_FILES.inbed },
-      { id:"oob", label:"Out of Bed", say:"I want to get out of bed", photo:IMAGE_FILES.outofbed },
-      { id:"stop", label:"Stop", say:"Stop please", photo:IMAGE_FILES.stop }
-    ],
-    communication: [
-      { id:"dontunderstand", label:"I don't understand", say:"I don't understand", photo:IMAGE_FILES.dontunderstand },
-      { id:"repeat", label:"Repeat please", say:"Please repeat", photo:IMAGE_FILES.repeat },
-      { id:"slowdown", label:"Slow down", say:"Please slow down", photo:IMAGE_FILES.slowdown },
-      { id:"help2", label:"Help", say:"I need help now", photo:IMAGE_FILES.help }
-    ],
-    team: [
-      { id:"nurse", label:"Nurse", say:"I want the nurse", photo:IMAGE_FILES.nurse },
-      { id:"doctor", label:"Doctor", say:"I want the doctor", photo:IMAGE_FILES.doctor },
-      { id:"ot", label:"OT", say:"I want occupational therapy", photo:IMAGE_FILES.ot },
-      { id:"speech", label:"Speech", say:"I want speech pathology", photo:IMAGE_FILES.speech }
-    ],
-    feelings: [
-      { id:"sad", label:"Sad", say:"I feel sad", photo:IMAGE_FILES.sad },
-      { id:"frustrated", label:"Frustrated", say:"I feel frustrated", photo:IMAGE_FILES.frustrated },
-      { id:"anxious", label:"Anxious", say:"I feel anxious", photo:IMAGE_FILES.anxious },
-      { id:"exhausted", label:"Exhausted", say:"I feel exhausted", photo:IMAGE_FILES.exhausted }
-    ],
-    people: [
-      { id:"family", label:"Family", say:"I want my family", photo:IMAGE_FILES.family },
-      { id:"friend", label:"Friend", say:"I want my friend", photo:IMAGE_FILES.friend },
-      { id:"mum", label:"Mum", say:"I want my mum", photo:IMAGE_FILES.mum },
-      { id:"dad", label:"Dad", say:"I want my dad", photo:IMAGE_FILES.dad }
-    ],
-    favorites: [
-      { id:"phone", label:"Phone", say:"I want my phone", photo:IMAGE_FILES.phone },
-      { id:"glasses", label:"Glasses", say:"I want my glasses", photo:IMAGE_FILES.glasses },
-      { id:"blanket", label:"Blanket", say:"I want my blanket", photo:IMAGE_FILES.blanket },
-      { id:"music", label:"Music", say:"I want music", photo:IMAGE_FILES.music }
-    ]
-  };
-
-  const STORAGE_KEY = "mcuTalkboard_lowdemand_v3";
-  const UI_KEY = "mcuTalkboard_lowdemand_ui_v3";
-  const EDIT_PASSWORD = "1234";
-
-  let state = loadState();
-  let currentPage = "needs";
-  let confirmMode = false;
-  let soundOn = true;
-  let editMode = false;
-  let confirmPendingId = null;
-  let confirmTimer = null;
-  let editingTile = null;
-
-  const grid = document.getElementById("grid");
-  const ynRow = document.getElementById("ynRow");
-  const toast = document.getElementById("toast");
-  const filePick = document.getElementById("filePick");
-  const painWrap = document.getElementById("painWrap");
-  const painRow = document.getElementById("painRow");
-  const painFaceBig = document.getElementById("painFaceBig");
-
-  const confirmChip = document.getElementById("confirmChip");
-  const soundChip = document.getElementById("soundChip");
-  const editChip = document.getElementById("editChip");
-  const sizeChip = document.getElementById("sizeChip");
-  const resetBtn = document.getElementById("resetBtn");
-  const clearBtn = document.getElementById("clearBtn");
-
-  const pageNeeds = document.getElementById("pageNeeds");
-  const pageMove = document.getElementById("pageMove");
-  const pageCommunication = document.getElementById("pageCommunication");
-  const pageTeam = document.getElementById("pageTeam");
-  const pageFeelings = document.getElementById("pageFeelings");
-  const pagePeople = document.getElementById("pagePeople");
-  const pageFavorites = document.getElementById("pageFavorites");
-  const pagePain = document.getElementById("pagePain");
-
-  const editModal = document.getElementById("editModal");
-  const editLabel = document.getElementById("editLabel");
-  const editSay = document.getElementById("editSay");
-  const photoBtn = document.getElementById("photoBtn");
-  const removePhotoBtn = document.getElementById("removePhotoBtn");
-  const cancelBtn = document.getElementById("cancelBtn");
-  const saveBtn = document.getElementById("saveBtn");
-
-  const sizeModal = document.getElementById("sizeModal");
-  const tileSizeRange = document.getElementById("tileSizeRange");
-  const frameSizeRange = document.getElementById("frameSizeRange");
-  const gapSizeRange = document.getElementById("gapSizeRange");
-  const tileSizeVal = document.getElementById("tileSizeVal");
-  const frameSizeVal = document.getElementById("frameSizeVal");
-  const gapSizeVal = document.getElementById("gapSizeVal");
-  const sizeCancelBtn = document.getElementById("sizeCancelBtn");
-  const sizeSaveBtn = document.getElementById("sizeSaveBtn");
-
-  function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
-
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.classList.add("on");
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=>toast.classList.remove("on"),900);
-  }
-
-  function saveAll(){
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        state,currentPage,confirmMode,soundOn,editMode
-      }));
-    }catch(e){
-      showToast("Save blocked");
-    }
-  }
-
-  function loadState(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(raw){
-        const parsed = JSON.parse(raw);
-        if(parsed && parsed.state && parsed.state.needs) return parsed.state;
-      }
-    }catch(e){}
-    return deepCopy(DEFAULT);
-  }
-
-  function loadFlags(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return;
-      const parsed = JSON.parse(raw);
-      if(parsed){
-        if(typeof parsed.currentPage === "string") currentPage = parsed.currentPage;
-        if(typeof parsed.confirmMode === "boolean") confirmMode = parsed.confirmMode;
-        if(typeof parsed.soundOn === "boolean") soundOn = parsed.soundOn;
-        if(typeof parsed.editMode === "boolean") editMode = parsed.editMode;
-      }
-    }catch(e){}
-  }
-
-  function speak(text){
-    if(!soundOn) return;
-    try{
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.92;
-      u.pitch = 1.0;
-      u.volume = 1.0;
-      window.speechSynthesis.speak(u);
-    }catch(e){
-      showToast("Speech blocked");
-    }
-  }
-
-  function setChipState(btn,on){
-    btn.classList.toggle("on",!!on);
-  }
-
-  function setActivePage(page){
-    currentPage = page;
-    [pageNeeds,pageMove,pageCommunication,pageTeam,pageFeelings,pagePeople,pageFavorites,pagePain].forEach(b=>b.classList.remove("active"));
-    if(page==="needs") pageNeeds.classList.add("active");
-    if(page==="move") pageMove.classList.add("active");
-    if(page==="communication") pageCommunication.classList.add("active");
-    if(page==="team") pageTeam.classList.add("active");
-    if(page==="feelings") pageFeelings.classList.add("active");
-    if(page==="people") pagePeople.classList.add("active");
-    if(page==="favorites") pageFavorites.classList.add("active");
-    if(page==="pain") pagePain.classList.add("active");
-    render();
-    saveAll();
-  }
-
-  function tilesForPage(page){
-    if(page==="pain") return [];
-    return [...(state[page] || [])].slice(0,4);
-  }
-
-  function painColor(n){
-    if(n<=2) return "rgba(47,230,179,.18)";
-    if(n<=5) return "rgba(255,212,59,.18)";
-    if(n<=7) return "rgba(255,140,0,.18)";
-    return "rgba(255,77,79,.18)";
-  }
-
-  function renderPainBar(){
-    const EMO = ["😊","🤨","🥺","😑","😕","☹️","😓","😣","😖","😫","😭"];
-    painRow.innerHTML = "";
-    painFaceBig.textContent = EMO[0];
-
-    for(let n=0;n<=10;n++){
-      const b = document.createElement("button");
-      b.className = "painBtn";
-      b.type = "button";
-      b.style.background = painColor(n);
-      if(n===0) b.classList.add("left");
-      if(n===10) b.classList.add("right");
-
-      const t = document.createElement("span");
-      t.textContent = String(n);
-      b.appendChild(t);
-
-      b.addEventListener("click", ()=>{
-        speak(`My pain is ${n}`);
-        [...painRow.children].forEach(x=>x.classList.remove("active"));
-        b.classList.add("active");
-        painFaceBig.textContent = EMO[n];
-      });
-
-      painRow.appendChild(b);
-    }
-  }
-
-  function openEditor(tile){
-    editingTile = tile;
-    editLabel.value = tile.label || "";
-    editSay.value = tile.say || "";
-    editModal.classList.add("on");
-    setTimeout(()=>editLabel.focus(),80);
-  }
-
-  function closeEditor(){
-    editModal.classList.remove("on");
-    editingTile = null;
-  }
-
-  photoBtn.addEventListener("click", ()=>{
-    if(!editingTile) return;
-    filePick.value = "";
-    filePick.click();
-  });
-
-  removePhotoBtn.addEventListener("click", ()=>{
-    if(!editingTile) return;
-    editingTile.photo = null;
-    saveAll();
-    render();
-    showToast("Photo removed");
-  });
-
-  cancelBtn.addEventListener("click", closeEditor);
-
-  saveBtn.addEventListener("click", ()=>{
-    if(!editingTile) return;
-    const a = editLabel.value.trim();
-    const b = editSay.value.trim();
-    if(a) editingTile.label = a;
-    if(b) editingTile.say = b;
-    saveAll();
-    render();
-    showToast("Saved");
-    closeEditor();
-  });
-
-  editModal.addEventListener("click", e=>{
-    if(e.target===editModal) closeEditor();
-  });
-
-  filePick.addEventListener("change", async e=>{
-    const file = e.target.files && e.target.files[0];
-    if(!file || !editingTile){
-      filePick.value = "";
-      return;
-    }
-    const dataUrl = await fileToDataURL(file);
-    editingTile.photo = dataUrl;
-    filePick.value = "";
-    saveAll();
-    render();
-    showToast("Photo saved");
-  });
-
-  function fileToDataURL(file){
-    return new Promise((resolve,reject)=>{
-      const r = new FileReader();
-      r.onload = ()=>resolve(r.result);
-      r.onerror = reject;
-      r.readAsDataURL(file);
-    });
-  }
-
-  function getCSSNum(varName){
-    const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-    return parseInt(v.replace("px",""),10);
-  }
-
-  function setCSS(varName, px){
-    document.documentElement.style.setProperty(varName, px + "px");
-  }
-
-  function openSizes(){
-    tileSizeRange.value = getCSSNum("--tileW");
-    frameSizeRange.value = getCSSNum("--frameW");
-    gapSizeRange.value = getCSSNum("--gap");
-    updateSizeLabels();
-    sizeModal.classList.add("on");
-  }
-
-  function closeSizes(){
-    sizeModal.classList.remove("on");
-  }
-
-  function updateSizeLabels(){
-    tileSizeVal.textContent = tileSizeRange.value + "px";
-    frameSizeVal.textContent = frameSizeRange.value + "px";
-    gapSizeVal.textContent = gapSizeRange.value + "px";
-  }
-
-  function applySizesLive(){
-    const tile = parseInt(tileSizeRange.value,10);
-    const fw = parseInt(frameSizeRange.value,10);
-    const gap = parseInt(gapSizeRange.value,10);
-
-    setCSS("--tileW", tile);
-    setCSS("--tileH", tile);
-    setCSS("--frameW", fw);
-    setCSS("--frameH", Math.round(fw * 0.84));
-    setCSS("--gap", gap);
-    render();
-  }
-
-  tileSizeRange.addEventListener("input", ()=>{
-    updateSizeLabels();
-    applySizesLive();
-  });
-
-  frameSizeRange.addEventListener("input", ()=>{
-    updateSizeLabels();
-    applySizesLive();
-  });
-
-  gapSizeRange.addEventListener("input", ()=>{
-    updateSizeLabels();
-    applySizesLive();
-  });
-
-  sizeChip.addEventListener("click", openSizes);
-  sizeCancelBtn.addEventListener("click", closeSizes);
-
-  sizeSaveBtn.addEventListener("click", ()=>{
-    const ui = {
-      tileW: parseInt(tileSizeRange.value,10),
-      frameW: parseInt(frameSizeRange.value,10),
-      gap: parseInt(gapSizeRange.value,10)
-    };
-    localStorage.setItem(UI_KEY, JSON.stringify(ui));
-    showToast("Sizes saved");
-    closeSizes();
-  });
-
-  sizeModal.addEventListener("click", e=>{
-    if(e.target===sizeModal) closeSizes();
-  });
-
-  function loadUISizes(){
-    try{
-      const raw = localStorage.getItem(UI_KEY);
-      if(!raw) return;
-      const ui = JSON.parse(raw);
-      if(ui && ui.tileW){
-        setCSS("--tileW", ui.tileW);
-        setCSS("--tileH", ui.tileW);
-      }
-      if(ui && ui.frameW){
-        setCSS("--frameW", ui.frameW);
-        setCSS("--frameH", Math.round(ui.frameW * 0.84));
-      }
-      if(ui && ui.gap){
-        setCSS("--gap", ui.gap);
-      }
-    }catch(e){}
-  }
-
-  function buildTile(tile){
-    const el = document.createElement("div");
-    el.className = "tile";
-    el.setAttribute("role","button");
-    el.setAttribute("tabindex","0");
-
-    const mediaArea = document.createElement("div");
-    mediaArea.className = "mediaArea";
-
-    const frame = document.createElement("div");
-    frame.className = "frame";
-
-    if(tile.photo){
-      const img = document.createElement("img");
-      img.src = tile.photo;
-      img.alt = "";
-      img.draggable = false;
-      frame.appendChild(img);
-    }
-
-    mediaArea.appendChild(frame);
-
-    const labelArea = document.createElement("div");
-    labelArea.className = "labelArea";
-
-    const label = document.createElement("div");
-    label.className = "label";
-    label.textContent = tile.label;
-
-    labelArea.appendChild(label);
-    el.appendChild(mediaArea);
-    el.appendChild(labelArea);
-
-    const activate = ()=>{
-      if(editMode){
-        openEditor(tile);
-        return;
-      }
-
-      if(confirmMode){
-        if(confirmPendingId === tile.id){
-          clearTimeout(confirmTimer);
-          confirmPendingId = null;
-          speak(tile.say);
-          showToast("Spoken");
-        }else{
-          confirmPendingId = tile.id;
-          showToast("Tap again to confirm");
-          clearTimeout(confirmTimer);
-          confirmTimer = setTimeout(()=>{ confirmPendingId = null; },2200);
-        }
-        return;
-      }
-
-      speak(tile.say);
-    };
-
-    el.addEventListener("click", activate);
-    el.addEventListener("keydown", ev=>{
-      if(ev.key==="Enter" || ev.key===" "){
-        ev.preventDefault();
-        activate();
-      }
-    });
-
-    return el;
-  }
-
-  function handleConfirmSpeak(id, text){
-    if(confirmPendingId === id){
-      clearTimeout(confirmTimer);
-      confirmPendingId = null;
-      speak(text);
-      showToast("Spoken");
-    }else{
-      confirmPendingId = id;
-      showToast("Tap again to confirm");
-      clearTimeout(confirmTimer);
-      confirmTimer = setTimeout(()=>{ confirmPendingId = null; },2200);
-    }
-  }
-
-  function render(){
-    if(currentPage==="pain"){
-      painWrap.classList.add("on");
-      renderPainBar();
-    }else{
-      painWrap.classList.remove("on");
-      painRow.innerHTML = "";
-      painFaceBig.textContent = "😊";
-    }
-
-    grid.innerHTML = "";
-    ynRow.innerHTML = "";
-
-    const tiles = tilesForPage(currentPage);
-    tiles.forEach(tile=> grid.appendChild(buildTile(tile)));
-
-    const yes = document.createElement("button");
-    yes.className = "ynBtn ynYes";
-    yes.textContent = "Yes";
-    yes.addEventListener("click", ()=>{
-      if(confirmMode) handleConfirmSpeak("yes_fixed","Yes");
-      else speak("Yes");
-    });
-
-    const no = document.createElement("button");
-    no.className = "ynBtn ynNo";
-    no.textContent = "No";
-    no.addEventListener("click", ()=>{
-      if(confirmMode) handleConfirmSpeak("no_fixed","No");
-      else speak("No");
-    });
-
-    ynRow.appendChild(yes);
-    ynRow.appendChild(no);
-  }
-
-  confirmChip.addEventListener("click", ()=>{
-    confirmMode = !confirmMode;
-    setChipState(confirmChip, confirmMode);
-    saveAll();
-  });
-
-  soundChip.addEventListener("click", ()=>{
-    soundOn = !soundOn;
-    setChipState(soundChip, soundOn);
-    showToast(soundOn ? "Sound ON" : "Sound OFF");
-    saveAll();
-  });
-
-  editChip.addEventListener("click", ()=>{
-    if(!editMode){
-      const entered = prompt("Enter password to enable Edit mode:");
-      if(entered===null) return;
-      if(entered!==EDIT_PASSWORD){
-        showToast("Wrong password");
-        return;
-      }
-      editMode = true;
-      setChipState(editChip,true);
-      showToast("Edit ON");
-      saveAll();
-    }else{
-      editMode = false;
-      setChipState(editChip,false);
-      closeEditor();
-      showToast("Edit OFF");
-      saveAll();
-    }
-  });
-
-  resetBtn.addEventListener("click", ()=>{
-    if(!confirm("Reset everything to default?")) return;
-    state = deepCopy(DEFAULT);
-    confirmMode = false;
-    soundOn = true;
-    editMode = false;
-    setChipState(confirmChip,false);
-    setChipState(soundChip,true);
-    setChipState(editChip,false);
-    confirmPendingId = null;
-    closeEditor();
-    saveAll();
-    render();
-    showToast("Reset done");
-  });
-
-  clearBtn.addEventListener("click", ()=>{
-    if(!confirm("Clear ONLY custom photos?")) return;
-    ["needs","move","communication","team","feelings","people","favorites"].forEach(p=>{
-      (state[p] || []).forEach(t=>{
-        const original = DEFAULT[p].find(d=>d.id===t.id);
-        t.photo = original ? original.photo : null;
-      });
-    });
-    closeEditor();
-    saveAll();
-    render();
-    showToast("Photos reset");
-  });
-
-  pageNeeds.addEventListener("click", ()=> setActivePage("needs"));
-  pageMove.addEventListener("click", ()=> setActivePage("move"));
-  pageCommunication.addEventListener("click", ()=> setActivePage("communication"));
-  pageTeam.addEventListener("click", ()=> setActivePage("team"));
-  pageFeelings.addEventListener("click", ()=> setActivePage("feelings"));
-  pagePeople.addEventListener("click", ()=> setActivePage("people"));
-  pageFavorites.addEventListener("click", ()=> setActivePage("favorites"));
-  pagePain.addEventListener("click", ()=> setActivePage("pain"));
-
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("dragstart", e => e.preventDefault());
-
-  loadFlags();
-  loadUISizes();
-  setChipState(confirmChip, confirmMode);
-  setChipState(soundChip, soundOn);
-  setChipState(editChip, editMode);
-  setActivePage(currentPage);
-  render();
+const ITEMS = {
+drink:{label:"DRINK", photo:"drink.png"},
+toilet:{label:"TOILET", photo:"toilet.png"},
+food:{label:"FOOD", photo:"food.png"},
+help:{label:"HELP", photo:"help.png"},
+nurse:{label:"NURSE", photo:"nurse.png"},
+doctor:{label:"DOCTOR", photo:"doctor.png"},
+sit:{label:"SIT", photo:"sit.png"},
+stop:{label:"STOP", photo:"stop.png"},
+sleeve:{label:"SLEEVE", photo:"clothes.png"},
+neck:{label:"NECK", photo:"clothes.png"},
+top:{label:"TOP", photo:"clothes.png"},
+bottom:{label:"BOTTOM", photo:"clothes.png"},
+repeat:{label:"REPEAT", photo:"repeat.png"},
+slowdown:{label:"SLOW DOWN", photo:"slowdown.png"},
+dontunderstand:{label:"DON'T UNDERSTAND", photo:"dontunderstand.png"}
+};
+
+const TASKS = {
+word: [
+{prompt:"Show me DRINK", answer:"drink", options:["drink","toilet","food","help"], targetType:"word"},
+{prompt:"Show me TOILET", answer:"toilet", options:["toilet","drink","food","help"], targetType:"word"},
+{prompt:"Show me NURSE", answer:"nurse", options:["nurse","doctor","help","food"], targetType:"word"},
+{prompt:"Show me STOP", answer:"stop", options:["stop","sit","help","drink"], targetType:"word"}
+],
+listen: [
+{prompt:"Listen and choose", answer:"drink", options:["drink","toilet","food","help"], speak:"Show me drink", targetType:"none"},
+{prompt:"Listen and choose", answer:"doctor", options:["doctor","nurse","food","help"], speak:"Show me doctor", targetType:"none"},
+{prompt:"Listen and choose", answer:"sit", options:["sit","stop","drink","help"], speak:"Show me sit", targetType:"none"},
+{prompt:"Listen and choose", answer:"repeat", options:["repeat","slowdown","dontunderstand","help"], speak:"Show me repeat", targetType:"none"}
+],
+scan: [
+{prompt:"Find DRINK", answer:"drink", options:["drink","toilet"], forcedPositions:["left","right"], targetType:"word"},
+{prompt:"Find TOILET", answer:"toilet", options:["drink","toilet"], forcedPositions:["right","left"], targetType:"word"},
+{prompt:"Find NURSE", answer:"nurse", options:["nurse","doctor"], forcedPositions:["left","right"], targetType:"word"},
+{prompt:"Find DOCTOR", answer:"doctor", options:["nurse","doctor"], forcedPositions:["right","left"], targetType:"word"}
+],
+dress: [
+{prompt:"Show me SLEEVE", answer:"sleeve", options:["sleeve","neck","top","bottom"], targetType:"word"},
+{prompt:"Show me NECK", answer:"neck", options:["neck","sleeve","top","bottom"], targetType:"word"},
+{prompt:"Show me TOP", answer:"top", options:["top","bottom","sleeve","neck"], targetType:"word"},
+{prompt:"Show me BOTTOM", answer:"bottom", options:["bottom","top","sleeve","neck"], targetType:"word"}
+]
+};
+
+const STATS = {
+word:{correct:0,total:0},
+listen:{correct:0,total:0},
+scan:{correct:0,total:0,leftMiss:0,rightMiss:0},
+dress:{correct:0,total:0}
+};
+
+let mode = "word";
+let currentTask = null;
+let choiceCount = 2;
+let cueAfterError = true;
+let rounds = 0;
+let correctTotal = 0;
+
+const board = document.getElementById("board");
+const promptEl = document.getElementById("prompt");
+const subPrompt = document.getElementById("subPrompt");
+const targetWrap = document.getElementById("targetWrap");
+const feedback = document.getElementById("feedback");
+const roundsEl = document.getElementById("rounds");
+const correctEl = document.getElementById("correct");
+const modeName = document.getElementById("modeName");
+const modeTitle = document.getElementById("modeTitle");
+const taskView = document.getElementById("taskView");
+const resultsView = document.getElementById("resultsView");
+const noteBox = document.getElementById("clinicalNote");
+
+function setActiveTab(id){
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+
+function speak(text){
+try{
+speechSynthesis.cancel();
+const u = new SpeechSynthesisUtterance(text);
+u.rate = 0.9;
+u.pitch = 1.0;
+speechSynthesis.speak(u);
+}catch(e){}
+}
+
+function shuffle(arr){
+return [...arr].sort(()=>Math.random()-0.5);
+}
+
+function updateTop(){
+roundsEl.textContent = rounds;
+correctEl.textContent = correctTotal;
+}
+
+function changeMode(newMode){
+mode = newMode;
+feedback.textContent = "";
+feedback.className = "feedback";
+
+if(mode === "results"){
+setActiveTab("tabResults");
+taskView.style.display = "none";
+resultsView.style.display = "block";
+renderResults();
+return;
+}
+
+resultsView.style.display = "none";
+taskView.style.display = "block";
+
+if(mode === "word"){
+setActiveTab("tabWord");
+modeName.textContent = "Word → Picture";
+modeTitle.textContent = "Word → Picture";
+subPrompt.textContent = "If this is poor but Listen is better, think reading problem";
+}
+if(mode === "listen"){
+setActiveTab("tabListen");
+modeName.textContent = "Listen → Picture";
+modeTitle.textContent = "Listen → Picture";
+subPrompt.textContent = "If this is better than Word, reading may be the main difficulty";
+}
+if(mode === "scan"){
+setActiveTab("tabScan");
+modeName.textContent = "Left / Right Scan";
+modeTitle.textContent = "Left / Right Scan";
+subPrompt.textContent = "Watch for repeated misses on one side";
+}
+if(mode === "dress"){
+setActiveTab("tabDress");
+modeName.textContent = "Dressing Perception";
+modeTitle.textContent = "Dressing Perception";
+subPrompt.textContent = "Checks sleeve / neck / top / bottom recognition";
+}
+
+nextTask();
+}
+
+function buildTarget(task){
+targetWrap.innerHTML = "";
+if(task.targetType === "none") return;
+
+const card = document.createElement("div");
+card.className = "targetCard";
+
+if(task.targetType === "word"){
+card.textContent = ITEMS[task.answer].label;
+} else if(task.targetType === "picture"){
+const img = document.createElement("img");
+img.src = ITEMS[task.answer].photo;
+img.alt = "";
+img.draggable = false;
+card.appendChild(img);
+}
+
+targetWrap.appendChild(card);
+}
+
+function getTaskOptions(task){
+let opts = [...task.options];
+if(choiceCount === 2) opts = opts.slice(0,2);
+if(choiceCount === 4) opts = opts.slice(0,4);
+
+if(mode === "scan" && task.forcedPositions && opts.length === 2){
+const answerKey = task.answer;
+const otherKey = opts.find(x=>x!==answerKey);
+if(task.forcedPositions[0] === "left"){
+return [answerKey, otherKey];
+} else {
+return [otherKey, answerKey];
+}
+}
+return shuffle(opts);
+}
+
+function buildChoice(key, wordOnly=false){
+const item = ITEMS[key];
+const btn = document.createElement("button");
+btn.className = "choice";
+btn.type = "button";
+btn.dataset.key = key;
+
+const media = document.createElement("div");
+media.className = "media";
+
+const frame = document.createElement("div");
+frame.className = "frame";
+
+if(wordOnly){
+const word = document.createElement("div");
+word.className = "wordOnly";
+word.textContent = item.label;
+frame.appendChild(word);
+} else {
+const img = document.createElement("img");
+img.src = item.photo;
+img.alt = "";
+img.draggable = false;
+frame.appendChild(img);
+}
+
+media.appendChild(frame);
+
+const labelWrap = document.createElement("div");
+labelWrap.className = "labelWrap";
+
+const label = document.createElement("div");
+label.className = "label";
+label.textContent = item.label;
+
+labelWrap.appendChild(label);
+btn.appendChild(media);
+btn.appendChild(labelWrap);
+
+btn.addEventListener("click", ()=>selectChoice(btn, key));
+return btn;
+}
+
+function nextTask(){
+feedback.textContent = "";
+feedback.className = "feedback";
+board.innerHTML = "";
+
+const pool = TASKS[mode];
+currentTask = pool[Math.floor(Math.random()*pool.length)];
+
+promptEl.textContent = currentTask.prompt;
+buildTarget(currentTask);
+
+const opts = getTaskOptions(currentTask);
+board.className = "board " + (opts.length === 2 ? "two" : "four");
+
+const useWordOnlyChoices = (mode === "dress" || mode === "word");
+opts.forEach(key=>{
+board.appendChild(buildChoice(key, useWordOnlyChoices));
+});
+
+if(currentTask.speak){
+speak(currentTask.speak);
+}
+}
+
+function selectChoice(btn, key){
+rounds += 1;
+STATS[mode].total += 1;
+
+if(key === currentTask.answer){
+correctTotal += 1;
+STATS[mode].correct += 1;
+feedback.textContent = "Correct";
+feedback.className = "feedback good";
+speak("Correct");
+} else {
+feedback.textContent = "Try again";
+feedback.className = "feedback bad";
+speak("Try again");
+
+if(mode === "scan"){
+const all = [...board.children];
+const index = all.indexOf(btn);
+if(index === 0) STATS.scan.leftMiss += 1;
+if(index === 1) STATS.scan.rightMiss += 1;
+}
+
+if(cueAfterError){
+[...board.children].forEach(choice=>{
+if(choice.dataset.key === currentTask.answer){
+choice.classList.add("correctCue");
+} else {
+choice.classList.add("dim");
+}
+});
+}
+}
+
+updateTop();
+}
+
+function renderResults(){
+document.getElementById("resWord").textContent = `${STATS.word.correct} / ${STATS.word.total} correct`;
+document.getElementById("resListen").textContent = `${STATS.listen.correct} / ${STATS.listen.total} correct`;
+document.getElementById("resScan").textContent = `${STATS.scan.correct} / ${STATS.scan.total} correct | Left misses: ${STATS.scan.leftMiss} | Right misses: ${STATS.scan.rightMiss}`;
+document.getElementById("resDress").textContent = `${STATS.dress.correct} / ${STATS.dress.total} correct`;
+
+let note = "";
+note += "Clinical impression:\n";
+
+if(STATS.word.total > 0 && STATS.listen.total > 0){
+const wordRate = STATS.word.correct / STATS.word.total;
+const listenRate = STATS.listen.correct / STATS.listen.total;
+
+if(listenRate > wordRate + 0.2){
+note += "- Listen performance is better than Word performance, which may suggest reading impairment contributes more than basic picture recognition.\n";
+} else if(wordRate < 0.5 && listenRate < 0.5){
+note += "- Both Word and Listen are reduced, suggesting broader comprehension / attention / cognitive difficulty rather than reading alone.\n";
+} else {
+note += "- Word and Listen performance are relatively similar.\n";
+}
+}
+
+if(STATS.scan.leftMiss > STATS.scan.rightMiss + 1){
+note += "- More left-sided misses than right-sided misses, which may support visual inattention / scanning difficulty to the left.\n";
+} else if(STATS.scan.rightMiss > STATS.scan.leftMiss + 1){
+note += "- More right-sided misses than left-sided misses.\n";
+} else if(STATS.scan.total > 0){
+note += "- Scan errors do not show a clear side pattern.\n";
+}
+
+if(STATS.dress.total > 0){
+const dressRate = STATS.dress.correct / STATS.dress.total;
+if(dressRate < 0.5){
+note += "- Poor performance on sleeve / neck / top / bottom tasks suggests dressing difficulty is likely influenced by perceptual and/or praxis impairment, not only language.\n";
+} else {
+note += "- Dressing-part identification is relatively better than expected.\n";
+}
+}
+
+note += "\nStrategy ideas:\n";
+note += "- Keep only 2 choices when performance drops.\n";
+note += "- Use spoken cue + picture before written word if reading is weak.\n";
+note += "- For dressing, use a plain top, fixed orientation, and visually highlight neck and sleeves.\n";
+note += "- If scanning errors are side-specific, place targets with deliberate cueing toward the missed side.\n";
+
+noteBox.value = note;
+}
+
+document.getElementById("tabWord").addEventListener("click", ()=>changeMode("word"));
+document.getElementById("tabListen").addEventListener("click", ()=>changeMode("listen"));
+document.getElementById("tabScan").addEventListener("click", ()=>changeMode("scan"));
+document.getElementById("tabDress").addEventListener("click", ()=>changeMode("dress"));
+document.getElementById("tabResults").addEventListener("click", ()=>changeMode("results"));
+
+document.getElementById("speakBtn").addEventListener("click", ()=>{
+if(currentTask?.speak) speak(currentTask.speak);
+else if(currentTask?.prompt) speak(currentTask.prompt);
+});
+
+document.getElementById("nextBtn").addEventListener("click", nextTask);
+
+document.getElementById("twoBtn").addEventListener("click", function(){
+choiceCount = 2;
+document.getElementById("twoBtn").classList.add("on");
+document.getElementById("fourBtn").classList.remove("on");
+nextTask();
+});
+
+document.getElementById("fourBtn").addEventListener("click", function(){
+choiceCount = 4;
+document.getElementById("fourBtn").classList.add("on");
+document.getElementById("twoBtn").classList.remove("on");
+nextTask();
+});
+
+document.getElementById("cueBtn").addEventListener("click", function(){
+cueAfterError = !cueAfterError;
+this.classList.toggle("on", cueAfterError);
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+Object.keys(STATS).forEach(k=>{
+Object.keys(STATS[k]).forEach(x=>STATS[k][x] = 0);
+});
+rounds = 0;
+correctTotal = 0;
+updateTop();
+feedback.textContent = "";
+feedback.className = "feedback";
+nextTask();
+});
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+
+document.getElementById("twoBtn").classList.add("on");
+document.getElementById("cueBtn").classList.add("on");
+
+updateTop();
+changeMode("word");
 </script>
 </body>
 </html>
