@@ -4,22 +4,30 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>MCU Cognitive Game</title>
+<title>MCU Rehab Game</title>
 <style>
 :root{
---bg1:#0f172a;
---bg2:#1e293b;
---panel:#111827;
---card:#1f2937;
---text:#f8fafc;
---muted:#cbd5e1;
---accent1:#38bdf8;
---accent2:#f59e0b;
---accent3:#34d399;
---accent4:#f472b6;
+--bgA:#09111f;
+--bgB:#17243a;
+--panel:rgba(12,19,34,.82);
+--text:#f8fbff;
+--muted:#c8d4e6;
+--line:rgba(255,255,255,.12);
+
+--blue:#3b82f6;
+--orange:#f59e0b;
+--green:#10b981;
+--pink:#ec4899;
+--violet:#8b5cf6;
+--red:#ef4444;
+
 --good:#22c55e;
 --bad:#ef4444;
+
 --shadow:0 14px 30px rgba(0,0,0,.28);
+--cardW:220px;
+--cardH:220px;
+--gap:24px;
 }
 
 *{box-sizing:border-box}
@@ -29,18 +37,18 @@ margin:0;
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 color:var(--text);
 background:
-radial-gradient(circle at top left, #1d4ed8 0%, transparent 24%),
-radial-gradient(circle at top right, #7c3aed 0%, transparent 18%),
-linear-gradient(180deg,var(--bg2),var(--bg1));
+radial-gradient(circle at 10% 10%, rgba(59,130,246,.25), transparent 22%),
+radial-gradient(circle at 90% 10%, rgba(236,72,153,.18), transparent 18%),
+linear-gradient(180deg,var(--bgB),var(--bgA));
 -webkit-user-select:none;
 user-select:none;
 -webkit-touch-callout:none;
 }
 
 .app{
-max-width:1100px;
+max-width:1180px;
 margin:0 auto;
-padding:18px 16px 28px;
+padding:16px 14px 28px;
 }
 
 .top{
@@ -60,68 +68,72 @@ gap:4px;
 
 .title{
 font-size:28px;
-font-weight:900;
+font-weight:950;
 letter-spacing:.2px;
 }
 
 .subtitle{
-color:var(--muted);
 font-size:14px;
+color:var(--muted);
 }
 
 .stats{
 display:flex;
-gap:10px;
 flex-wrap:wrap;
+gap:10px;
 }
 
 .stat{
 background:rgba(255,255,255,.08);
-border:1px solid rgba(255,255,255,.12);
+border:1px solid var(--line);
 border-radius:999px;
 padding:10px 14px;
-font-weight:800;
 font-size:14px;
+font-weight:900;
 box-shadow:var(--shadow);
 }
 
 .tabs{
 display:grid;
-grid-template-columns:repeat(5,minmax(0,1fr));
+grid-template-columns:repeat(6,minmax(0,1fr));
 gap:10px;
-margin-bottom:18px;
+margin-bottom:16px;
 }
 
 .tab{
 border:none;
 border-radius:18px;
-padding:14px 12px;
+padding:14px 10px;
 color:#fff;
-font-size:16px;
-font-weight:900;
+font-size:15px;
+font-weight:950;
 box-shadow:var(--shadow);
 touch-action:manipulation;
 }
 
 .tab.active{
-outline:4px solid rgba(255,255,255,.22);
+outline:4px solid rgba(255,255,255,.20);
 transform:translateY(-1px);
 }
 
-.tab.read{background:linear-gradient(135deg,#0ea5e9,#2563eb)}
-.tab.build{background:linear-gradient(135deg,#f59e0b,#f97316)}
-.tab.match{background:linear-gradient(135deg,#10b981,#059669)}
-.tab.orient{background:linear-gradient(135deg,#ec4899,#db2777)}
-.tab.results{background:linear-gradient(135deg,#64748b,#334155)}
+.t-match{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+.t-orient{background:linear-gradient(135deg,#f59e0b,#ea580c)}
+.t-process{background:linear-gradient(135deg,#10b981,#059669)}
+.t-build{background:linear-gradient(135deg,#ec4899,#db2777)}
+.t-results{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+.t-edit{background:linear-gradient(135deg,#64748b,#334155)}
 
 .panel{
-background:rgba(17,24,39,.72);
-border:1px solid rgba(255,255,255,.10);
+background:var(--panel);
+border:1px solid var(--line);
 border-radius:28px;
 padding:18px;
 box-shadow:var(--shadow);
 backdrop-filter:blur(10px);
 }
+
+.stage{display:none}
+.stage.active{display:block}
 
 .prompt{
 text-align:center;
@@ -135,55 +147,78 @@ margin-bottom:8px;
 text-align:center;
 color:var(--muted);
 font-size:15px;
-min-height:24px;
+min-height:22px;
 margin-bottom:18px;
 }
 
-.stage{
-display:none;
-}
-
-.stage.active{
-display:block;
-}
-
-.cards2, .cards4{
-display:grid;
+.previewWrap{
+display:flex;
 justify-content:center;
-gap:22px;
+align-items:center;
+margin-bottom:18px;
+min-height:160px;
 }
 
-.cards2{
-grid-template-columns:repeat(2,minmax(180px,240px));
+.previewCard{
+width:220px;
+height:170px;
+border-radius:28px;
+background:#fff;
+overflow:hidden;
+box-shadow:var(--shadow);
+display:flex;
+align-items:center;
+justify-content:center;
+color:#111827;
+font-size:32px;
+font-weight:950;
+text-align:center;
+padding:12px;
 }
 
-.cards4{
-grid-template-columns:repeat(2,minmax(170px,220px));
+.previewCard img{
+width:100%;
+height:100%;
+object-fit:contain;
+background:#fff;
+pointer-events:none;
+-webkit-user-drag:none;
+user-drag:none;
 }
+
+.board{
+display:grid;
+gap:var(--gap);
+justify-content:center;
+}
+
+.board.two{grid-template-columns:repeat(2,minmax(180px,var(--cardW)))}
+.board.three{grid-template-columns:repeat(3,minmax(160px,200px))}
+.board.four{grid-template-columns:repeat(2,minmax(180px,var(--cardW)))}
 
 .gameCard{
-min-height:220px;
+min-height:var(--cardH);
 border:none;
 border-radius:28px;
 padding:14px;
-box-shadow:var(--shadow);
+overflow:hidden;
 display:flex;
 flex-direction:column;
 justify-content:space-between;
 align-items:center;
 touch-action:manipulation;
+box-shadow:var(--shadow);
 position:relative;
-overflow:hidden;
 }
 
-.gameCard.c1{background:linear-gradient(180deg,#38bdf8,#2563eb)}
-.gameCard.c2{background:linear-gradient(180deg,#fbbf24,#f97316)}
-.gameCard.c3{background:linear-gradient(180deg,#34d399,#059669)}
-.gameCard.c4{background:linear-gradient(180deg,#f9a8d4,#db2777)}
+.c1{background:linear-gradient(180deg,#60a5fa,#2563eb)}
+.c2{background:linear-gradient(180deg,#fbbf24,#f97316)}
+.c3{background:linear-gradient(180deg,#34d399,#059669)}
+.c4{background:linear-gradient(180deg,#f9a8d4,#db2777)}
 
-.cardMedia{
-width:100%;
+.media{
 flex:1;
+width:100%;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -193,12 +228,12 @@ padding:8px;
 .imgBox{
 width:150px;
 height:130px;
+border-radius:22px;
 background:#fff;
-border-radius:24px;
+overflow:hidden;
 display:flex;
 align-items:center;
 justify-content:center;
-overflow:hidden;
 box-shadow:0 8px 18px rgba(0,0,0,.18);
 }
 
@@ -212,44 +247,98 @@ pointer-events:none;
 user-drag:none;
 }
 
-.wordBox{
+.label{
 width:100%;
-min-height:82px;
-background:#fff;
+min-height:56px;
+border-radius:18px;
+background:rgba(255,255,255,.95);
 color:#111827;
-border-radius:20px;
+font-size:22px;
+font-weight:950;
+text-align:center;
 display:flex;
 align-items:center;
 justify-content:center;
-text-align:center;
-font-size:30px;
-font-weight:950;
 padding:10px;
-line-height:1.05;
-box-shadow:0 8px 18px rgba(0,0,0,.16);
+line-height:1.08;
 }
 
-.miniLabel{
-margin-top:10px;
-width:100%;
-min-height:54px;
-background:rgba(255,255,255,.92);
-color:#111827;
-border-radius:16px;
+.wordTarget{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+min-height:76px;
+margin-bottom:18px;
+}
+
+.slot{
+width:64px;
+height:64px;
+border-radius:18px;
+border:2px dashed rgba(255,255,255,.24);
+background:rgba(255,255,255,.06);
 display:flex;
 align-items:center;
 justify-content:center;
-text-align:center;
-font-size:22px;
-font-weight:900;
-padding:8px 10px;
+font-size:30px;
+font-weight:950;
 }
+
+.letterBank{
+display:flex;
+justify-content:center;
+gap:12px;
+flex-wrap:wrap;
+}
+
+.letterBtn{
+width:72px;
+height:72px;
+border:none;
+border-radius:20px;
+background:#fff;
+color:#111827;
+font-size:34px;
+font-weight:950;
+box-shadow:var(--shadow);
+touch-action:manipulation;
+}
+
+.processArea{
+display:flex;
+flex-direction:column;
+gap:18px;
+align-items:center;
+}
+
+.processGrid{
+display:grid;
+grid-template-columns:repeat(3,92px);
+gap:16px;
+justify-content:center;
+}
+
+.processBtn{
+width:92px;
+height:92px;
+border:none;
+border-radius:24px;
+box-shadow:var(--shadow);
+touch-action:manipulation;
+}
+
+.p1{background:#3b82f6}
+.p2{background:#f59e0b}
+.p3{background:#10b981}
+.p4{background:#ec4899}
 
 .feedback{
 margin-top:18px;
 min-height:34px;
 text-align:center;
-font-size:30px;
+font-size:28px;
 font-weight:950;
 }
 
@@ -271,7 +360,7 @@ padding:14px 18px;
 background:rgba(255,255,255,.10);
 color:#fff;
 font-size:15px;
-font-weight:900;
+font-weight:950;
 box-shadow:var(--shadow);
 touch-action:manipulation;
 }
@@ -280,92 +369,15 @@ touch-action:manipulation;
 outline:3px solid rgba(255,255,255,.22);
 }
 
-.buildTarget{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-margin-bottom:18px;
-min-height:74px;
-}
-
-.slot{
-width:64px;
-height:64px;
-border-radius:18px;
-background:rgba(255,255,255,.08);
-border:2px dashed rgba(255,255,255,.22);
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:30px;
-font-weight:950;
-color:#fff;
-}
-
-.letters{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:12px;
-}
-
-.letterBtn{
-width:72px;
-height:72px;
-border:none;
-border-radius:22px;
-font-size:34px;
-font-weight:950;
-color:#111827;
-background:#fff;
-box-shadow:var(--shadow);
-touch-action:manipulation;
-}
-
-.targetPreview{
-display:flex;
-justify-content:center;
-margin-bottom:18px;
-}
-
-.previewCard{
-width:220px;
-height:170px;
-border-radius:28px;
-background:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:var(--shadow);
-overflow:hidden;
-color:#111827;
-font-size:34px;
-font-weight:950;
-padding:12px;
-text-align:center;
-}
-
-.previewCard img{
-width:100%;
-height:100%;
-object-fit:contain;
-pointer-events:none;
--webkit-user-drag:none;
-user-drag:none;
-}
-
 .resultsGrid{
 display:grid;
 grid-template-columns:repeat(2,minmax(0,1fr));
 gap:14px;
-margin-top:12px;
 }
 
 .resultCard{
 background:rgba(255,255,255,.08);
-border:1px solid rgba(255,255,255,.10);
+border:1px solid var(--line);
 border-radius:20px;
 padding:14px;
 }
@@ -379,7 +391,7 @@ margin-bottom:6px;
 .noteBox{
 margin-top:16px;
 width:100%;
-min-height:140px;
+min-height:150px;
 border:none;
 border-radius:18px;
 background:rgba(255,255,255,.08);
@@ -389,10 +401,57 @@ font:inherit;
 resize:none;
 }
 
-@media (max-width:700px){
+.editGrid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:14px;
+}
+
+.editCard{
+background:rgba(255,255,255,.08);
+border:1px solid var(--line);
+border-radius:18px;
+padding:14px;
+}
+
+.editCard h4{
+margin:0 0 10px 0;
+font-size:18px;
+}
+
+.field{
+display:flex;
+flex-direction:column;
+gap:6px;
+margin-bottom:10px;
+}
+
+.field label{
+color:var(--muted);
+font-size:13px;
+font-weight:800;
+}
+
+.field input, .field select{
+width:100%;
+height:44px;
+border:none;
+border-radius:12px;
+padding:0 12px;
+background:rgba(255,255,255,.10);
+color:#fff;
+font:inherit;
+}
+
+.field input[type="file"]{
+height:auto;
+padding:10px 12px;
+}
+
+@media (max-width:800px){
 .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
-.cards2,.cards4{grid-template-columns:1fr}
-.resultsGrid{grid-template-columns:1fr}
+.board.two,.board.three,.board.four{grid-template-columns:1fr}
+.resultsGrid,.editGrid{grid-template-columns:1fr}
 .prompt{font-size:25px}
 }
 </style>
@@ -401,65 +460,112 @@ resize:none;
 <div class="app">
 <div class="top">
 <div class="titleWrap">
-<div class="title">MCU Cognitive Game</div>
-<div class="subtitle">Reading, word building, matching and orientation check</div>
+<div class="title">MCU Rehab Game</div>
+<div class="subtitle">Different app: processing, matching, orientation and word building</div>
 </div>
 
 <div class="stats">
-<div class="stat">Mode: <span id="modeLabel">Reading</span></div>
+<div class="stat">Mode: <span id="modeLabel">Matching</span></div>
 <div class="stat">Rounds: <span id="rounds">0</span></div>
 <div class="stat">Correct: <span id="correct">0</span></div>
 </div>
 </div>
 
 <div class="tabs">
-<button class="tab read active" id="tabRead" type="button">Reading</button>
-<button class="tab build" id="tabBuild" type="button">Word Build</button>
-<button class="tab match" id="tabMatch" type="button">Matching</button>
-<button class="tab orient" id="tabOrient" type="button">Orientation</button>
-<button class="tab results" id="tabResults" type="button">Results</button>
+<button class="tab t-match active" id="tabMatch" type="button">Matching</button>
+<button class="tab t-orient" id="tabOrient" type="button">Orientation</button>
+<button class="tab t-process" id="tabProcess" type="button">Processing</button>
+<button class="tab t-build" id="tabBuild" type="button">Word Build</button>
+<button class="tab t-results" id="tabResults" type="button">Results</button>
+<button class="tab t-edit" id="tabEdit" type="button">Edit</button>
 </div>
 
 <div class="panel">
-<div id="stageRead" class="stage active">
-<div class="prompt" id="readPrompt">Tap the picture that matches the word</div>
-<div class="helper" id="readHelper">Use this to see if written word recognition is present</div>
-<div class="targetPreview" id="readTargetPreview"></div>
-<div class="cards2" id="readBoard"></div>
-</div>
-
-<div id="stageBuild" class="stage">
-<div class="prompt" id="buildPrompt">Build the word</div>
-<div class="helper">Tap letters in order to make the word</div>
-<div class="targetPreview" id="buildTargetPreview"></div>
-<div class="buildTarget" id="buildSlots"></div>
-<div class="letters" id="letterBank"></div>
-</div>
-
-<div id="stageMatch" class="stage">
-<div class="prompt" id="matchPrompt">Tap the picture that is the same</div>
-<div class="helper">Checks picture recognition and matching</div>
-<div class="targetPreview" id="matchTargetPreview"></div>
-<div class="cards4" id="matchBoard"></div>
+<div id="stageMatch" class="stage active">
+<div class="prompt" id="matchPrompt">Tap the same picture</div>
+<div class="helper">Picture matching and visual recognition</div>
+<div class="previewWrap" id="matchPreview"></div>
+<div class="board four" id="matchBoard"></div>
 </div>
 
 <div id="stageOrient" class="stage">
 <div class="prompt" id="orientPrompt">Tap the correct orientation</div>
-<div class="helper">Checks top / bottom / sleeve / neck understanding and object orientation</div>
-<div class="targetPreview" id="orientTargetPreview"></div>
-<div class="cards4" id="orientBoard"></div>
+<div class="helper">Uses pictures, not words, to test top / bottom / sleeve / neck / object direction</div>
+<div class="previewWrap" id="orientPreview"></div>
+<div class="board four" id="orientBoard"></div>
+</div>
+
+<div id="stageProcess" class="stage">
+<div class="prompt" id="processPrompt">Tap the colour I say</div>
+<div class="helper">Simple processing speed and attention training</div>
+<div class="processArea">
+<div class="previewCard" id="processCue">BLUE</div>
+<div class="processGrid" id="processGrid"></div>
+</div>
+</div>
+
+<div id="stageBuild" class="stage">
+<div class="prompt" id="buildPrompt">Build the word</div>
+<div class="helper">Checks letter selection and word making</div>
+<div class="previewWrap" id="buildPreview"></div>
+<div class="wordTarget" id="buildSlots"></div>
+<div class="letterBank" id="letterBank"></div>
 </div>
 
 <div id="stageResults" class="stage">
 <div class="prompt">Results</div>
-<div class="helper">Quick interpretation for bedside use</div>
+<div class="helper">Quick bedside summary</div>
 <div class="resultsGrid">
-<div class="resultCard"><strong>Reading</strong><div id="resRead"></div></div>
-<div class="resultCard"><strong>Word Build</strong><div id="resBuild"></div></div>
 <div class="resultCard"><strong>Matching</strong><div id="resMatch"></div></div>
 <div class="resultCard"><strong>Orientation</strong><div id="resOrient"></div></div>
+<div class="resultCard"><strong>Processing</strong><div id="resProcess"></div></div>
+<div class="resultCard"><strong>Word Build</strong><div id="resBuild"></div></div>
 </div>
-<textarea id="clinicalSummary" class="noteBox" readonly></textarea>
+<textarea class="noteBox" id="clinicalSummary" readonly></textarea>
+</div>
+
+<div id="stageEdit" class="stage">
+<div class="prompt">Edit</div>
+<div class="helper">Change prompts, labels and photos for this patient</div>
+<div class="editGrid">
+<div class="editCard">
+<h4>Edit item</h4>
+<div class="field">
+<label>Item</label>
+<select id="editItem"></select>
+</div>
+<div class="field">
+<label>Label</label>
+<input id="editLabel" />
+</div>
+<div class="field">
+<label>Photo</label>
+<input id="editPhoto" type="file" accept="image/*" />
+</div>
+<button class="btn" id="saveItemBtn" type="button">Save item</button>
+</div>
+
+<div class="editCard">
+<h4>Edit prompts</h4>
+<div class="field">
+<label>Matching prompt</label>
+<input id="editMatchPrompt" />
+</div>
+<div class="field">
+<label>Orientation prompt</label>
+<input id="editOrientPrompt" />
+</div>
+<div class="field">
+<label>Processing prompt</label>
+<input id="editProcessPrompt" />
+</div>
+<div class="field">
+<label>Word build prompt</label>
+<input id="editBuildPrompt" />
+</div>
+<button class="btn" id="savePromptsBtn" type="button">Save prompts</button>
+</div>
+</div>
 </div>
 
 <div class="feedback" id="feedback"></div>
@@ -475,26 +581,58 @@ resize:none;
 </div>
 
 <script>
-const ITEMS = {
-drink:{word:"DRINK", img:"drink.png"},
-toilet:{word:"TOILET", img:"toilet.png"},
-food:{word:"FOOD", img:"food.png"},
-help:{word:"HELP", img:"help.png"},
-nurse:{word:"NURSE", img:"nurse.png"},
-doctor:{word:"DOCTOR", img:"doctor.png"},
-sit:{word:"SIT", img:"sit.png"},
-stop:{word:"STOP", img:"stop.png"},
-sleeve:{word:"SLEEVE", img:"clothes.png"},
-neck:{word:"NECK", img:"clothes.png"},
-top:{word:"TOP", img:"clothes.png"},
-bottom:{word:"BOTTOM", img:"clothes.png"}
+const STORAGE_KEY = "mcu_rehab_game_v1";
+
+const defaultData = {
+prompts:{
+match:"Tap the same picture",
+orient:"Tap the correct orientation",
+process:"Tap the colour I say",
+build:"Build the word"
+},
+items:{
+drink:{label:"Drink", img:"drink.png"},
+toilet:{label:"Toilet", img:"toilet.png"},
+food:{label:"Food", img:"food.png"},
+help:{label:"Help", img:"help.png"},
+nurse:{label:"Nurse", img:"nurse.png"},
+doctor:{label:"Doctor", img:"doctor.png"},
+sit:{label:"Sit", img:"sit.png"},
+stop:{label:"Stop", img:"stop.png"},
+shirt_top:{label:"Top side", img:"clothes.png"},
+shirt_bottom:{label:"Bottom side", img:"clothes.png"},
+shirt_sleeve:{label:"Sleeve", img:"clothes.png"},
+shirt_neck:{label:"Neck hole", img:"clothes.png"},
+arrow_up:{label:"Up", img:"outofbed.png"},
+arrow_down:{label:"Down", img:"inbed.png"},
+arrow_left:{label:"Left", img:"repeat.png"},
+arrow_right:{label:"Right", img:"slowdown.png"}
+}
 };
 
-const READ_TASKS = [
+let appData = loadData();
+
+const stats = {
+match:{correct:0,total:0},
+orient:{correct:0,total:0},
+process:{correct:0,total:0},
+build:{correct:0,total:0}
+};
+
+const MATCH_TASKS = [
 {answer:"drink", options:["drink","toilet","food","help"]},
-{answer:"toilet", options:["drink","toilet","food","help"]},
-{answer:"nurse", options:["nurse","doctor","help","food"]},
-{answer:"stop", options:["stop","sit","help","drink"]}
+{answer:"toilet", options:["toilet","drink","food","help"]},
+{answer:"nurse", options:["nurse","doctor","help","drink"]},
+{answer:"sit", options:["sit","stop","drink","help"]}
+];
+
+const ORIENT_TASKS = [
+{answer:"shirt_top", options:["shirt_top","shirt_bottom","shirt_sleeve","shirt_neck"]},
+{answer:"shirt_bottom", options:["shirt_bottom","shirt_top","shirt_sleeve","shirt_neck"]},
+{answer:"shirt_sleeve", options:["shirt_sleeve","shirt_neck","shirt_top","shirt_bottom"]},
+{answer:"shirt_neck", options:["shirt_neck","shirt_sleeve","shirt_top","shirt_bottom"]},
+{answer:"arrow_up", options:["arrow_up","arrow_down","arrow_left","arrow_right"]},
+{answer:"arrow_left", options:["arrow_left","arrow_right","arrow_up","arrow_down"]}
 ];
 
 const BUILD_TASKS = [
@@ -504,38 +642,36 @@ const BUILD_TASKS = [
 {answer:"sit"}
 ];
 
-const MATCH_TASKS = [
-{answer:"drink", options:["drink","toilet","food","help"]},
-{answer:"toilet", options:["toilet","drink","food","help"]},
-{answer:"nurse", options:["nurse","doctor","help","drink"]},
-{answer:"sit", options:["sit","stop","help","drink"]}
+const PROCESS_TASKS = [
+{answer:"BLUE", choices:["BLUE","ORANGE","GREEN","PINK"]},
+{answer:"GREEN", choices:["BLUE","ORANGE","GREEN","PINK"]},
+{answer:"PINK", choices:["BLUE","ORANGE","GREEN","PINK"]},
+{answer:"ORANGE", choices:["BLUE","ORANGE","GREEN","PINK"]}
 ];
 
-const ORIENT_TASKS = [
-{answer:"top", options:["top","bottom","sleeve","neck"], prompt:"Tap TOP"},
-{answer:"bottom", options:["bottom","top","sleeve","neck"], prompt:"Tap BOTTOM"},
-{answer:"sleeve", options:["sleeve","neck","top","bottom"], prompt:"Tap SLEEVE"},
-{answer:"neck", options:["neck","sleeve","top","bottom"], prompt:"Tap NECK"}
-];
-
-const stats = {
-read:{correct:0,total:0},
-build:{correct:0,total:0},
-match:{correct:0,total:0},
-orient:{correct:0,total:0}
-};
-
-let mode = "read";
-let currentTask = null;
+let mode = "match";
 let rounds = 0;
 let correct = 0;
-let choiceCount = 2;
+let choiceCount = 4;
+let currentTask = null;
 let buildProgress = [];
 
-const feedback = document.getElementById("feedback");
 const modeLabel = document.getElementById("modeLabel");
 const roundsEl = document.getElementById("rounds");
 const correctEl = document.getElementById("correct");
+const feedback = document.getElementById("feedback");
+
+function loadData(){
+try{
+const raw = localStorage.getItem(STORAGE_KEY);
+if(raw) return JSON.parse(raw);
+}catch(e){}
+return JSON.parse(JSON.stringify(defaultData));
+}
+
+function saveData(){
+localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
 
 function shuffle(arr){
 return [...arr].sort(()=>Math.random()-0.5);
@@ -556,7 +692,7 @@ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 }
 
-function setActiveStage(id){
+function setStage(id){
 document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 feedback.textContent = "";
@@ -568,116 +704,165 @@ roundsEl.textContent = rounds;
 correctEl.textContent = correct;
 }
 
-function makePreview(containerId, itemKey, showWord=false){
-const container = document.getElementById(containerId);
-container.innerHTML = "";
-const card = document.createElement("div");
-card.className = "previewCard";
-if(showWord){
-card.textContent = ITEMS[itemKey].word;
-}else{
-const img = document.createElement("img");
-img.src = ITEMS[itemKey].img;
-img.alt = "";
-card.appendChild(img);
-}
-container.appendChild(card);
-}
-
-function makeCard(itemKey, colorClass, showWord=false, labelText=null, onTap=null){
-const btn = document.createElement("button");
-btn.className = `gameCard ${colorClass}`;
-btn.type = "button";
-
-const media = document.createElement("div");
-media.className = "cardMedia";
-
-if(showWord){
-const word = document.createElement("div");
-word.className = "wordBox";
-word.textContent = ITEMS[itemKey].word;
-media.appendChild(word);
-}else{
-const box = document.createElement("div");
-box.className = "imgBox";
-const img = document.createElement("img");
-img.src = ITEMS[itemKey].img;
-img.alt = "";
-box.appendChild(img);
-media.appendChild(box);
-}
-
-const label = document.createElement("div");
-label.className = "miniLabel";
-label.textContent = labelText || ITEMS[itemKey].word;
-
-btn.appendChild(media);
-btn.appendChild(label);
-
-if(onTap) btn.addEventListener("click", onTap);
-return btn;
-}
-
 function setFeedback(text, good=true){
 feedback.textContent = text;
 feedback.className = "feedback " + (good ? "good" : "bad");
 }
 
-function markResult(bucket, wasCorrect){
+function markResult(bucket, ok){
 stats[bucket].total += 1;
 rounds += 1;
-if(wasCorrect){
+if(ok){
 stats[bucket].correct += 1;
 correct += 1;
 }
 updateTop();
 }
 
-function startRead(){
-mode = "read";
-modeLabel.textContent = "Reading";
-setActiveTab("tabRead");
-setActiveStage("stageRead");
-
-currentTask = READ_TASKS[Math.floor(Math.random()*READ_TASKS.length)];
-document.getElementById("readPrompt").textContent = "Tap the picture for " + ITEMS[currentTask.answer].word;
-document.getElementById("readHelper").textContent = "Word is the target. Pictures are the choices.";
-makePreview("readTargetPreview", currentTask.answer, true);
-
-const board = document.getElementById("readBoard");
-board.className = choiceCount === 2 ? "cards2" : "cards4";
-board.innerHTML = "";
-const opts = shuffle(currentTask.options).slice(0, choiceCount);
-
-while(!opts.includes(currentTask.answer)){
-opts[Math.floor(Math.random()*opts.length)] = currentTask.answer;
+function preview(containerId, itemKey){
+const wrap = document.getElementById(containerId);
+wrap.innerHTML = "";
+const card = document.createElement("div");
+card.className = "previewCard";
+const img = document.createElement("img");
+img.src = appData.items[itemKey].img;
+img.alt = "";
+card.appendChild(img);
+wrap.appendChild(card);
 }
 
-shuffle(opts).forEach((key, i)=>{
-board.appendChild(
-makeCard(key, ["c1","c2","c3","c4"][i], false, ITEMS[key].word, ()=>{
+function makeCard(key, cls, onTap){
+const item = appData.items[key];
+const btn = document.createElement("button");
+btn.className = `gameCard ${cls}`;
+btn.type = "button";
+
+const media = document.createElement("div");
+media.className = "media";
+
+const box = document.createElement("div");
+box.className = "imgBox";
+
+const img = document.createElement("img");
+img.src = item.img;
+img.alt = "";
+box.appendChild(img);
+media.appendChild(box);
+
+const label = document.createElement("div");
+label.className = "label";
+label.textContent = item.label;
+
+btn.appendChild(media);
+btn.appendChild(label);
+btn.addEventListener("click", onTap);
+return btn;
+}
+
+function startMatch(){
+mode = "match";
+modeLabel.textContent = "Matching";
+setActiveTab("tabMatch");
+setStage("stageMatch");
+
+document.getElementById("matchPrompt").textContent = appData.prompts.match;
+currentTask = MATCH_TASKS[Math.floor(Math.random()*MATCH_TASKS.length)];
+preview("matchPreview", currentTask.answer);
+
+const board = document.getElementById("matchBoard");
+board.className = choiceCount === 2 ? "board two" : "board four";
+board.innerHTML = "";
+
+let opts = shuffle(currentTask.options).slice(0, choiceCount);
+if(!opts.includes(currentTask.answer)){
+opts[Math.floor(Math.random()*opts.length)] = currentTask.answer;
+}
+opts = shuffle(opts);
+
+opts.forEach((key, i)=>{
+board.appendChild(makeCard(key, ["c1","c2","c3","c4"][i], ()=>{
 const ok = key === currentTask.answer;
-markResult("read", ok);
+markResult("match", ok);
 setFeedback(ok ? "Correct" : "Try again", ok);
-})
-);
+}));
 });
+}
+
+function startOrient(){
+mode = "orient";
+modeLabel.textContent = "Orientation";
+setActiveTab("tabOrient");
+setStage("stageOrient");
+
+document.getElementById("orientPrompt").textContent = appData.prompts.orient;
+currentTask = ORIENT_TASKS[Math.floor(Math.random()*ORIENT_TASKS.length)];
+preview("orientPreview", currentTask.answer);
+
+const board = document.getElementById("orientBoard");
+board.innerHTML = "";
+board.className = "board four";
+
+shuffle(currentTask.options).forEach((key, i)=>{
+board.appendChild(makeCard(key, ["c1","c2","c3","c4"][i], ()=>{
+const ok = key === currentTask.answer;
+markResult("orient", ok);
+setFeedback(ok ? "Correct" : "Try again", ok);
+}));
+});
+}
+
+function startProcess(){
+mode = "process";
+modeLabel.textContent = "Processing";
+setActiveTab("tabProcess");
+setStage("stageProcess");
+
+document.getElementById("processPrompt").textContent = appData.prompts.process;
+currentTask = PROCESS_TASKS[Math.floor(Math.random()*PROCESS_TASKS.length)];
+
+const cue = document.getElementById("processCue");
+cue.textContent = currentTask.answer;
+cue.style.background = "#fff";
+
+const grid = document.getElementById("processGrid");
+grid.innerHTML = "";
+
+const map = {
+BLUE:"p1",
+ORANGE:"p2",
+GREEN:"p3",
+PINK:"p4"
+};
+
+shuffle(currentTask.choices).forEach(name=>{
+const btn = document.createElement("button");
+btn.className = `processBtn ${map[name]}`;
+btn.type = "button";
+btn.setAttribute("aria-label", name);
+btn.addEventListener("click", ()=>{
+const ok = name === currentTask.answer;
+markResult("process", ok);
+setFeedback(ok ? "Correct" : "Try again", ok);
+});
+grid.appendChild(btn);
+});
+
+speak(currentTask.answer);
 }
 
 function startBuild(){
 mode = "build";
 modeLabel.textContent = "Word Build";
 setActiveTab("tabBuild");
-setActiveStage("stageBuild");
+setStage("stageBuild");
 
+document.getElementById("buildPrompt").textContent = appData.prompts.build;
 currentTask = BUILD_TASKS[Math.floor(Math.random()*BUILD_TASKS.length)];
 buildProgress = [];
 
-document.getElementById("buildPrompt").textContent = "Build " + ITEMS[currentTask.answer].word;
-document.getElementById("buildHelper")?.remove;
-makePreview("buildTargetPreview", currentTask.answer, false);
+preview("buildPreview", currentTask.answer);
 
-const targetWord = ITEMS[currentTask.answer].word;
+const targetWord = appData.items[currentTask.answer].label.toUpperCase();
 const slots = document.getElementById("buildSlots");
 const bank = document.getElementById("letterBank");
 slots.innerHTML = "";
@@ -690,8 +875,8 @@ slots.appendChild(s);
 }
 
 let letters = targetWord.split("");
-while(letters.length < Math.max(6, targetWord.length + 2)){
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+while(letters.length < Math.max(6, targetWord.length + 2)){
 letters.push(alphabet[Math.floor(Math.random()*alphabet.length)]);
 }
 letters = shuffle(letters);
@@ -724,152 +909,147 @@ const slots = [...document.querySelectorAll("#buildSlots .slot")];
 slots.forEach((s,i)=> s.textContent = buildProgress[i] || "");
 }
 
-function startMatch(){
-mode = "match";
-modeLabel.textContent = "Matching";
-setActiveTab("tabMatch");
-setActiveStage("stageMatch");
-
-currentTask = MATCH_TASKS[Math.floor(Math.random()*MATCH_TASKS.length)];
-document.getElementById("matchPrompt").textContent = "Tap the same picture";
-document.getElementById("matchHelper")?.remove;
-makePreview("matchTargetPreview", currentTask.answer, false);
-
-const board = document.getElementById("matchBoard");
-board.className = choiceCount === 2 ? "cards2" : "cards4";
-board.innerHTML = "";
-
-const opts = shuffle(currentTask.options).slice(0, choiceCount);
-while(!opts.includes(currentTask.answer)){
-opts[Math.floor(Math.random()*opts.length)] = currentTask.answer;
-}
-
-shuffle(opts).forEach((key, i)=>{
-board.appendChild(
-makeCard(key, ["c1","c2","c3","c4"][i], false, ITEMS[key].word, ()=>{
-const ok = key === currentTask.answer;
-markResult("match", ok);
-setFeedback(ok ? "Correct" : "Try again", ok);
-})
-);
-});
-}
-
-function startOrient(){
-mode = "orient";
-modeLabel.textContent = "Orientation";
-setActiveTab("tabOrient");
-setActiveStage("stageOrient");
-
-currentTask = ORIENT_TASKS[Math.floor(Math.random()*ORIENT_TASKS.length)];
-document.getElementById("orientPrompt").textContent = currentTask.prompt;
-document.getElementById("orientHelper")?.remove;
-makePreview("orientTargetPreview", currentTask.answer, true);
-
-const board = document.getElementById("orientBoard");
-board.className = "cards4";
-board.innerHTML = "";
-
-shuffle(currentTask.options).forEach((key, i)=>{
-board.appendChild(
-makeCard(key, ["c1","c2","c3","c4"][i], true, ITEMS[key].word, ()=>{
-const ok = key === currentTask.answer;
-markResult("orient", ok);
-setFeedback(ok ? "Correct" : "Try again", ok);
-})
-);
-});
-}
-
 function showResults(){
 mode = "results";
 modeLabel.textContent = "Results";
 setActiveTab("tabResults");
-setActiveStage("stageResults");
+setStage("stageResults");
 
-document.getElementById("resRead").textContent = `${stats.read.correct} / ${stats.read.total} correct`;
-document.getElementById("resBuild").textContent = `${stats.build.correct} / ${stats.build.total} correct`;
 document.getElementById("resMatch").textContent = `${stats.match.correct} / ${stats.match.total} correct`;
 document.getElementById("resOrient").textContent = `${stats.orient.correct} / ${stats.orient.total} correct`;
+document.getElementById("resProcess").textContent = `${stats.process.correct} / ${stats.process.total} correct`;
+document.getElementById("resBuild").textContent = `${stats.build.correct} / ${stats.build.total} correct`;
 
-const readRate = stats.read.total ? stats.read.correct / stats.read.total : 0;
-const buildRate = stats.build.total ? stats.build.correct / stats.build.total : 0;
 const matchRate = stats.match.total ? stats.match.correct / stats.match.total : 0;
 const orientRate = stats.orient.total ? stats.orient.correct / stats.orient.total : 0;
+const processRate = stats.process.total ? stats.process.correct / stats.process.total : 0;
+const buildRate = stats.build.total ? stats.build.correct / stats.build.total : 0;
 
-let summary = "Quick interpretation:\n";
+let txt = "Quick summary:\n";
 
-if(stats.read.total > 0){
-if(readRate < .5){
-summary += "- Reading task is reduced.\n";
-} else {
-summary += "- Reading task shows some preserved word recognition.\n";
-}
-}
-
-if(stats.build.total > 0){
-if(buildRate < .5){
-summary += "- Word building is reduced, suggesting difficulty with letter sequencing / word assembly.\n";
-} else {
-summary += "- Word building is relatively better than expected.\n";
-}
+if(stats.match.total){
+txt += matchRate < .5
+? "- Matching is reduced, suggesting visual recognition / discrimination difficulty.\n"
+: "- Matching is relatively preserved.\n";
 }
 
-if(stats.match.total > 0){
-if(matchRate < .5){
-summary += "- Matching is reduced, suggesting picture recognition / visual discrimination difficulty.\n";
-} else {
-summary += "- Matching is relatively preserved.\n";
-}
+if(stats.orient.total){
+txt += orientRate < .5
+? "- Orientation tasks are reduced, suggesting perceptual and/or praxis difficulty with object direction and clothing parts.\n"
+: "- Orientation tasks are relatively better.\n";
 }
 
-if(stats.orient.total > 0){
-if(orientRate < .5){
-summary += "- Orientation task is reduced, suggesting perceptual / praxis difficulty with top-bottom / sleeve-neck concepts.\n";
-} else {
-summary += "- Orientation task is relatively preserved.\n";
-}
+if(stats.process.total){
+txt += processRate < .5
+? "- Processing task is reduced, suggesting slower attention and response speed.\n"
+: "- Processing speed task is relatively better.\n";
 }
 
-summary += "\nUseful strategy ideas:\n";
-summary += "- Keep only 2 choices when accuracy drops.\n";
-summary += "- Use picture target before word target if reading is weak.\n";
-summary += "- If word building is poor, use whole-word recognition rather than asking her to construct words.\n";
-summary += "- If orientation is poor, use real clothing with visual markers on neck and sleeves.\n";
-
-document.getElementById("clinicalSummary").value = summary;
+if(stats.build.total){
+txt += buildRate < .5
+? "- Word building is reduced, suggesting difficulty with letter sequencing or word assembly.\n"
+: "- Word building is relatively better.\n";
 }
 
-document.getElementById("tabRead").addEventListener("click", startRead);
-document.getElementById("tabBuild").addEventListener("click", startBuild);
-document.getElementById("tabMatch").addEventListener("click", startMatch);
-document.getElementById("tabOrient").addEventListener("click", startOrient);
-document.getElementById("tabResults").addEventListener("click", showResults);
+txt += "\nStrategy ideas:\n";
+txt += "- Keep tasks to 2 choices when accuracy drops.\n";
+txt += "- Use picture-based orientation tasks rather than verbal-only instruction.\n";
+txt += "- For dressing, highlight neck and sleeves on real clothing.\n";
+txt += "- For processing, use one cue at a time and reduce background distraction.\n";
+txt += "- If word building is poor, use recognition rather than spelling demands.\n";
 
-document.getElementById("speakBtn").addEventListener("click", ()=>{
-if(mode === "read"){
-speak(document.getElementById("readPrompt").textContent);
-} else if(mode === "build"){
-speak(document.getElementById("buildPrompt").textContent);
-} else if(mode === "match"){
-speak(document.getElementById("matchPrompt").textContent);
-} else if(mode === "orient"){
-speak(document.getElementById("orientPrompt").textContent);
+document.getElementById("clinicalSummary").value = txt;
+}
+
+function showEdit(){
+mode = "edit";
+modeLabel.textContent = "Edit";
+setActiveTab("tabEdit");
+setStage("stageEdit");
+populateEdit();
+}
+
+function populateEdit(){
+const sel = document.getElementById("editItem");
+sel.innerHTML = "";
+Object.keys(appData.items).forEach(key=>{
+const opt = document.createElement("option");
+opt.value = key;
+opt.textContent = key;
+sel.appendChild(opt);
+});
+loadEditItem();
+
+document.getElementById("editMatchPrompt").value = appData.prompts.match;
+document.getElementById("editOrientPrompt").value = appData.prompts.orient;
+document.getElementById("editProcessPrompt").value = appData.prompts.process;
+document.getElementById("editBuildPrompt").value = appData.prompts.build;
+}
+
+function loadEditItem(){
+const key = document.getElementById("editItem").value;
+document.getElementById("editLabel").value = appData.items[key].label;
+document.getElementById("editPhoto").value = "";
+}
+
+document.getElementById("editItem").addEventListener("change", loadEditItem);
+
+document.getElementById("saveItemBtn").addEventListener("click", ()=>{
+const key = document.getElementById("editItem").value;
+const label = document.getElementById("editLabel").value.trim();
+if(label) appData.items[key].label = label;
+
+const file = document.getElementById("editPhoto").files[0];
+if(file){
+const r = new FileReader();
+r.onload = ()=>{
+appData.items[key].img = r.result;
+saveData();
+setFeedback("Item saved", true);
+};
+r.readAsDataURL(file);
+}else{
+saveData();
+setFeedback("Item saved", true);
 }
 });
 
+document.getElementById("savePromptsBtn").addEventListener("click", ()=>{
+appData.prompts.match = document.getElementById("editMatchPrompt").value.trim() || appData.prompts.match;
+appData.prompts.orient = document.getElementById("editOrientPrompt").value.trim() || appData.prompts.orient;
+appData.prompts.process = document.getElementById("editProcessPrompt").value.trim() || appData.prompts.process;
+appData.prompts.build = document.getElementById("editBuildPrompt").value.trim() || appData.prompts.build;
+saveData();
+setFeedback("Prompts saved", true);
+});
+
+document.getElementById("tabMatch").addEventListener("click", startMatch);
+document.getElementById("tabOrient").addEventListener("click", startOrient);
+document.getElementById("tabProcess").addEventListener("click", startProcess);
+document.getElementById("tabBuild").addEventListener("click", startBuild);
+document.getElementById("tabResults").addEventListener("click", showResults);
+document.getElementById("tabEdit").addEventListener("click", showEdit);
+
+document.getElementById("speakBtn").addEventListener("click", ()=>{
+if(mode === "match") speak(appData.prompts.match);
+if(mode === "orient") speak(appData.prompts.orient);
+if(mode === "process") speak(currentTask?.answer || appData.prompts.process);
+if(mode === "build") speak(appData.prompts.build);
+});
+
 document.getElementById("nextBtn").addEventListener("click", ()=>{
-if(mode === "read") startRead();
-if(mode === "build") startBuild();
 if(mode === "match") startMatch();
 if(mode === "orient") startOrient();
+if(mode === "process") startProcess();
+if(mode === "build") startBuild();
+if(mode === "results") showResults();
+if(mode === "edit") showEdit();
 });
 
 document.getElementById("twoChoiceBtn").addEventListener("click", function(){
 choiceCount = 2;
 this.classList.add("on");
 document.getElementById("fourChoiceBtn").classList.remove("on");
-if(mode === "read") startRead();
 if(mode === "match") startMatch();
 });
 
@@ -877,7 +1057,6 @@ document.getElementById("fourChoiceBtn").addEventListener("click", function(){
 choiceCount = 4;
 this.classList.add("on");
 document.getElementById("twoChoiceBtn").classList.remove("on");
-if(mode === "read") startRead();
 if(mode === "match") startMatch();
 });
 
@@ -890,19 +1069,24 @@ rounds = 0;
 correct = 0;
 updateTop();
 setFeedback("", true);
-if(mode === "read") startRead();
-if(mode === "build") startBuild();
 if(mode === "match") startMatch();
 if(mode === "orient") startOrient();
+if(mode === "process") startProcess();
+if(mode === "build") startBuild();
 if(mode === "results") showResults();
 });
+
+function updateTop(){
+roundsEl.textContent = rounds;
+correctEl.textContent = correct;
+}
 
 document.addEventListener("contextmenu", e=>e.preventDefault());
 document.addEventListener("dragstart", e=>e.preventDefault());
 
+document.getElementById("fourChoiceBtn").classList.add("on");
 updateTop();
-document.getElementById("twoChoiceBtn").classList.add("on");
-startRead();
+startMatch();
 </script>
 </body>
 </html>
