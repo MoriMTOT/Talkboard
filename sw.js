@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mcu-talkboard-final-v20';
+const CACHE_NAME='talkboard-wordclean-v12';
 const CORE_FILES = [
   './',
   './index.html',
